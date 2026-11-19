@@ -255,6 +255,115 @@ async function ensureVerticalRatio(page) {
 }
 
 /**
+ * Watch for and automatically approve Google Flow credit confirmation dialogs:
+ * e.g., "Would you like me to kick off this 1 video generation, costing 12 credits?"
+ * Buttons: "Always approve in project" | "Approve" | "Reject"
+ *
+ * Prioritizes "Always approve in project" first, falling back to "Approve".
+ * Never clicks "Reject".
+ */
+async function handleCreditConfirmationDialog(page) {
+  if (!page) return false;
+
+  try {
+    // 1. Check if credit confirmation dialog text is present in the DOM
+    const dialogPrompt = await page.evaluate(() => {
+      const candidates = Array.from(document.querySelectorAll('p, span, div, h1, h2, h3, h4'));
+      for (const el of candidates) {
+        const text = (el.innerText || el.textContent || '').trim();
+        if (text.includes('credits') && (text.includes('kick off') || text.includes('generation') || text.includes('costing'))) {
+          return text.replace(/\s+/g, ' ').slice(0, 150);
+        }
+      }
+      return null;
+    }).catch(() => null);
+
+    if (dialogPrompt) {
+      console.log(`[LocalRunner] Credit confirmation dialog detected: "${dialogPrompt}"`);
+    }
+
+    // 2. Primary target: "Always approve in project" (prevents future prompts in this project)
+    const alwaysApproveSelectors = [
+      'button:has-text("Always approve in project")',
+      'button:has-text("Always approve")',
+      'div[role="button"]:has-text("Always approve in project")',
+      'div[role="button"]:has-text("Always approve")',
+      '[aria-label*="Always approve in project" i]',
+      '[aria-label*="Always approve" i]',
+      'button:text-matches("always approve", "i")'
+    ];
+
+    for (const sel of alwaysApproveSelectors) {
+      const btn = page.locator(sel).first();
+      if (await btn.isVisible().catch(() => false)) {
+        console.log(`[LocalRunner] Clicking "Always approve in project" button via "${sel}"...`);
+        await btn.click({ force: true }).catch(() => {});
+        await page.waitForTimeout(1000);
+        return true;
+      }
+    }
+
+    // 3. Fallback target: "Approve" (single generation confirmation)
+    const approveSelectors = [
+      'button:text-is("Approve")',
+      'button:text-matches("^\\s*Approve\\s*$", "i")',
+      'div[role="button"]:text-is("Approve")',
+      'div[role="button"]:text-matches("^\\s*Approve\\s*$", "i")',
+      '[aria-label="Approve" i]',
+      'button:has-text("Approve")',
+      'div[role="button"]:has-text("Approve")'
+    ];
+
+    for (const sel of approveSelectors) {
+      const btn = page.locator(sel).first();
+      if (await btn.isVisible().catch(() => false)) {
+        const btnText = (await btn.innerText().catch(() => '')).trim();
+        // Skip "Reject" or other unrelated buttons
+        if (btnText.toLowerCase().includes('reject')) continue;
+        console.log(`[LocalRunner] Clicking fallback "Approve" button via "${sel}" (label: "${btnText}")...`);
+        await btn.click({ force: true }).catch(() => {});
+        await page.waitForTimeout(1000);
+        return true;
+      }
+    }
+
+    // 4. In-depth DOM traversal fallback (in case elements are inside custom web components or shadow roots)
+    const domClicked = await page.evaluate(() => {
+      const clickables = Array.from(document.querySelectorAll('button, div[role="button"], span[role="button"], a[role="button"]'));
+
+      // Try "always approve" first
+      for (const el of clickables) {
+        const text = (el.innerText || el.textContent || '').trim().toLowerCase();
+        if (text.includes('always approve') && el.offsetParent !== null) {
+          el.click();
+          return 'Always approve in project (DOM)';
+        }
+      }
+
+      // Try "approve" next
+      for (const el of clickables) {
+        const text = (el.innerText || el.textContent || '').trim().toLowerCase();
+        if ((text === 'approve' || text.startsWith('approve')) && !text.includes('reject') && el.offsetParent !== null) {
+          el.click();
+          return 'Approve (DOM)';
+        }
+      }
+      return null;
+    }).catch(() => null);
+
+    if (domClicked) {
+      console.log(`[LocalRunner] Auto-approved credit dialog via ${domClicked}.`);
+      await page.waitForTimeout(1000);
+      return true;
+    }
+  } catch (err) {
+    // Non-blocking catch
+  }
+
+  return false;
+}
+
+/**
  * Automate Google Flow / Veo via Playwright
  */
 async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, options) {
@@ -317,6 +426,7 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
     await ensureGoogleFlowWorkspace(page);
     await ensureVideoMode(page);
     await ensureVerticalRatio(page);
+    await handleCreditConfirmationDialog(page);
 
     const downloadedHashes = new Set();
 
@@ -350,6 +460,7 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
       // Check workspace state before prompt input
       await ensureGoogleFlowWorkspace(page);
       await ensureVideoMode(page);
+      await handleCreditConfirmationDialog(page);
 
       // Snapshot all video sources currently in the DOM before submitting new prompt
       const priorVideoSrcs = new Set(
@@ -455,12 +566,21 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
             await page.keyboard.press('Control+Enter');
           }
 
+          // Credit confirmation dialog check right after prompt submission
+          await page.waitForTimeout(1500);
+          await handleCreditConfirmationDialog(page);
+          await page.waitForTimeout(1000);
+          await handleCreditConfirmationDialog(page);
+
           console.log(`[LocalRunner] Waiting for Veo generation to complete (up to ${options.timeoutMs / 1000}s)...`);
           const startTime = Date.now();
           let videoFound = false;
 
           while (Date.now() - startTime < options.timeoutMs) {
             await page.waitForTimeout(4000);
+
+            // Periodically check and auto-approve credit confirmation dialog if it popped up during queuing
+            await handleCreditConfirmationDialog(page);
 
             // 1. Inspect DOM video elements for a NEW video src not present before submission
             const currentVideos = await page.locator('video').evaluateAll(vids => {
@@ -743,6 +863,7 @@ if (require.main === module) {
 module.exports = {
   runLocalAutomation,
   generateClipsViaGoogleFlow,
+  handleCreditConfirmationDialog,
   standardizeClip,
   extractThumbnailFrame
 };
