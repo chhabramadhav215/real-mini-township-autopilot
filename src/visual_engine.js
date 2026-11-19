@@ -219,7 +219,7 @@ async function generateKeyframe(stage, townKey, episode, townSeed, outputDir) {
   }
 
   const prompt = stage.image_prompt || 
-    `Extreme macro 45-degree isometric tilt-shift photography on a Sony A7RV 90mm f/2.8 lens: Real adult craftsman male hands with rolled dark denim sleeves and silver wristwatch holding ${stage.tool || 'miniature tool'} and ${stage.action || 'building road'} on wooden workbench diorama. Photorealistic, 8k resolution, razor sharp focus.`;
+    `In a detailed 1:87 HO-scale miniature town diorama under active construction on a craftsman studio workbench: visible surrounding miniature infrastructure with tiny brick townhouses, micro paved asphalt streets, tiny streetlamps, and green cutting mat. Giant real adult craftsman male hands with silver wristwatch actively holding ${stage.tool || 'miniature tool'} and ${stage.action || 'building road'}. Extreme macro 45-degree isometric tilt-shift photography on a Sony A7RV 90mm f/2.8 lens, razor sharp focus, creamy bokeh, warm 5500K studio lighting, 8k resolution.`;
 
   const hfToken = process.env.HF_TOKEN;
 
@@ -408,10 +408,10 @@ async function tryHFI2VSpaces(firstFramePath, lastFramePath, motionPrompt, hfTok
 }
 
 /**
- * Continuous Working Motion Video Synthesizer (Zero Frozen Photos)
- * Generates an intermediate micro-action frame showing craftsman hands in vigorous mid-stroke action,
- * then renders a multi-stream dynamic construction video with active tool vibration (8-12Hz micro-oscillations),
- * progressive directional construction wipes, and Sony A7RV 90mm macro lens depth-of-field breathing.
+ * Continuous Working Motion Video Synthesizer (Zero Frozen Photos / Zero Jitter)
+ * Generates an intermediate micro-action frame showing craftsman hands in smooth mid-stroke action,
+ * then renders a multi-stream buttery-smooth motorized macro slider sequence with organic lens breathing
+ * and cinematic crossfades.
  */
 async function createContinuousWorkingMotionVideo(firstFramePath, lastFramePath, stage, townSeed, destVideoPath, transitionsDir) {
   console.log(`[VisualEngine] Synthesizing continuous working motion video -> ${path.basename(destVideoPath)}`);
@@ -422,7 +422,7 @@ async function createContinuousWorkingMotionVideo(firstFramePath, lastFramePath,
   if (!fs.existsSync(actionFramePath) || fs.statSync(actionFramePath).size < 10000) {
     try {
       console.log(`[VisualEngine] Generating intermediate mid-action working frame for Stage ${stage.stage_num}...`);
-      const actionPrompt = `Extreme macro 45-degree isometric tilt-shift photography on a Sony A7RV 90mm f/2.8 lens: Real adult craftsman male hands with visible skin pores, subtle soil dust on knuckles, and matte silver wristwatch mid-action vigorously using ${stage.tool} to ${stage.action} on the wooden diorama table. Real hands in active physical working motion, miniature loose dirt and gravel particles shifting, tool actively pressed into surface, locked tripod view, razor-sharp macro focus, shallow depth of field, 8k resolution.`;
+      const actionPrompt = `In a detailed 1:87 HO-scale miniature town diorama under active construction on a studio craftsman workbench: visible surrounding miniature infrastructure with tiny brick townhouses, micro asphalt streets, tiny streetlamps, and cutting mat. Giant real adult craftsman male hands with visible skin pores and matte silver wristwatch mid-action smoothly using ${stage.tool} to ${stage.action}. Extreme macro 45-degree isometric tilt-shift photography on a Sony A7RV 90mm f/2.8 lens, locked tripod perspective, razor-sharp focus on the miniature worksite, creamy cinematic background bokeh, warm 5500K studio dual-softbox lighting, 8k resolution, ultra-detailed scale model crafting.`;
       await tryPollinationsFlux(actionPrompt, townSeed + stage.stage_num * 17, actionFramePath);
     } catch (e) {
       console.warn(`[VisualEngine] Action frame generation notice: ${e.message}`);
@@ -432,56 +432,56 @@ async function createContinuousWorkingMotionVideo(firstFramePath, lastFramePath,
   const hasActionFrame = fs.existsSync(actionFramePath) && fs.statSync(actionFramePath).size > 10000;
 
   if (hasActionFrame) {
-    // 3-Frame Progressive Construction Motion Sequence:
-    // Stream 0 (firstFramePath): Hands enter and camera pushes in (0 to 1.8s)
-    // Stream 1 (actionFramePath): Active vigorous tool vibration & material shifting (0 to 1.8s)
-    // Stream 2 (lastFramePath): Completed structure with macro settle (0 to 1.6s)
-    console.log(`[VisualEngine] Compiling 3-frame dynamic working construction sequence (30fps)...`);
+    // 3-Frame Progressive Construction Motion Sequence (Smooth Motorized Slider + Organic Breathing):
+    // Stream 0 (firstFramePath): Hands enter and camera slides in (0 to 2.2s)
+    // Stream 1 (actionFramePath): Smooth worksite action slide with gentle organic breathing (0 to 2.2s)
+    // Stream 2 (lastFramePath): Completed structure with smooth macro pull-back (0 to 2.0s)
+    console.log(`[VisualEngine] Compiling 3-frame smooth cinematic motion sequence (30fps)...`);
     const filterComplex = [
-      '[0:v]scale=1200:2133:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-out_w)/2+12*sin(t*3):(in_h-out_h)/2+8*cos(t*3.5),format=yuv420p,settb=AVTB,setpts=PTS-STARTPTS[v0]',
-      '[1:v]scale=1200:2133:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-out_w)/2+18*sin(t*9):(in_h-out_h)/2+14*cos(t*11),format=yuv420p,settb=AVTB,setpts=PTS-STARTPTS[v1]',
-      '[2:v]scale=1200:2133:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-out_w)/2+10*cos(t*2):(in_h-out_h)/2+6*sin(t*2.5),format=yuv420p,settb=AVTB,setpts=PTS-STARTPTS[v2]',
-      '[v0][v1]xfade=transition=smoothleft:duration=0.6:offset=1.2,format=yuv420p[m1]',
-      '[m1][v2]xfade=transition=wipeleft:duration=0.6:offset=2.4,format=yuv420p[outv]'
+      '[0:v]scale=1160:2062:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-out_w)/2+14*(t/2.2):(in_h-out_h)/2+2.5*sin(t*1.5),format=yuv420p,settb=AVTB,setpts=PTS-STARTPTS[v0]',
+      '[1:v]scale=1160:2062:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-out_w)/2-14*(t/2.2):(in_h-out_h)/2+2.5*cos(t*1.5),format=yuv420p,settb=AVTB,setpts=PTS-STARTPTS[v1]',
+      '[2:v]scale=1160:2062:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-out_w)/2+10*(t/2.0):(in_h-out_h)/2+2.0*sin(t*1.2),format=yuv420p,settb=AVTB,setpts=PTS-STARTPTS[v2]',
+      '[v0][v1]xfade=transition=dissolve:duration=0.7:offset=1.5,format=yuv420p[m1]',
+      '[m1][v2]xfade=transition=dissolve:duration=0.7:offset=3.0,format=yuv420p[outv]'
     ].join(';');
 
     const args = [
-      '-loop', '1', '-t', '1.8', '-i', firstFramePath,
-      '-loop', '1', '-t', '1.8', '-i', actionFramePath,
-      '-loop', '1', '-t', '1.6', '-i', lastFramePath,
+      '-loop', '1', '-t', '2.2', '-i', firstFramePath,
+      '-loop', '1', '-t', '2.2', '-i', actionFramePath,
+      '-loop', '1', '-t', '2.0', '-i', lastFramePath,
       '-filter_complex', filterComplex,
       '-map', '[outv]',
       '-r', '30',
       '-c:v', 'libx264',
       '-preset', 'veryfast',
-      '-crf', '22',
+      '-crf', '20',
       '-pix_fmt', 'yuv420p',
-      '-t', '3.4',
+      '-t', '4.4',
       '-y',
       destVideoPath
     ];
 
     await runFFmpeg(args);
   } else {
-    // 2-Frame Continuous Motion Sequence with continuous tracking & tool oscillation
-    console.log(`[VisualEngine] Compiling 2-frame continuous motion sequence (30fps)...`);
+    // 2-Frame Smooth Motorized Slider Sequence (Zero Jitter)
+    console.log(`[VisualEngine] Compiling 2-frame smooth motorized slider sequence (30fps)...`);
     const filterComplex = [
-      '[0:v]scale=1200:2133:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-out_w)/2+16*sin(t*8):(in_h-out_h)/2+12*cos(t*10),format=yuv420p,settb=AVTB,setpts=PTS-STARTPTS[v0]',
-      '[1:v]scale=1200:2133:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-out_w)/2+14*cos(t*9):(in_h-out_h)/2+16*sin(t*7),format=yuv420p,settb=AVTB,setpts=PTS-STARTPTS[v1]',
-      '[v0][v1]xfade=transition=smoothleft:duration=0.8:offset=1.8,format=yuv420p[outv]'
+      '[0:v]scale=1160:2062:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-out_w)/2+18*(t/2.6):(in_h-out_h)/2+2.5*sin(t*1.5),format=yuv420p,settb=AVTB,setpts=PTS-STARTPTS[v0]',
+      '[1:v]scale=1160:2062:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-out_w)/2-18*(t/2.4):(in_h-out_h)/2+2.5*cos(t*1.5),format=yuv420p,settb=AVTB,setpts=PTS-STARTPTS[v1]',
+      '[v0][v1]xfade=transition=dissolve:duration=0.8:offset=1.8,format=yuv420p[outv]'
     ].join(';');
 
     const args = [
       '-loop', '1', '-t', '2.6', '-i', firstFramePath,
-      '-loop', '1', '-t', '2.2', '-i', lastFramePath,
+      '-loop', '1', '-t', '2.4', '-i', lastFramePath,
       '-filter_complex', filterComplex,
       '-map', '[outv]',
       '-r', '30',
       '-c:v', 'libx264',
       '-preset', 'veryfast',
-      '-crf', '22',
+      '-crf', '20',
       '-pix_fmt', 'yuv420p',
-      '-t', '4.0',
+      '-t', '4.4',
       '-y',
       destVideoPath
     ];

@@ -110,20 +110,21 @@ async function generateNarration(plan, outputDir) {
 
 /**
  * Procedural ASMR Construction Foley synthesis
+ * Soft, natural acoustic workbench textures that complement voiceover without harsh digital noise
  */
 async function generateASMRFoley(asmrType, durationSeconds, destPath) {
   const d = Math.max(durationSeconds, 2.0);
 
-  // ASMR filter expressions for different tactile textures
+  // Soft, warm, acoustic workbench textures
   const foleyPresets = {
-    dirt_scraping: `anoisesrc=c=pink:r=44100:a=0.4,bandpass=f=1200:w=800,tremolo=f=4:d=0.7,volume=0.35`,
-    grass_trimming: `anoisesrc=c=white:r=44100:a=0.5,highpass=f=3500,tremolo=f=7:d=0.9,volume=0.3`,
-    cement_troweling: `anoisesrc=c=brown:r=44100:a=0.6,bandpass=f=700:w=500,chorus=0.5:0.9:50|60:0.4|0.32:0.25|0.4:2|1.2,volume=0.35`,
-    brick_tapping: `aevalsrc='sin(1200*2*PI*t)*exp(-25*mod(t,0.6))+0.3*sin(2400*2*PI*t)*exp(-35*mod(t,0.6))':s=44100,volume=0.4`,
-    spray_painting: `anoisesrc=c=white:r=44100:a=0.5,bandpass=f=4500:w=3000,tremolo=f=2:d=0.5,volume=0.3`,
-    gravel_rolling: `anoisesrc=c=pink:r=44100:a=0.5,bandpass=f=1800:w=1200,tremolo=f=8:d=0.8,volume=0.35`,
-    wood_cutting: `anoisesrc=c=brown:r=44100:a=0.4,bandpass=f=900:w=600,tremolo=f=12:d=0.8,volume=0.3`,
-    wire_tweezing: `aevalsrc='sin(3200*2*PI*t)*exp(-40*mod(t,0.8))+0.2*sin(4800*2*PI*t)*exp(-50*mod(t,0.8))':s=44100,volume=0.35`
+    dirt_scraping: `anoisesrc=c=pink:r=44100:a=0.2,bandpass=f=900:w=600,lowpass=f=3000,tremolo=f=3:d=0.5,volume=0.18`,
+    grass_trimming: `anoisesrc=c=white:r=44100:a=0.15,bandpass=f=2800:w=1500,tremolo=f=5:d=0.6,volume=0.15`,
+    cement_troweling: `anoisesrc=c=brown:r=44100:a=0.25,bandpass=f=600:w=400,lowpass=f=2500,tremolo=f=2:d=0.4,volume=0.18`,
+    brick_tapping: `aevalsrc='sin(900*2*PI*t)*exp(-30*mod(t,0.7))+0.2*sin(1800*2*PI*t)*exp(-40*mod(t,0.7))':s=44100,lowpass=f=3500,volume=0.2`,
+    spray_painting: `anoisesrc=c=white:r=44100:a=0.15,bandpass=f=3200:w=1800,volume=0.15`,
+    gravel_rolling: `anoisesrc=c=pink:r=44100:a=0.2,bandpass=f=1200:w=800,lowpass=f=3000,tremolo=f=4:d=0.6,volume=0.18`,
+    wood_cutting: `anoisesrc=c=brown:r=44100:a=0.2,bandpass=f=750:w=500,lowpass=f=2800,tremolo=f=6:d=0.5,volume=0.16`,
+    wire_tweezing: `aevalsrc='sin(2200*2*PI*t)*exp(-50*mod(t,0.9))+0.15*sin(3400*2*PI*t)*exp(-60*mod(t,0.9))':s=44100,volume=0.18`
   };
 
   const filter = foleyPresets[asmrType] || foleyPresets.dirt_scraping;
@@ -132,7 +133,7 @@ async function generateASMRFoley(asmrType, durationSeconds, destPath) {
     '-f', 'lavfi',
     '-i', filter,
     '-t', `${d.toFixed(2)}`,
-    '-af', `afade=t=in:st=0:d=0.2,afade=t=out:st=${(d - 0.3).toFixed(2)}:d=0.3`,
+    '-af', `afade=t=in:st=0:d=0.3,afade=t=out:st=${(d - 0.4).toFixed(2)}:d=0.4`,
     '-y',
     destPath
   ];
@@ -285,7 +286,9 @@ async function generateThumbnail(stage5Path, townKey, townMemory, episodeNum, su
 
 /**
  * Assemble Master Video
- * Concatenates transitions, layers ASMR foley + Voiceover narration, burns badges & subtitles
+ * Concatenates all 5 stages (4 transitions + Grand Finale Reveal),
+ * layers ASMR foley + Voiceover narration with breathing pre-roll & post-roll,
+ * burns badges & subtitles, and normalizes audio with zero speech cutoffs.
  */
 async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outputDir) {
   const finalVideoPath = path.join(outputDir, `${townKey}_ep${plan.episode}.mp4`);
@@ -293,53 +296,87 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
 
   const { transitionPaths, finalStagePath } = visualResult;
 
-  // 1. Generate Voiceover Narration
+  // 1. Generate Voiceover Narration for all stages
   console.log(`[AudioMaster] Generating voiceover narration tracks...`);
   const narrationPaths = await generateNarration(plan, outputDir);
 
-  // 2. Generate ASMR Foley Tracks for each transition
-  console.log(`[AudioMaster] Synthesizing ASMR construction foley audio...`);
+  // 2. Render Stage 5 Grand Finale Reveal video clip (so the completed town is fully revealed & narrated)
+  const finaleVideoPath = path.join(outputDir, 'finale_reveal.mp4');
+  if (!fs.existsSync(finaleVideoPath) || fs.statSync(finaleVideoPath).size < 10000) {
+    console.log(`[AudioMaster] Rendering cinematic grand finale reveal for Stage 5...`);
+    const finaleArgs = [
+      '-loop', '1', '-t', '5.5', '-i', finalStagePath,
+      '-vf', 'scale=1160:2062:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-out_w)/2-16*(t/5.5):(in_h-out_h)/2+2.0*sin(t*1.2),format=yuv420p',
+      '-r', '30',
+      '-c:v', 'libx264',
+      '-preset', 'veryfast',
+      '-crf', '20',
+      '-pix_fmt', 'yuv420p',
+      '-y',
+      finaleVideoPath
+    ];
+    await runFFmpeg(finaleArgs);
+  }
+
+  const allVideoTracks = [...transitionPaths, finaleVideoPath];
+
+  // 3. Generate ASMR Foley Tracks for all 5 stages based on exact narration duration
+  console.log(`[AudioMaster] Synthesizing acoustic ASMR construction foley audio...`);
   const foleyDir = path.join(outputDir, 'foley');
   if (!fs.existsSync(foleyDir)) fs.mkdirSync(foleyDir, { recursive: true });
 
   const foleyPaths = [];
-  for (let i = 0; i < transitionPaths.length; i++) {
+  const segDurations = [];
+
+  for (let i = 0; i < plan.stages.length; i++) {
     const stage = plan.stages[i];
-    const transDuration = getMediaDuration(transitionPaths[i]);
+    const narrAudio = narrationPaths[i] || narrationPaths[0];
+    const narrDuration = getMediaDuration(narrAudio);
+    // Give 0.35s pre-roll + narration + 0.55s post-roll settling time so speech is never cut off
+    const segDuration = Math.max(narrDuration + 0.9, 4.2);
+    segDurations.push(segDuration);
+
     const foleyPath = path.join(foleyDir, `foley_${i + 1}.wav`);
-    await generateASMRFoley(stage.asmr_type, transDuration, foleyPath);
+    await generateASMRFoley(stage.asmr_type, segDuration, foleyPath);
     foleyPaths.push(foleyPath);
   }
 
-  // 3. Generate Top-Left Episode Badge
+  // 4. Generate Top-Left Episode Badge
   const badgeSvgPath = path.join(outputDir, 'badge_overlay.svg');
   createBadgeOverlay(townKey, townMemory, plan.episode, badgeSvgPath);
 
-  // 4. Combine each segment: Video Transition + Sync Narration & Foley + Subtitle
+  // 5. Combine each segment: Video Track + Sync Narration & Foley + Subtitle + Badge
   const segmentPaths = [];
   const segmentsDir = path.join(outputDir, 'segments');
   if (!fs.existsSync(segmentsDir)) fs.mkdirSync(segmentsDir, { recursive: true });
 
-  for (let i = 0; i < transitionPaths.length; i++) {
+  for (let i = 0; i < plan.stages.length; i++) {
     const stage = plan.stages[i];
-    const transVideo = transitionPaths[i];
+    const transVideo = allVideoTracks[i] || allVideoTracks[allVideoTracks.length - 1];
     const narrAudio = narrationPaths[i] || narrationPaths[0];
     const foleyAudio = foleyPaths[i];
+    const segDuration = segDurations[i];
+    const videoDuration = getMediaDuration(transVideo);
     const segmentDest = path.join(segmentsDir, `segment_${i + 1}.mp4`);
 
     const subSvgPath = path.join(segmentsDir, `sub_${i + 1}.svg`);
     createSubtitleOverlay(stage.narration, subSvgPath);
 
-    console.log(`[AudioMaster] Mastering Segment ${i + 1}/${transitionPaths.length}...`);
+    console.log(`[AudioMaster] Mastering Segment ${i + 1}/${plan.stages.length} (Duration: ${segDuration.toFixed(2)}s, Voiceover: ${getMediaDuration(narrAudio).toFixed(2)}s)...`);
 
-    // Mix narration (1.0) and ASMR Foley (0.35) into combined audio,
-    // and burn top-left badge + bottom subtitle
+    // Pad video if shorter than required narration segment duration
+    let vFilter = '[0:v]';
+    if (videoDuration < segDuration) {
+      const padSec = (segDuration - videoDuration + 0.1).toFixed(2);
+      vFilter = `[0:v]tpad=stop_mode=clone:stop_duration=${padSec}[vpad];[vpad]`;
+    }
+
     const filterComplex = [
-      `[1:a]volume=1.0[anarr]`,
-      `[2:a]volume=0.35[afoley]`,
-      `[anarr][afoley]amix=inputs=2:duration=first:dropout_transition=2[aout]`,
-      `[0:v][3:v]overlay=50:90[vbadge]`,
-      `[vbadge][4:v]overlay=50:1440[vout]`
+      `${vFilter}[3:v]overlay=50:90[vbadge]`,
+      `[vbadge][4:v]overlay=50:1440[vout]`,
+      `[1:a]adelay=350|350,volume=1.05,highpass=f=80,lowpass=f=12000[anarr]`,
+      `[2:a]volume=0.18,afade=t=in:st=0:d=0.3,afade=t=out:st=${(segDuration - 0.4).toFixed(2)}:d=0.4[afoley]`,
+      `[anarr][afoley]amix=inputs=2:duration=longest:dropout_transition=0,volume=1.1,alimiter=limit=0.95[aout]`
     ].join(';');
 
     const segmentArgs = [
@@ -357,7 +394,7 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
       '-c:a', 'aac',
       '-b:a', '192k',
       '-pix_fmt', 'yuv420p',
-      '-shortest',
+      '-t', `${segDuration.toFixed(2)}`,
       '-y',
       segmentDest
     ];
@@ -367,7 +404,7 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     segmentPaths.push(segmentDest);
   }
 
-  // 5. Concatenate all segments into final video
+  // 6. Concatenate all 5 segments into final video
   console.log(`[AudioMaster] Concatenating ${segmentPaths.length} segments into master reel...`);
   const concatListPath = path.join(outputDir, 'concat_list.txt');
   const concatContent = segmentPaths.map(p => `file '${p.replace(/\\/g, '/')}'`).join('\n');
@@ -386,10 +423,11 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
   if (fs.existsSync(concatListPath)) fs.unlinkSync(concatListPath);
   if (fs.existsSync(badgeSvgPath)) fs.unlinkSync(badgeSvgPath);
 
-  // 6. Generate 3D Episode Thumbnail
+  // 7. Generate 3D Episode Thumbnail
   await generateThumbnail(finalStagePath, townKey, townMemory, plan.episode, plan.subtitle_2word, finalThumbPath);
 
-  console.log(`[AudioMaster] MASTER VIDEO COMPLETE: ${finalVideoPath} (${Math.round(fs.statSync(finalVideoPath).size / (1024 * 1024))} MB)`);
+  const finalDuration = getMediaDuration(finalVideoPath);
+  console.log(`[AudioMaster] MASTER VIDEO COMPLETE: ${finalVideoPath} (Duration: ${finalDuration.toFixed(1)}s, ${Math.round(fs.statSync(finalVideoPath).size / (1024 * 1024))} MB)`);
 
   return {
     finalVideoPath,
