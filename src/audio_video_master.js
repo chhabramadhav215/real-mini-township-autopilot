@@ -318,7 +318,9 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     await runFFmpeg(finaleArgs);
   }
 
-  const allVideoTracks = [...transitionPaths, finaleVideoPath];
+  const allVideoTracks = transitionPaths.length >= plan.stages.length
+    ? transitionPaths.slice(0, plan.stages.length)
+    : [...transitionPaths, finaleVideoPath];
 
   // 3. Generate ASMR Foley Tracks for all 5 stages based on exact narration duration
   console.log(`[AudioMaster] Synthesizing acoustic ASMR construction foley audio...`);

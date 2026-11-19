@@ -11,7 +11,9 @@
     "test:local": "node test_local.js smart_city",
     "test:village": "node test_local.js mountain_village",
     "test:city": "node test_local.js smart_city",
-    "test:desert": "node test_local.js desert_town"
+    "test:desert": "node test_local.js desert_town",
+    "local:login": "node scripts/local_login.js",
+    "local:auto": "node src/local_browser_runner.js"
   },
   "keywords": [
     "miniature",
@@ -31,6 +33,7 @@
     "@gradio/client": "^2.8.0",
     "dotenv": "^16.4.7",
     "googleapis": "^144.0.0",
-    "msedge-tts": "^2.1.1"
+    "msedge-tts": "^2.1.1",
+    "playwright": "^1.65.1"
   }
 }
