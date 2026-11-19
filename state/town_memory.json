@@ -1,0 +1,50 @@
+{
+  "mountain_village": {
+    "name": "Mountain Village",
+    "badge_text": "VILLAGE",
+    "badge_color": "#16a34a",
+    "badge_accent": "#22c55e",
+    "cron_utc": "06:00 UTC",
+    "cron_ist": "11:30 AM IST",
+    "cron_schedule": "0 6 * * *",
+    "episode": 0,
+    "camera_seed": 482910,
+    "diorama_anchor_prompt": "Heavy rustic pine wood workbench diorama base, natural rough bark grain texture, surrounded by raw granite rock fragments, micro moss clumps, untreated alpine loam soil, warm morning 45-degree angle workshop illumination.",
+    "built_structures": [],
+    "active_multipart": null,
+    "last_frame_path": "state/last_frame_mountain_village.jpg",
+    "history": []
+  },
+  "smart_city": {
+    "name": "Smart City",
+    "badge_text": "CITY",
+    "badge_color": "#2563eb",
+    "badge_accent": "#3b82f6",
+    "cron_utc": "12:00 UTC",
+    "cron_ist": "05:30 PM IST",
+    "cron_schedule": "0 12 * * *",
+    "episode": 0,
+    "camera_seed": 739215,
+    "diorama_anchor_prompt": "Dark walnut craftsman workbench diorama base with industrial green cutting grid border subtly visible at the frame edges, flat rich dark virgin soil, tiny wild weed sprout clusters, neutral crisp 5500K studio dual-softbox lighting with delicate specular highlights.",
+    "built_structures": [],
+    "active_multipart": null,
+    "last_frame_path": "state/last_frame_smart_city.jpg",
+    "history": []
+  },
+  "desert_town": {
+    "name": "Desert Town",
+    "badge_text": "DESERT",
+    "badge_color": "#ea580c",
+    "badge_accent": "#f97316",
+    "cron_utc": "17:00 UTC",
+    "cron_ist": "10:30 PM IST",
+    "cron_schedule": "0 17 * * *",
+    "episode": 0,
+    "camera_seed": 618492,
+    "diorama_anchor_prompt": "Aged distressed reclaimed oak workbench diorama base, red sandstone dust, cracked clay earth surface with miniature dry desert scrub bushes and rough red gravel, golden hour directional side lighting with long warm shadows.",
+    "built_structures": [],
+    "active_multipart": null,
+    "last_frame_path": "state/last_frame_desert_town.jpg",
+    "history": []
+  }
+}

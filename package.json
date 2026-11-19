@@ -1,0 +1,36 @@
+{
+  "name": "real-mini-township-autopilot",
+  "version": "1.0.0",
+  "description": "100% Autonomous Node.js + GitHub Actions diorama builder that generates and uploads 3 daily hyper-realistic vertical miniature construction reels to YouTube Shorts, Instagram Reels, and Facebook Reels",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "build:village": "node src/index.js mountain_village",
+    "build:city": "node src/index.js smart_city",
+    "build:desert": "node src/index.js desert_town",
+    "test:local": "node test_local.js smart_city",
+    "test:village": "node test_local.js mountain_village",
+    "test:city": "node test_local.js smart_city",
+    "test:desert": "node test_local.js desert_town"
+  },
+  "keywords": [
+    "miniature",
+    "diorama",
+    "autonomous",
+    "youtube-shorts",
+    "instagram-reels",
+    "facebook-reels",
+    "asmr",
+    "ffmpeg",
+    "flux",
+    "gemini"
+  ],
+  "author": "Antigravity",
+  "license": "MIT",
+  "dependencies": {
+    "@gradio/client": "^2.8.0",
+    "dotenv": "^16.4.7",
+    "googleapis": "^144.0.0",
+    "msedge-tts": "^2.1.1"
+  }
+}

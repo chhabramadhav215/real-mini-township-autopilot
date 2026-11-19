@@ -1,0 +1,408 @@
+const fs = require('fs');
+const path = require('path');
+const { spawn, spawnSync } = require('child_process');
+const { MsEdgeTTS, OUTPUT_FORMAT } = require('msedge-tts');
+
+/**
+ * Audio/Video Master:
+ * - Edge-TTS Narration (en-US-AndrewNeural)
+ * - ASMR Construction Foley Synthesis & Mixing
+ * - Color-Coded Episode Badge Burn-In (VILLAGE • EP XX / CITY • EP XX / DESERT • EP XX)
+ * - Lower-Center Dynamic Captions
+ * - 3D Episode Thumbnail Generator
+ * - Final Vertical Video (1080x1920) Assembly
+ */
+
+function runFFmpeg(args) {
+  return new Promise((resolve, reject) => {
+    const proc = spawn('ffmpeg', args, { stdio: ['ignore', 'pipe', 'pipe'] });
+    let stderr = '';
+    proc.stderr.on('data', (d) => { stderr += d.toString(); });
+    proc.on('close', (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`FFmpeg error (${code}): ${stderr.slice(-300)}`));
+    });
+    proc.on('error', reject);
+  });
+}
+
+function getMediaDuration(mediaPath) {
+  try {
+    const res = spawnSync('ffprobe', [
+      '-v', 'error',
+      '-show_entries', 'format=duration',
+      '-of', 'default=noprint_wrappers=1:nokey=1',
+      mediaPath
+    ]);
+    const duration = parseFloat(res.stdout.toString().trim());
+    return isNaN(duration) ? 4.0 : duration;
+  } catch (e) {
+    return 4.0;
+  }
+}
+
+/**
+ * Generate calm US-English narration using edge-tts (en-US-AndrewNeural)
+ */
+async function generateNarration(plan, outputDir) {
+  const narrationDir = path.join(outputDir, 'narration');
+  if (!fs.existsSync(narrationDir)) fs.mkdirSync(narrationDir, { recursive: true });
+
+  const narrationPaths = [];
+
+  for (let i = 0; i < plan.stages.length; i++) {
+    const stage = plan.stages[i];
+    const destMp3 = path.join(narrationDir, `narration_${stage.stage_num}.mp3`);
+
+    if (fs.existsSync(destMp3) && fs.statSync(destMp3).size > 1000) {
+      narrationPaths.push(destMp3);
+      continue;
+    }
+
+    const text = stage.narration || `Stage ${stage.stage_num}: precision miniature construction.`;
+    let synthesized = false;
+
+    // Retry with delay and fresh instance for robust Edge TTS synthesis
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const tempSubDir = path.join(narrationDir, `tmp_stage_${stage.stage_num}_${attempt}`);
+        if (!fs.existsSync(tempSubDir)) fs.mkdirSync(tempSubDir, { recursive: true });
+
+        const tts = new MsEdgeTTS();
+        await tts.setMetadata('en-US-AndrewNeural', OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
+
+        const result = await tts.toFile(tempSubDir, text);
+        const generatedAudio = result.audioFilePath;
+
+        if (fs.existsSync(generatedAudio) && fs.statSync(generatedAudio).size > 500) {
+          fs.copyFileSync(generatedAudio, destMp3);
+          fs.rmSync(tempSubDir, { recursive: true, force: true });
+          console.log(`[AudioMaster] Generated TTS narration for Stage ${stage.stage_num} via AndrewNeural`);
+          synthesized = true;
+          // Short delay between requests to respect edge socket reset
+          await new Promise(r => setTimeout(r, 600));
+          break;
+        }
+        fs.rmSync(tempSubDir, { recursive: true, force: true });
+      } catch (err) {
+        await new Promise(r => setTimeout(r, 1200));
+      }
+    }
+
+    // Fallback narration chime if offline or network failure
+    if (!synthesized) {
+      console.log(`[AudioMaster] Synthesizing audio tone for Stage ${stage.stage_num}`);
+      const synthArgs = [
+        '-f', 'lavfi',
+        '-i', 'sine=frequency=440:duration=3',
+        '-af', 'volume=0.2,afade=t=out:st=2.5:d=0.5',
+        '-y',
+        destMp3
+      ];
+      await runFFmpeg(synthArgs);
+    }
+
+    narrationPaths.push(destMp3);
+  }
+
+  return narrationPaths;
+}
+
+/**
+ * Procedural ASMR Construction Foley synthesis
+ */
+async function generateASMRFoley(asmrType, durationSeconds, destPath) {
+  const d = Math.max(durationSeconds, 2.0);
+
+  // ASMR filter expressions for different tactile textures
+  const foleyPresets = {
+    dirt_scraping: `anoisesrc=c=pink:r=44100:a=0.4,bandpass=f=1200:w=800,tremolo=f=4:d=0.7,volume=0.35`,
+    grass_trimming: `anoisesrc=c=white:r=44100:a=0.5,highpass=f=3500,tremolo=f=7:d=0.9,volume=0.3`,
+    cement_troweling: `anoisesrc=c=brown:r=44100:a=0.6,bandpass=f=700:w=500,chorus=0.5:0.9:50|60:0.4|0.32:0.25|0.4:2|1.2,volume=0.35`,
+    brick_tapping: `aevalsrc='sin(1200*2*PI*t)*exp(-25*mod(t,0.6))+0.3*sin(2400*2*PI*t)*exp(-35*mod(t,0.6))':s=44100,volume=0.4`,
+    spray_painting: `anoisesrc=c=white:r=44100:a=0.5,bandpass=f=4500:w=3000,tremolo=f=2:d=0.5,volume=0.3`,
+    gravel_rolling: `anoisesrc=c=pink:r=44100:a=0.5,bandpass=f=1800:w=1200,tremolo=f=8:d=0.8,volume=0.35`,
+    wood_cutting: `anoisesrc=c=brown:r=44100:a=0.4,bandpass=f=900:w=600,tremolo=f=12:d=0.8,volume=0.3`,
+    wire_tweezing: `aevalsrc='sin(3200*2*PI*t)*exp(-40*mod(t,0.8))+0.2*sin(4800*2*PI*t)*exp(-50*mod(t,0.8))':s=44100,volume=0.35`
+  };
+
+  const filter = foleyPresets[asmrType] || foleyPresets.dirt_scraping;
+
+  const args = [
+    '-f', 'lavfi',
+    '-i', filter,
+    '-t', `${d.toFixed(2)}`,
+    '-af', `afade=t=in:st=0:d=0.2,afade=t=out:st=${(d - 0.3).toFixed(2)}:d=0.3`,
+    '-y',
+    destPath
+  ];
+
+  await runFFmpeg(args);
+}
+
+/**
+ * Create color-coded Top-Left Episode Badge SVG
+ */
+function createBadgeOverlay(townKey, townMemory, episodeNum, destSvgPath) {
+  const badgeText = townMemory.badge_text || "CITY";
+  const badgeColor = townMemory.badge_color || "#2563eb";
+  const badgeAccent = townMemory.badge_accent || "#60a5fa";
+  const epString = String(episodeNum).padStart(2, '0');
+  const fullLabel = `${badgeText} • EP ${epString}`;
+
+  // SVG badge: 440px wide x 90px tall
+  const svg = `<svg width="440" height="90" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="${badgeColor}" stop-opacity="0.95"/>
+        <stop offset="100%" stop-color="${badgeAccent}" stop-opacity="0.9"/>
+      </linearGradient>
+      <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+        <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.6"/>
+      </filter>
+    </defs>
+    <!-- Background Pill with Shadow -->
+    <rect x="6" y="6" width="428" height="78" rx="24" fill="#0f172a" fill-opacity="0.8" filter="url(#shadow)" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+    <!-- Color Pill Accent -->
+    <rect x="14" y="14" width="70" height="62" rx="16" fill="url(#badgeGrad)"/>
+    <!-- Glowing Status Indicator Dot -->
+    <circle cx="49" cy="45" r="9" fill="#ffffff" filter="url(#shadow)"/>
+    <!-- Typography -->
+    <text x="104" y="54" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="900" fill="#ffffff" letter-spacing="2">${fullLabel}</text>
+  </svg>`;
+
+  fs.writeFileSync(destSvgPath, svg, 'utf8');
+  return destSvgPath;
+}
+
+/**
+ * Create lower-center dynamic subtitle SVG
+ */
+function createSubtitleOverlay(text, destSvgPath) {
+  const cleanText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  
+  // Wrap lines if longer than 36 characters
+  const words = cleanText.split(' ');
+  const lines = [];
+  let currentLine = '';
+
+  for (const w of words) {
+    if ((currentLine + ' ' + w).length > 36) {
+      lines.push(currentLine.trim());
+      currentLine = w;
+    } else {
+      currentLine += (currentLine ? ' ' : '') + w;
+    }
+  }
+  if (currentLine) lines.push(currentLine.trim());
+
+  const svgHeight = lines.length === 1 ? 90 : 130;
+  const line1Y = lines.length === 1 ? 58 : 48;
+  const line2Y = 94;
+
+  const svg = `<svg width="980" height="${svgHeight}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="textGlow" x="-10%" y="-10%" width="130%" height="130%">
+        <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.9"/>
+      </filter>
+    </defs>
+    <!-- Dark Translucent Backdrop Pill -->
+    <rect x="0" y="0" width="980" height="${svgHeight}" rx="20" fill="#000000" fill-opacity="0.65" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+    <text x="490" y="${line1Y}" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="800" fill="#ffffff" text-anchor="middle" filter="url(#textGlow)">${lines[0] || ''}</text>
+    ${lines[1] ? `<text x="490" y="${line2Y}" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="800" fill="#fde047" text-anchor="middle" filter="url(#textGlow)">${lines[1]}</text>` : ''}
+  </svg>`;
+
+  fs.writeFileSync(destSvgPath, svg, 'utf8');
+  return destSvgPath;
+}
+
+/**
+ * Generate 3D Episode Thumbnail from Stage 5 Keyframe
+ */
+async function generateThumbnail(stage5Path, townKey, townMemory, episodeNum, subtitle2Word, destThumbPath) {
+  console.log(`[AudioMaster] Generating 3D Episode Thumbnail -> ${path.basename(destThumbPath)}`);
+
+  const thumbSvgPath = destThumbPath.replace(/\.jpg$/, '_overlay.svg');
+  const badgeColor = townMemory.badge_color || "#2563eb";
+  const epText = `EP ${String(episodeNum).padStart(2, '0')}`;
+  const subText = (subtitle2Word || "DIORAMA BUILD").toUpperCase();
+
+  const svg = `<svg width="1080" height="1920" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="heavy3d" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.95"/>
+      </filter>
+      <linearGradient id="gradEp" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="60%" stop-color="#f8fafc"/>
+        <stop offset="100%" stop-color="#cbd5e1"/>
+      </linearGradient>
+      <linearGradient id="gradSub" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fef08a"/>
+        <stop offset="100%" stop-color="#eab308"/>
+      </linearGradient>
+    </defs>
+    <!-- Vignette Frame Edges -->
+    <rect x="0" y="0" width="1080" height="1920" fill="none" stroke="#000000" stroke-width="40" stroke-opacity="0.5"/>
+
+    <!-- Top Badge Strip -->
+    <rect x="60" y="100" width="460" height="96" rx="28" fill="${badgeColor}" fill-opacity="0.9" filter="url(#heavy3d)"/>
+    <text x="290" y="165" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="3">${townMemory.badge_text || "TOWN"} SERIES</text>
+
+    <!-- Center-Bottom 3D Episode Title Block -->
+    <!-- Dark Glass Panel -->
+    <rect x="60" y="1420" width="960" height="380" rx="36" fill="#0b0f19" fill-opacity="0.88" stroke="rgba(255,255,255,0.25)" stroke-width="3" filter="url(#heavy3d)"/>
+    
+    <!-- 3D Episode Tag -->
+    <rect x="100" y="1460" width="260" height="84" rx="20" fill="${badgeColor}" filter="url(#heavy3d)"/>
+    <text x="230" y="1520" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="4">${epText}</text>
+    
+    <!-- 2-Word Bold Headline -->
+    <text x="100" y="1630" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="900" fill="url(#gradSub)" filter="url(#heavy3d)" letter-spacing="2">${subText}</text>
+    
+    <!-- Subtitle Footnote -->
+    <text x="100" y="1720" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#94a3b8" letter-spacing="1">100% AUTONOMOUS HYPER-REALISTIC DIORAMA</text>
+  </svg>`;
+
+  fs.writeFileSync(thumbSvgPath, svg, 'utf8');
+
+  // Burn thumbnail graphic with Stage 5 image as background
+  const args = [
+    '-i', stage5Path,
+    '-i', thumbSvgPath,
+    '-filter_complex', '[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920[bg];[bg][1:v]overlay=0:0[out]',
+    '-map', '[out]',
+    '-frames:v', '1',
+    '-y',
+    destThumbPath
+  ];
+
+  await runFFmpeg(args);
+  if (fs.existsSync(thumbSvgPath)) fs.unlinkSync(thumbSvgPath);
+  console.log(`[AudioMaster] Thumbnail generated successfully (${Math.round(fs.statSync(destThumbPath).size / 1024)} KB)`);
+  return destThumbPath;
+}
+
+/**
+ * Assemble Master Video
+ * Concatenates transitions, layers ASMR foley + Voiceover narration, burns badges & subtitles
+ */
+async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outputDir) {
+  const finalVideoPath = path.join(outputDir, `${townKey}_ep${plan.episode}.mp4`);
+  const finalThumbPath = path.join(outputDir, `${townKey}_ep${plan.episode}_thumb.jpg`);
+
+  const { transitionPaths, finalStagePath } = visualResult;
+
+  // 1. Generate Voiceover Narration
+  console.log(`[AudioMaster] Generating voiceover narration tracks...`);
+  const narrationPaths = await generateNarration(plan, outputDir);
+
+  // 2. Generate ASMR Foley Tracks for each transition
+  console.log(`[AudioMaster] Synthesizing ASMR construction foley audio...`);
+  const foleyDir = path.join(outputDir, 'foley');
+  if (!fs.existsSync(foleyDir)) fs.mkdirSync(foleyDir, { recursive: true });
+
+  const foleyPaths = [];
+  for (let i = 0; i < transitionPaths.length; i++) {
+    const stage = plan.stages[i];
+    const transDuration = getMediaDuration(transitionPaths[i]);
+    const foleyPath = path.join(foleyDir, `foley_${i + 1}.wav`);
+    await generateASMRFoley(stage.asmr_type, transDuration, foleyPath);
+    foleyPaths.push(foleyPath);
+  }
+
+  // 3. Generate Top-Left Episode Badge
+  const badgeSvgPath = path.join(outputDir, 'badge_overlay.svg');
+  createBadgeOverlay(townKey, townMemory, plan.episode, badgeSvgPath);
+
+  // 4. Combine each segment: Video Transition + Sync Narration & Foley + Subtitle
+  const segmentPaths = [];
+  const segmentsDir = path.join(outputDir, 'segments');
+  if (!fs.existsSync(segmentsDir)) fs.mkdirSync(segmentsDir, { recursive: true });
+
+  for (let i = 0; i < transitionPaths.length; i++) {
+    const stage = plan.stages[i];
+    const transVideo = transitionPaths[i];
+    const narrAudio = narrationPaths[i] || narrationPaths[0];
+    const foleyAudio = foleyPaths[i];
+    const segmentDest = path.join(segmentsDir, `segment_${i + 1}.mp4`);
+
+    const subSvgPath = path.join(segmentsDir, `sub_${i + 1}.svg`);
+    createSubtitleOverlay(stage.narration, subSvgPath);
+
+    console.log(`[AudioMaster] Mastering Segment ${i + 1}/${transitionPaths.length}...`);
+
+    // Mix narration (1.0) and ASMR Foley (0.35) into combined audio,
+    // and burn top-left badge + bottom subtitle
+    const filterComplex = [
+      `[1:a]volume=1.0[anarr]`,
+      `[2:a]volume=0.35[afoley]`,
+      `[anarr][afoley]amix=inputs=2:duration=first:dropout_transition=2[aout]`,
+      `[0:v][3:v]overlay=50:90[vbadge]`,
+      `[vbadge][4:v]overlay=50:1440[vout]`
+    ].join(';');
+
+    const segmentArgs = [
+      '-i', transVideo,
+      '-i', narrAudio,
+      '-i', foleyAudio,
+      '-i', badgeSvgPath,
+      '-i', subSvgPath,
+      '-filter_complex', filterComplex,
+      '-map', '[vout]',
+      '-map', '[aout]',
+      '-c:v', 'libx264',
+      '-preset', 'veryfast',
+      '-crf', '20',
+      '-c:a', 'aac',
+      '-b:a', '192k',
+      '-pix_fmt', 'yuv420p',
+      '-shortest',
+      '-y',
+      segmentDest
+    ];
+
+    await runFFmpeg(segmentArgs);
+    if (fs.existsSync(subSvgPath)) fs.unlinkSync(subSvgPath);
+    segmentPaths.push(segmentDest);
+  }
+
+  // 5. Concatenate all segments into final video
+  console.log(`[AudioMaster] Concatenating ${segmentPaths.length} segments into master reel...`);
+  const concatListPath = path.join(outputDir, 'concat_list.txt');
+  const concatContent = segmentPaths.map(p => `file '${p.replace(/\\/g, '/')}'`).join('\n');
+  fs.writeFileSync(concatListPath, concatContent, 'utf8');
+
+  const concatArgs = [
+    '-f', 'concat',
+    '-safe', '0',
+    '-i', concatListPath,
+    '-c', 'copy',
+    '-y',
+    finalVideoPath
+  ];
+
+  await runFFmpeg(concatArgs);
+  if (fs.existsSync(concatListPath)) fs.unlinkSync(concatListPath);
+  if (fs.existsSync(badgeSvgPath)) fs.unlinkSync(badgeSvgPath);
+
+  // 6. Generate 3D Episode Thumbnail
+  await generateThumbnail(finalStagePath, townKey, townMemory, plan.episode, plan.subtitle_2word, finalThumbPath);
+
+  console.log(`[AudioMaster] MASTER VIDEO COMPLETE: ${finalVideoPath} (${Math.round(fs.statSync(finalVideoPath).size / (1024 * 1024))} MB)`);
+
+  return {
+    finalVideoPath,
+    finalThumbPath
+  };
+}
+
+module.exports = {
+  generateNarration,
+  generateASMRFoley,
+  createBadgeOverlay,
+  createSubtitleOverlay,
+  generateThumbnail,
+  assembleMasterVideo,
+  runFFmpeg
+};
