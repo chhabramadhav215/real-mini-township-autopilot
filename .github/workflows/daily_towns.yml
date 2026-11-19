@@ -49,9 +49,7 @@ jobs:
           cache: 'npm'
 
       - name: Install FFmpeg
-        uses: FedericoCarboni/setup-ffmpeg@v3
-        with:
-          ffmpeg-version: release
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
       - name: Install Dependencies
         run: npm ci
@@ -103,13 +101,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add state/town_memory.json state/last_frame_*.jpg || true
-          if git diff --staged --quiet; then
-            echo "No memory changes to commit."
-          else
+          if ! git diff --staged --quiet; then
             git commit -m "chore(memory): save diorama continuity for ${{ steps.select_town.outputs.town }} [skip ci]"
-            git push origin HEAD:main || git push
-            echo "Town memory successfully synced to GitHub."
           fi
+          git push origin HEAD:main || git push || true
+          echo "Town memory successfully synced to GitHub."
 
       - name: Archive Video & Thumbnail Artifacts
         if: always()

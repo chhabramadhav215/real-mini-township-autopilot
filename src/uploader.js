@@ -57,56 +57,59 @@ async function uploadToYouTube(videoPath, thumbPath, socialContent) {
     return { platform: 'youtube', status: 'skipped' };
   }
 
-  console.log('[Uploader] Authenticating with YouTube Data API v3...');
-  const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, 'https://developers.google.com/oauthplayground');
-  oauth2Client.setCredentials({ refresh_token: refreshToken });
+  try {
+    console.log('[Uploader] Authenticating with YouTube Data API v3...');
+    const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, 'https://developers.google.com/oauthplayground');
+    oauth2Client.setCredentials({ refresh_token: refreshToken });
 
-  const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
+    const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
 
-  console.log(`[Uploader] Uploading "${socialContent.title}" to YouTube Shorts...`);
-  const fileSize = fs.statSync(videoPath).size;
-
-  const res = await youtube.videos.insert({
-    part: ['snippet', 'status'],
-    requestBody: {
-      snippet: {
-        title: socialContent.title.slice(0, 100),
-        description: socialContent.description,
-        tags: ['miniature', 'diorama', 'asmr', 'shorts', 'craftsman', 'satisfying', 'scale model'],
-        categoryId: '26', // Howto & Style
-        defaultLanguage: 'en',
-        defaultAudioLanguage: 'en'
-      },
-      status: {
-        privacyStatus: process.env.YOUTUBE_PRIVACY || 'public',
-        selfDeclaredMadeForKids: false
-      }
-    },
-    media: {
-      body: fs.createReadStream(videoPath)
-    }
-  });
-
-  const videoId = res.data.id;
-  console.log(`[Uploader] YouTube Shorts uploaded successfully! Video ID: ${videoId} (https://youtube.com/shorts/${videoId})`);
-
-  // Upload custom thumbnail if exists
-  if (thumbPath && fs.existsSync(thumbPath)) {
-    try {
-      console.log(`[Uploader] Setting custom thumbnail for YouTube video ${videoId}...`);
-      await youtube.thumbnails.set({
-        videoId: videoId,
-        media: {
-          body: fs.createReadStream(thumbPath)
+    console.log(`[Uploader] Uploading "${socialContent.title}" to YouTube Shorts...`);
+    const res = await youtube.videos.insert({
+      part: ['snippet', 'status'],
+      requestBody: {
+        snippet: {
+          title: socialContent.title.slice(0, 100),
+          description: socialContent.description,
+          tags: ['miniature', 'diorama', 'asmr', 'shorts', 'craftsman', 'satisfying', 'scale model'],
+          categoryId: '26', // Howto & Style
+          defaultLanguage: 'en',
+          defaultAudioLanguage: 'en'
+        },
+        status: {
+          privacyStatus: process.env.YOUTUBE_PRIVACY || 'public',
+          selfDeclaredMadeForKids: false
         }
-      });
-      console.log(`[Uploader] Custom thumbnail set successfully.`);
-    } catch (err) {
-      console.warn(`[Uploader] Setting thumbnail failed: ${err.message}`);
-    }
-  }
+      },
+      media: {
+        body: fs.createReadStream(videoPath)
+      }
+    });
 
-  return { platform: 'youtube', status: 'success', videoId, url: `https://youtube.com/shorts/${videoId}` };
+    const videoId = res.data.id;
+    console.log(`[Uploader] YouTube Shorts uploaded successfully! Video ID: ${videoId} (https://youtube.com/shorts/${videoId})`);
+
+    // Upload custom thumbnail if exists
+    if (thumbPath && fs.existsSync(thumbPath)) {
+      try {
+        console.log(`[Uploader] Setting custom thumbnail for YouTube video ${videoId}...`);
+        await youtube.thumbnails.set({
+          videoId: videoId,
+          media: {
+            body: fs.createReadStream(thumbPath)
+          }
+        });
+        console.log(`[Uploader] Custom thumbnail set successfully.`);
+      } catch (err) {
+        console.warn(`[Uploader] Setting thumbnail warning: ${err.message}`);
+      }
+    }
+
+    return { platform: 'youtube', status: 'success', videoId, url: `https://youtube.com/shorts/${videoId}` };
+  } catch (err) {
+    console.warn(`[Uploader] YouTube upload error: ${err.message}. Skipping YouTube upload gracefully.`);
+    return { platform: 'youtube', status: 'failed', error: err.message };
+  }
 }
 
 /**
@@ -295,8 +298,12 @@ async function updateAndCommitTownMemory(townKey, plan, finalStagePath) {
       if (commitRes.status === 0) {
         console.log(`[Git] Committed state updates to repository.`);
         if (process.env.GITHUB_ACTIONS === 'true') {
-          spawnSync('git', ['push']);
-          console.log(`[Git] Pushed updates to origin.`);
+          const pushRes = spawnSync('git', ['push', 'origin', 'HEAD:main']);
+          if (pushRes.status === 0) {
+            console.log(`[Git] Pushed memory updates to origin.`);
+          } else {
+            console.log(`[Git] In-script push deferred to workflow step.`);
+          }
         }
       }
     }
@@ -317,14 +324,43 @@ async function processUploadAndStateCommit(townKey, townMemory, plan, finalVideo
   console.log(`AUTONOMOUS UPLOAD DISPATCH: "${socialContent.title}"`);
   console.log(`==================================================\n`);
 
+  let ytResult = { platform: 'youtube', status: 'skipped' };
+  let igResult = { platform: 'instagram', status: 'skipped' };
+  let fbResult = { platform: 'facebook', status: 'skipped' };
+
+  try {
+    ytResult = await uploadToYouTube(finalVideoPath, finalThumbPath, socialContent);
+  } catch (e) {
+    console.warn(`[Uploader] YouTube upload error caught: ${e.message}. Continuing...`);
+    ytResult = { platform: 'youtube', status: 'failed', error: e.message };
+  }
+
+  try {
+    igResult = await uploadToInstagram(finalVideoPath, socialContent);
+  } catch (e) {
+    console.warn(`[Uploader] Instagram upload error caught: ${e.message}. Continuing...`);
+    igResult = { platform: 'instagram', status: 'failed', error: e.message };
+  }
+
+  try {
+    fbResult = await uploadToFacebook(finalVideoPath, socialContent);
+  } catch (e) {
+    console.warn(`[Uploader] Facebook upload error caught: ${e.message}. Continuing...`);
+    fbResult = { platform: 'facebook', status: 'failed', error: e.message };
+  }
+
   const results = {
-    youtube: await uploadToYouTube(finalVideoPath, finalThumbPath, socialContent),
-    instagram: await uploadToInstagram(finalVideoPath, socialContent),
-    facebook: await uploadToFacebook(finalVideoPath, socialContent)
+    youtube: ytResult,
+    instagram: igResult,
+    facebook: fbResult
   };
 
-  // Update town memory and last frame anchor
-  await updateAndCommitTownMemory(townKey, plan, finalStagePath);
+  // Update town memory and last frame anchor - NEVER skipped even if uploads failed or skipped
+  try {
+    await updateAndCommitTownMemory(townKey, plan, finalStagePath);
+  } catch (memErr) {
+    console.error(`[Memory] Critical error saving town memory: ${memErr.message}`);
+  }
 
   return results;
 }
