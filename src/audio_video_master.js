@@ -332,8 +332,8 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     const stage = plan.stages[i];
     const narrAudio = narrationPaths[i] || narrationPaths[0];
     const narrDuration = getMediaDuration(narrAudio);
-    // Give 0.35s pre-roll + narration + 0.55s post-roll settling time so speech is never cut off
-    const segDuration = Math.max(narrDuration + 0.9, 4.2);
+    // Give 0.40s pre-roll + full narration + 0.60s post-roll settling time so speech is never cut off
+    const segDuration = Math.max(narrDuration + 1.0, 4.5);
     segDurations.push(segDuration);
 
     const foleyPath = path.join(foleyDir, `foley_${i + 1}.wav`);
@@ -374,8 +374,8 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     const filterComplex = [
       `${vFilter}[3:v]overlay=50:90[vbadge]`,
       `[vbadge][4:v]overlay=50:1440[vout]`,
-      `[1:a]adelay=350|350,volume=1.05,highpass=f=80,lowpass=f=12000[anarr]`,
-      `[2:a]volume=0.18,afade=t=in:st=0:d=0.3,afade=t=out:st=${(segDuration - 0.4).toFixed(2)}:d=0.4[afoley]`,
+      `[1:a]adelay=400|400,volume=1.05,highpass=f=80,lowpass=f=12000[anarr]`,
+      `[2:a]volume=0.15,afade=t=in:st=0:d=0.3,afade=t=out:st=${(segDuration - 0.5).toFixed(2)}:d=0.5[afoley]`,
       `[anarr][afoley]amix=inputs=2:duration=longest:dropout_transition=0,volume=1.1,alimiter=limit=0.95[aout]`
     ].join(';');
 
@@ -404,23 +404,31 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     segmentPaths.push(segmentDest);
   }
 
-  // 6. Concatenate all 5 segments into final video
-  console.log(`[AudioMaster] Concatenating ${segmentPaths.length} segments into master reel...`);
-  const concatListPath = path.join(outputDir, 'concat_list.txt');
-  const concatContent = segmentPaths.map(p => `file '${p.replace(/\\/g, '/')}'`).join('\n');
-  fs.writeFileSync(concatListPath, concatContent, 'utf8');
+  // 6. Concatenate all 5 segments with re-encoding to guarantee 100% continuous, zero-dropout audio & video
+  console.log(`[AudioMaster] Concatenating ${segmentPaths.length} segments with seamless audio remuxing...`);
+  const concatFilter = [];
+  const concatInputs = [];
+  for (let i = 0; i < segmentPaths.length; i++) {
+    concatInputs.push('-i', segmentPaths[i]);
+    concatFilter.push(`[${i}:v][${i}:a]`);
+  }
+  concatFilter.push(`concat=n=${segmentPaths.length}:v=1:a=1[vmaster][amaster]`);
 
   const concatArgs = [
-    '-f', 'concat',
-    '-safe', '0',
-    '-i', concatListPath,
-    '-c', 'copy',
+    ...concatInputs,
+    '-filter_complex', concatFilter.join(''),
+    '-map', '[vmaster]',
+    '-map', '[amaster]',
+    '-c:v', 'libx264',
+    '-preset', 'veryfast',
+    '-crf', '19',
+    '-c:a', 'aac',
+    '-b:a', '192k',
     '-y',
     finalVideoPath
   ];
 
   await runFFmpeg(concatArgs);
-  if (fs.existsSync(concatListPath)) fs.unlinkSync(concatListPath);
   if (fs.existsSync(badgeSvgPath)) fs.unlinkSync(badgeSvgPath);
 
   // 7. Generate 3D Episode Thumbnail

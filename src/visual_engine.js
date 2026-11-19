@@ -159,7 +159,7 @@ async function tryPollinationsFlux(prompt, seed, destPath) {
   const maxRetries = 4;
   const models = ['flux', 'flux-realism', 'turbo'];
 
-  const concisePrompt = prompt.length > 400 ? prompt.slice(0, 400) : prompt;
+  const concisePrompt = prompt.length > 900 ? prompt.slice(0, 900) : prompt;
   const encoded = encodeURIComponent(concisePrompt);
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -219,22 +219,24 @@ async function generateKeyframe(stage, townKey, episode, townSeed, outputDir) {
   }
 
   const prompt = stage.image_prompt || 
-    `In a detailed 1:87 HO-scale miniature town diorama under active construction on a craftsman studio workbench: visible surrounding miniature infrastructure with tiny brick townhouses, micro paved asphalt streets, tiny streetlamps, and green cutting mat. Giant real adult craftsman male hands with silver wristwatch actively holding ${stage.tool || 'miniature tool'} and ${stage.action || 'building road'}. Extreme macro 45-degree isometric tilt-shift photography on a Sony A7RV 90mm f/2.8 lens, razor sharp focus, creamy bokeh, warm 5500K studio lighting, 8k resolution.`;
+    `Stage ${stage.stage_num}/5: Real craftsman adult male hands holding ${stage.tool || 'miniature tool'} to ${stage.action || 'building road'} on a detailed 1:87 scale miniature town diorama worksite. Visible miniature infrastructure with tiny brick townhouses, micro asphalt streets, tiny streetlamps, and green cutting mat. Macro 45-degree isometric tilt-shift photography on Sony A7RV 90mm f/2.8 lens, razor sharp focus, creamy bokeh, warm 5500K studio lighting, 8k resolution.`;
 
+  // Use stage-specific seed to guarantee each stage produces a distinct, progressive scene
+  const stageSeed = (townSeed + (stage.stage_num * 1047) + (episode * 79)) % 1000000;
   const hfToken = process.env.HF_TOKEN;
 
   // 1. PRIMARY: HuggingFace FLUX Space via @gradio/client
-  console.log(`[VisualEngine] ---> GENERATING STAGE ${stage.stage_num}/5 (PRIMARY: HuggingFace FLUX)`);
-  let resultPath = await tryGradioFlux(prompt, townSeed, hfToken, destPath);
+  console.log(`[VisualEngine] ---> GENERATING STAGE ${stage.stage_num}/5 (PRIMARY: HuggingFace FLUX, Seed: ${stageSeed})`);
+  let resultPath = await tryGradioFlux(prompt, stageSeed, hfToken, destPath);
   if (resultPath) return resultPath;
 
   // 2. SECONDARY: HuggingFace Inference API Router
-  resultPath = await tryHFInferenceAPI(prompt, townSeed, hfToken, destPath);
+  resultPath = await tryHFInferenceAPI(prompt, stageSeed, hfToken, destPath);
   if (resultPath) return resultPath;
 
   // 3. TERTIARY: Pollinations Flux with 4% Bottom Crop (Watermark-Free)
-  console.log(`[VisualEngine] ---> FALLING BACK TO POLLINATIONS FLUX (4% Watermark Crop)`);
-  resultPath = await tryPollinationsFlux(prompt, townSeed, destPath);
+  console.log(`[VisualEngine] ---> FALLING BACK TO POLLINATIONS FLUX (4% Watermark Crop, Seed: ${stageSeed})`);
+  resultPath = await tryPollinationsFlux(prompt, stageSeed, destPath);
   if (resultPath) return resultPath;
 
   throw new Error(`Failed to generate photorealistic keyframe for Stage ${stage.stage_num} after retries.`);
@@ -422,8 +424,9 @@ async function createContinuousWorkingMotionVideo(firstFramePath, lastFramePath,
   if (!fs.existsSync(actionFramePath) || fs.statSync(actionFramePath).size < 10000) {
     try {
       console.log(`[VisualEngine] Generating intermediate mid-action working frame for Stage ${stage.stage_num}...`);
-      const actionPrompt = `In a detailed 1:87 HO-scale miniature town diorama under active construction on a studio craftsman workbench: visible surrounding miniature infrastructure with tiny brick townhouses, micro asphalt streets, tiny streetlamps, and cutting mat. Giant real adult craftsman male hands with visible skin pores and matte silver wristwatch mid-action smoothly using ${stage.tool} to ${stage.action}. Extreme macro 45-degree isometric tilt-shift photography on a Sony A7RV 90mm f/2.8 lens, locked tripod perspective, razor-sharp focus on the miniature worksite, creamy cinematic background bokeh, warm 5500K studio dual-softbox lighting, 8k resolution, ultra-detailed scale model crafting.`;
-      await tryPollinationsFlux(actionPrompt, townSeed + stage.stage_num * 17, actionFramePath);
+      const actionPrompt = `Stage ${stage.stage_num}/5 mid-action: Real craftsman adult male hands actively using ${stage.tool} to ${stage.action} on 1:87 scale miniature town diorama. Close-up worksite view showing ${stage.action}, miniature asphalt streets, tiny curbs, scale townhouses, and green grid cutting mat. Macro 45-degree isometric tilt-shift photography on Sony A7RV 90mm lens, razor-sharp focus on the build, warm 5500K studio lighting, 8k resolution.`;
+      const actionSeed = (townSeed + (stage.stage_num * 2089) + (stage.stage_num * 33)) % 1000000;
+      await tryPollinationsFlux(actionPrompt, actionSeed, actionFramePath);
     } catch (e) {
       console.warn(`[VisualEngine] Action frame generation notice: ${e.message}`);
     }

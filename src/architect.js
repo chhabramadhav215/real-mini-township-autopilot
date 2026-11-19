@@ -7,7 +7,7 @@ const path = require('path');
  */
 
 const CRAFTSMAN_HANDS_DESCRIPTION = 
-  "Real adult male craftsman hands with visible skin pores, subtle dried cement and soil dust on knuckles, rolled-up dark denim work sleeves, and a matte silver wristwatch";
+  "Real adult male craftsman hands with visible skin pores, subtle dried cement and soil dust on knuckles, rolled-up dark denim work sleeves, bare wrists with no jewelry or wristwatches";
 
 const CAMERA_BASE_PROMPT = 
   "Extreme macro 45-degree isometric tilt-shift photography on a Sony A7RV 90mm f/2.8 lens, 8k resolution, razor-sharp focus on the center miniature build, soft creamy bokeh workbench background, locked tripod perspective, consistent directional 5500K workshop lighting";
@@ -88,8 +88,8 @@ const PROCEDURAL_BLUEPRINTS = {
         },
         {
           stage_num: 3,
-          action: "Lowering slotted miniature concrete drainage pipes into the trench using precision watchmaker tweezers",
-          tool: "precision watchmaker tweezers",
+          action: "Lowering slotted miniature concrete drainage pipes into the trench using precision miniature tweezers",
+          tool: "precision miniature tweezers",
           asmr_type: "wire_tweezing",
           narration: "Using precision tweezers, pre-cast concrete stormwater conduits are lowered and joined seam to seam."
         },
@@ -190,7 +190,7 @@ const PROCEDURAL_BLUEPRINTS = {
         {
           stage_num: 4,
           action: "Lowering twin turned-brass underground fuel storage tanks onto the concrete cradle",
-          tool: "precision watchmaker tweezers",
+          tool: "precision miniature tweezers",
           asmr_type: "wire_tweezing",
           narration: "Machined brass fuel cylinders with detailed micro manhole covers are positioned in their concrete saddles."
         },
@@ -223,7 +223,7 @@ const PROCEDURAL_BLUEPRINTS = {
         {
           stage_num: 2,
           action: "Mounting two detailed miniature chrome fuel dispenser pumps onto the island pad",
-          tool: "precision watchmaker tweezers",
+          tool: "precision miniature tweezers",
           asmr_type: "wire_tweezing",
           narration: "Two chrome fuel dispensers with miniature analog dial faces and flexible rubber hoses are fastened down."
         },
@@ -277,7 +277,7 @@ const PROCEDURAL_BLUEPRINTS = {
         {
           stage_num: 3,
           action: "Lowering curved stainless steel architectural lamp posts into each pre-drilled anchor socket",
-          tool: "watchmaker tweezers",
+          tool: "precision miniature tweezers",
           asmr_type: "brick_tapping",
           narration: "Custom turned stainless steel lamp posts are seated into each foundation and trued with a micro plumb line."
         },
@@ -341,7 +341,7 @@ const PROCEDURAL_BLUEPRINTS = {
         {
           stage_num: 5,
           action: "Placing micro granite curbstones along the finished trail using precision tweezers",
-          tool: "precision watchmaker tweezers",
+          tool: "precision miniature tweezers",
           asmr_type: "brick_tapping",
           narration: "Finally, individual granite curbstones lock the road in place. Our mountain village now has its first permanent avenue."
         }
@@ -428,7 +428,7 @@ const PROCEDURAL_BLUEPRINTS = {
         {
           stage_num: 4,
           action: "Laying individual rough-sawn timber road decking planks one by one across the stringers",
-          tool: "watchmaker tweezers",
+          tool: "precision miniature tweezers",
           asmr_type: "brick_tapping",
           narration: "Rough-sawn wood deck planks are secured crosswise, creating an authentic clattering timber roadway."
         },
@@ -478,7 +478,7 @@ const PROCEDURAL_BLUEPRINTS = {
         {
           stage_num: 4,
           action: "Placing miniature fired terracotta cobblestone blocks one by one using precision tweezers",
-          tool: "watchmaker tweezers",
+          tool: "precision miniature tweezers",
           asmr_type: "brick_tapping",
           narration: "Fired terracotta pavers are laid in an interlocking herringbone pattern, designed to resist scorching desert heat."
         },
@@ -566,7 +566,7 @@ This is Episode 1! The tabletop is 100% untouched wild overgrown terrain (weeds,
 Invent a realistic civil-engineering problem arising from the existing town (e.g., mud -> asphalt, drainage flooding, parking shortage, fuel depot, river bridge). Solve it step-by-step.`}
 
 CRITICAL VISUAL SPECIFICATIONS FOR ALL 5 STAGES:
-1. Every stage image prompt MUST incorporate real adult craftsman male hands, skin pores, rolled dark denim sleeves, silver wristwatch, holding miniature tools at the front of the prompt.
+1. Every stage image prompt MUST incorporate real adult craftsman male hands, skin pores, rolled dark denim sleeves (no jewelry, no wristwatches), holding miniature tools at the front of the prompt.
 2. Motion prompts: For each transition between stages, describe how the craftsman's hands smoothly move and install the miniature piece.
 3. ASMR Foley type: Select from ["grass_trimming", "dirt_scraping", "cement_troweling", "brick_tapping", "spray_painting", "gravel_rolling", "wood_cutting", "wire_tweezing"].
 4. Narration: 1-2 calm, documentary-style US English sentences per stage explaining the craftsmanship.
@@ -709,11 +709,11 @@ function generateProceduralPlan(townKey, townMemory, nextEpisode) {
     const isFirst = idx === 0;
     const isLast = idx === 4;
     
-    // Scale reference elements for unmistakable miniature town / diorama scale
-    const imagePrompt = `In a detailed 1:87 HO-scale miniature town diorama under active construction on a studio craftsman workbench: visible surrounding miniature infrastructure including tiny paved asphalt streets with painted yellow lane stripes, miniature multi-story brick townhouses, tiny warm-glowing streetlamps, micro pine trees, and scale construction cones. Craftsman workbench visible at frame edge with green grid cutting mat, precision tweezers, and miniature paint jars. Giant real adult craftsman male hands with visible skin pores and matte silver wristwatch tower over the scale miniature diorama, actively holding ${stage.tool} to ${stage.action}. ${builtSoFar}. Extreme macro 45-degree isometric tilt-shift photography on a Sony A7RV 90mm f/2.8 lens, locked tripod perspective, razor-sharp focus on the miniature worksite, cinematic shallow depth of field with soft workshop background bokeh, warm 5500K studio dual-softbox lighting, 8k resolution, ultra-detailed scale model crafting.`;
+    // Scale reference elements for unmistakable miniature town / diorama scale (zero wristwatches/accessories)
+    const imagePrompt = `Stage ${stage.stage_num}/5 of ${baseBlueprint.title}: Real craftsman adult male hands holding ${stage.tool} to ${stage.action} on a detailed 1:87 scale miniature town diorama worksite. In the diorama scene: visible miniature construction worksite showing ${stage.action}, with tiny concrete curbs, miniature paved asphalt road, surrounding tiny two-story brick townhouses, micro streetlamps, and scale trees. Craftsman studio workbench background with green cutting mat grid lines. Locked 45-degree isometric macro view on a Sony A7RV 90mm f/2.8 lens, razor-sharp focus on the miniature build, shallow depth of field, warm 5500K studio lighting, 8k resolution, authentic scale modeling.`;
 
     const nextAction = !isLast ? baseBlueprint.stages[idx + 1].action : "finishing the structure and wiping the work surface";
-    const motionPrompt = `Cinematic macro 45-degree isometric video: Smooth, steady motorized macro camera movement gliding over the 1:87 scale miniature town diorama. Real adult craftsman male hands with silver wristwatch calmly and smoothly use ${stage.tool} to ${stage.action}, transitioning smoothly toward ${nextAction}. Realistic tactile miniature modeling, zero camera jitter, buttery smooth motion, cinematic shallow depth of field, 30fps.`;
+    const motionPrompt = `Cinematic macro 45-degree isometric video: Smooth, steady motorized macro camera slide across the 1:87 scale miniature town diorama. Real craftsman hands smoothly use ${stage.tool} to ${stage.action}, transitioning smoothly toward ${nextAction}. Realistic miniature scale modeling, buttery smooth camera tracking, zero jitter, 30fps.`;
 
     return {
       stage_num: stage.stage_num,
