@@ -23,15 +23,20 @@
     "cron_utc": "12:00 UTC",
     "cron_ist": "05:30 PM IST",
     "cron_schedule": "0 12 * * *",
-    "episode": 3,
+    "episode": 4,
     "camera_seed": 739215,
-    "diorama_anchor_prompt": "Dark walnut craftsman workbench diorama base with industrial green cutting grid border subtly visible at the frame edges, flat rich dark virgin soil, tiny wild weed sprout clusters, neutral crisp 5500K studio dual-softbox lighting with delicate specular highlights. Virgin untouched tabletop landscape. Completed addition: Compacted dual-lane asphalt boulevard with concrete curbs and painted lane markers. Visible on table: Compacted dual-lane asphalt boulevard with concrete curbs and painted lane markers. Completed addition: Subterranean concrete stormwater drainage culverts and cast-iron style catch basins. Visible on table: Compacted dual-lane asphalt boulevard with concrete curbs and painted lane markers; Subterranean concrete stormwater drainage culverts and cast-iron style catch basins. Completed addition: Repaved asphalt patch with tar-sealed perimeter seams and high-visibility road work cones.",
+    "diorama_anchor_prompt": "Dark walnut craftsman workbench diorama base with industrial green cutting grid border subtly visible at the frame edges, flat rich dark virgin soil, tiny wild weed sprout clusters, neutral crisp 5500K studio dual-softbox lighting with delicate specular highlights. Virgin untouched tabletop landscape. Completed addition: Compacted dual-lane asphalt boulevard with concrete curbs and painted lane markers. Visible on table: Compacted dual-lane asphalt boulevard with concrete curbs and painted lane markers. Completed addition: Subterranean concrete stormwater drainage culverts and cast-iron style catch basins. Visible on table: Compacted dual-lane asphalt boulevard with concrete curbs and painted lane markers; Subterranean concrete stormwater drainage culverts and cast-iron style catch basins. Completed addition: Repaved asphalt patch with tar-sealed perimeter seams and high-visibility road work cones. Visible on table: Compacted dual-lane asphalt boulevard with concrete curbs and painted lane markers; Subterranean concrete stormwater drainage culverts and cast-iron style catch basins; Repaved asphalt patch with tar-sealed perimeter seams and high-visibility road work cones. Completed addition: Deep reinforced concrete underground fuel containment vault with twin brass fuel cylinders.",
     "built_structures": [
       "Compacted dual-lane asphalt boulevard with concrete curbs and painted lane markers",
       "Subterranean concrete stormwater drainage culverts and cast-iron style catch basins",
-      "Repaved asphalt patch with tar-sealed perimeter seams and high-visibility road work cones"
+      "Repaved asphalt patch with tar-sealed perimeter seams and high-visibility road work cones",
+      "Deep reinforced concrete underground fuel containment vault with twin brass fuel cylinders"
     ],
-    "active_multipart": null,
+    "active_multipart": {
+      "part": 1,
+      "total_parts": 2,
+      "title": "Metropolis Fuel Depot & Charging Hub"
+    },
     "last_frame_path": "state/last_frame_smart_city.jpg",
     "history": [
       {
@@ -51,6 +56,12 @@
         "title": "Pothole Emergency Repair & Bitumen Seal Coating",
         "subtitle_2word": "ROAD REPAIR",
         "completed_at": "2026-11-19T17:06:29.288Z"
+      },
+      {
+        "episode": 4,
+        "title": "Excavating Underground Fuel Storage Vaults (Part 1 of 2)",
+        "subtitle_2word": "FUEL VAULT",
+        "completed_at": "2026-11-19T17:29:27.835Z"
       }
     ]
   },
