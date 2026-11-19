@@ -5,9 +5,13 @@ const { planEpisode } = require('./architect');
 const { generateEpisodeVisuals } = require('./visual_engine');
 const { assembleMasterVideo } = require('./audio_video_master');
 const { processUploadAndStateCommit } = require('./uploader');
+const { getNextQueuedEpisode, markEpisodeUploaded } = require('./queue_manager');
+const { downloadAsset, deleteReleaseAndTag } = require('./github_releases');
 
 /**
- * Autonomous Mini Township Autopilot - Main Controller
+ * Autonomous Mini Township Autopilot - Main Controller & Scheduled Publisher
+ * Checks state/upload_queue.json for pre-rendered Google Flow/Veo episodes first.
+ * Falls back to autonomous cloud generation if queue is empty.
  */
 async function runTownshipAutopilot(targetTownKey = null) {
   const startTime = Date.now();
@@ -36,6 +40,89 @@ async function runTownshipAutopilot(targetTownKey = null) {
   console.log(`Color Badge: ${townMemory.badge_text} (${townMemory.badge_color})`);
   console.log(`Fixed Camera Seed: ${townMemory.camera_seed}`);
   console.log(`Diorama Anchor: "${townMemory.diorama_anchor_prompt}"\n`);
+
+  // ---------------------------------------------------------------------------
+  // STEP 0: HYBRID LOCAL QUEUE CHECK (Pre-rendered Google Flow / Veo Releases)
+  // ---------------------------------------------------------------------------
+  const queuedItem = getNextQueuedEpisode(townKey);
+  if (queuedItem && queuedItem.video_download_url) {
+    console.log(`\n======================================================`);
+    console.log(`[Publisher] PRE-RENDERED QUEUED EPISODE DETECTED!`);
+    console.log(`Town:        ${townMemory.name} (${townKey})`);
+    console.log(`Episode:     Episode ${queuedItem.episode} - "${queuedItem.title}"`);
+    console.log(`Tag/Asset:   ${queuedItem.tag_name || queuedItem.id}`);
+    console.log(`Download:    ${queuedItem.video_download_url}`);
+    console.log(`======================================================\n`);
+
+    const queueOutputDir = path.resolve('output', `${townKey}_ep${queuedItem.episode}`);
+    if (!fs.existsSync(queueOutputDir)) fs.mkdirSync(queueOutputDir, { recursive: true });
+
+    const localVideoPath = path.join(queueOutputDir, queuedItem.video_asset_name || `${townKey}_ep${queuedItem.episode}.mp4`);
+    const localThumbPath = path.join(queueOutputDir, queuedItem.thumb_asset_name || `${townKey}_ep${queuedItem.episode}_thumb.jpg`);
+
+    try {
+      console.log(`[Publisher] Downloading pre-rendered master video from GitHub Release asset...`);
+      await downloadAsset(queuedItem.video_download_url, localVideoPath);
+
+      if (queuedItem.thumb_download_url) {
+        console.log(`[Publisher] Downloading pre-rendered 3D thumbnail...`);
+        await downloadAsset(queuedItem.thumb_download_url, localThumbPath);
+      }
+
+      if (fs.existsSync(localVideoPath) && fs.statSync(localVideoPath).size > 100000) {
+        console.log(`[Publisher] Pre-rendered asset verified (${(fs.statSync(localVideoPath).size / (1024 * 1024)).toFixed(2)} MB).`);
+        console.log(`[Publisher] Dispatching scheduled upload to YouTube Shorts...`);
+
+        const uploadResult = await processUploadAndStateCommit(
+          townKey,
+          townMemory,
+          queuedItem.plan || { episode: queuedItem.episode, title: queuedItem.title, subtitle_2word: queuedItem.subtitle_2word },
+          localVideoPath,
+          localThumbPath,
+          localThumbPath
+        );
+
+        // Delete cloud release asset to conserve GitHub cloud storage
+        if (queuedItem.release_id || queuedItem.tag_name) {
+          console.log(`[Publisher] Deleting GitHub Release ${queuedItem.tag_name} to conserve cloud quota...`);
+          await deleteReleaseAndTag(queuedItem.release_id, queuedItem.tag_name).catch(() => {});
+        }
+
+        // Mark as uploaded in queue
+        markEpisodeUploaded(townKey, queuedItem.episode, {
+          published_via: 'github_actions_scheduled_queue',
+          youtube_upload: uploadResult?.youtube || null
+        });
+
+        const durationSec = ((Date.now() - startTime) / 1000).toFixed(1);
+        console.log(`\n======================================================`);
+        console.log(`SCHEDULED QUEUE PUBLISH COMPLETE IN ${durationSec}s!`);
+        console.log(`Series:       ${townMemory.name} Ep ${queuedItem.episode}`);
+        console.log(`Master Video: ${localVideoPath}`);
+        console.log(`Thumbnail:    ${localThumbPath}`);
+        console.log(`Upload Result: ${JSON.stringify(uploadResult)}`);
+        console.log(`======================================================\n`);
+
+        return {
+          townKey,
+          episode: queuedItem.episode,
+          finalVideoPath: localVideoPath,
+          finalThumbPath: localThumbPath,
+          uploadResult
+        };
+      } else {
+        console.warn(`[Publisher] Downloaded asset was invalid or corrupt. Falling back to autonomous cloud generation...`);
+      }
+    } catch (err) {
+      console.warn(`[Publisher] Notice downloading queued asset (${err.message}). Falling back to autonomous cloud generation...`);
+    }
+  } else {
+    console.log(`[Publisher] No pre-rendered queue item found for ${townKey}. Proceeding with autonomous cloud generation...`);
+  }
+
+  // ---------------------------------------------------------------------------
+  // FALLBACK: AUTONOMOUS CLOUD GENERATION PIPELINE
+  // ---------------------------------------------------------------------------
 
   // Setup Episode Output Directory
   const nextEpNum = (townMemory.episode || 0) + 1;

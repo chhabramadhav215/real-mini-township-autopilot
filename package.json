@@ -13,7 +13,9 @@
     "test:city": "node test_local.js smart_city",
     "test:desert": "node test_local.js desert_town",
     "local:login": "node scripts/local_login.js",
-    "local:auto": "node src/local_browser_runner.js"
+    "local:auto": "node src/local_browser_runner.js",
+    "local:queue": "node src/local_queue_builder.js",
+    "queue:clean": "node src/local_queue_builder.js --clean-only"
   },
   "keywords": [
     "miniature",

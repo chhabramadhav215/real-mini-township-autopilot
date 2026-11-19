@@ -1,122 +1,144 @@
-# Local Windows 11 Automation Guide (Google Flow / Veo + YouTube Shorts)
+# Hybrid Local-Queue + GitHub-Scheduled-Upload Automation Guide
 
-This guide explains how to generate genuine, continuous-motion miniature diorama construction videos using your authenticated **Google AI Pro (Google Flow / Veo)** browser session on Windows 11, then automatically assemble neural voiceover, acoustic ASMR foley, dynamic subtitles, series badges, and upload directly to **YouTube Shorts**.
+This guide details the **Hybrid Local-Queue + GitHub-Scheduled-Upload architecture** for `real-mini-township-autopilot`. It allows you to pre-generate genuine 1:87 HO-scale miniature diorama construction episodes using **Google AI Pro (Google Flow / Veo)** whenever your Windows 11 laptop is turned on, while **GitHub Actions publishes them autonomously on schedule** (even when your laptop is turned off or in sleep mode).
+
+Local disk space is automatically capped under **2.0 GB** with smart cleanup of previously published episodes.
 
 ---
 
-## 1. Quick Architecture Overview
+## 1. System Architecture
 
 ```
-[Google Flow / Veo (labs.google/fx/tools/flow)]
-         │ (Automated via Playwright with persistent session in .browser_profile)
-         ▼
-[5x High-Fidelity 1:87 HO-Scale Diorama Construction Video Clips]
-         │ (Saved & Standardized to 1080x1920 @ 30fps)
-         ▼
-[Audio/Video Mastering Engine]
-  ├── Azure Neural Voiceover (Microsoft Edge-TTS "en-US-AndrewNeural")
-  ├── Multi-Layer Acoustic ASMR Foley (cement, troweling, tweezing, rolling)
-  ├── Pre-Roll (400ms) & Post-Roll (600ms) settling padding (zero voice cutoffs)
-  ├── Re-encoded Filter-Complex Concat (concat=n=5:v=1:a=1)
-  ├── 3D High-Contrast Thumbnail (1080x1920 JPEG)
-  └── Dynamic Episode & Series SVG Badge Overlays
-         ▼
-[Autonomous Dispatch & Continuity Sync]
-  ├── Direct YouTube Shorts Upload via YouTube Data API v3
-  └── State Continuity Update (state/town_memory.json & anchor frame)
+┌────────────────────────────────────────────────────────────────────────┐
+│ WINDOWS 11 LAPTOP (Runs whenever turned on or via Task Scheduler)      │
+│                                                                        │
+│ 1. Storage Auto-Cleanup:                                               │
+│    Reads state/upload_queue.json and deletes raw clips and rendered    │
+│    .mp4/.jpg files for any episodes marked uploaded: true.             │
+│                                                                        │
+│ 2. Storage Quota Check:                                                │
+│    Ensures total local queue size is strictly < 1.8 GB (Hard Cap: 2GB) │
+│                                                                        │
+│ 3. Batch Diorama Generation:                                           │
+│    Uses Google Flow / Veo (Playwright) to generate 5 real-motion clips  │
+│    across Mountain Village, Smart City, and Desert Town.               │
+│                                                                        │
+│ 4. Cloud Release Hosting:                                              │
+│    Uploads .mp4 & .jpg to GitHub Releases (keeps git repo < 5 MB)      │
+│    and pushes metadata to state/upload_queue.json on origin/main.      │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │ Pushes state/upload_queue.json
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ GITHUB ACTIONS CLOUD SCHEDULE (Runs 24/7 even with laptop powered off) │
+│                                                                        │
+│ 06:00 UTC (11:30 AM IST) -> Mountain Village                           │
+│ 12:00 UTC (05:30 PM IST) -> Smart City                                 │
+│ 17:00 UTC (10:30 PM IST) -> Desert Town                                │
+│                                                                        │
+│ 1. Checks state/upload_queue.json for pre-rendered Google Flow asset   │
+│ 2. Downloads master .mp4 & thumbnail from GitHub Release asset         │
+│ 3. Publishes to YouTube Shorts (+ Instagram / Facebook Reels if set)   │
+│ 4. Deletes GitHub Release asset to conserve cloud quota                │
+│ 5. Marks episode uploaded: true in state/upload_queue.json             │
+│ 6. Syncs updated state back to origin/main                             │
+│                                                                        │
+│ * Note: If queue is empty, falls back to autonomous cloud diffusion    │
+└────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## 2. One-Time Setup: Authenticate Google Flow (`npm run local:login`)
 
-To allow Playwright to generate videos using your **Google AI Pro** subscription, log in once using the dedicated setup command:
+Log into your Google AI Pro / Veo account once in a persistent Chrome browser profile:
 
 ```cmd
 npm run local:login
 ```
 
-### What Happens:
-1. Google Chrome opens to `https://labs.google/fx/tools/flow`.
-2. Sign in to your Google Account that has Google AI Pro / Veo access.
-3. Once you see the Google Flow project or prompt interface, return to your terminal and press **ENTER** (or close the browser window).
-4. All authentication tokens, cookies, and local state are saved to `.browser_profile/`.
-
-> [!IMPORTANT]
-> Both `.browser_profile/` and `.env` are strictly listed in `.gitignore`. Your Google session credentials and cookies will **NEVER** be committed or pushed to GitHub.
+* Chrome opens to `https://labs.google/fx/tools/flow`.
+* Log in with your Google account that has Google AI Pro access.
+* Once you see the Google Flow generation interface, return to the terminal and press **ENTER**.
+* Session cookies and storage are saved in `.browser_profile/` (strictly gitignored).
 
 ---
 
-## 3. Running Local Generation & Testing
+## 3. Local Queue Management Commands
 
-### A. Test Run (Dry Run — Video Generation & Assembly Only)
-Inspect the generated video and 3D thumbnail locally in `output/` without uploading:
-
-```cmd
-npm run local:auto -- --town=smart_city --dry-run
-```
-
-Available series keys:
-* `--town=smart_city` (Metropolis Smart City series)
-* `--town=mountain_village` (Alpine Mountain Village series)
-* `--town=desert_town` (Desert Outpost series)
-
-### B. Live Run (Generate + Auto-Upload to YouTube Shorts)
-Once tested, run without `--dry-run` to generate the next episode and automatically publish it to YouTube Shorts:
+### A. Batch Generate Upcoming Episodes (`npm run local:queue`)
+Pre-generates upcoming episodes across the 3 towns, uploads assets to GitHub Releases, and updates `state/upload_queue.json`:
 
 ```cmd
-npm run local:auto -- --town=smart_city
+npm run local:queue
 ```
 
-### Optional Command-Line Flags
-* `--headless`: Runs the browser silently in the background (default is a visible Chrome window so you can watch generation live).
-* `--timeout=240000`: Sets custom max wait time per stage in milliseconds (default: 180,000 ms = 3 minutes).
-* `--skip-browser`: Skips the Flow generation step and re-masters existing clips in `output/<town_key>_ep<num>/clips/`.
+#### Optional Options:
+* `--max=5`: Set maximum episodes to batch build in this session (Default: 3).
+* `--town=smart_city`: Target a specific town instead of auto-balancing.
+* `--clean-only`: Run storage cleanup of uploaded files and exit.
+* `--dry-run`: Render and master locally without uploading to GitHub Releases.
+* `--headless`: Run Playwright in background without visible Chrome window.
+
+### B. Quick Storage Cleanup (`npm run queue:clean`)
+Reclaims local disk space immediately by deleting files for episodes already uploaded by GitHub Actions:
+
+```cmd
+npm run queue:clean
+```
 
 ---
 
-## 4. Automatic Execution on Windows 11 (Task Scheduler)
+## 4. Automatic Startup & Cleanup on Windows 11
 
-You can configure Windows 11 to automatically run the builder and publish fresh episodes whenever your laptop turns on or on a schedule.
+### A. One-Click Batch Runner (`run_township_queue.bat`)
+A lightweight batch runner is included in the project root:
+* Pulls the latest upload status from GitHub (`git pull --rebase origin main`).
+* Cleans up local disk space for all published episodes.
+* Tops up the queue with upcoming episodes while total storage is under **1.8 GB**.
+* Logs all activity to `logs/queue_run.log`.
 
-### Option A: One-Click PowerShell Command (Recommended)
+You can double-click `run_township_queue.bat` at any time, or let Windows Task Scheduler run it automatically.
 
-Open **PowerShell as Administrator** and run:
+### B. Task Scheduler Setup (Runs whenever Laptop Turns On)
+
+#### Option 1: PowerShell Command (Recommended)
+Open **PowerShell as Administrator** and execute:
 
 ```powershell
-$Action = New-ScheduledTaskAction -Execute "cmd.exe" -Argument '/c "cd /d C:\real-mini-township && npm run local:auto"'
+$Action = New-ScheduledTaskAction -Execute "cmd.exe" -Argument '/c "cd /d C:\real-mini-township && run_township_queue.bat --no-pause"'
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
-Register-ScheduledTask -TaskName "RealMiniTownshipAutopilot" -Action $Action -Trigger $Trigger -Settings $Settings -Description "Autonomous Mini Township Diorama Builder & YouTube Shorts Generator"
+Register-ScheduledTask -TaskName "RealMiniTownshipQueue" -Action $Action -Trigger $Trigger -Settings $Settings -Description "Autonomous 2GB-Capped Mini Township Diorama Batch Builder"
 ```
 
-### Option B: Windows GUI Task Scheduler Step-by-Step
-
+#### Option 2: Windows GUI Task Scheduler
 1. Press `Win + R`, type `taskschd.msc`, and press **Enter**.
-2. In the right-hand panel, click **Create Basic Task...**.
-3. **Name**: `Real Mini Township Autopilot`.
-4. **Trigger**: Select **When I log on** (or choose **Daily** at your preferred time, e.g., 11:30 AM IST).
+2. Click **Create Basic Task...** in the Actions pane on the right.
+3. **Name**: `Real Mini Township Queue Builder`.
+4. **Trigger**: Select **When I log on** (or choose **Daily** at a preferred time).
 5. **Action**: Select **Start a program**.
    * **Program/script**: `cmd.exe`
-   * **Add arguments**: `/c "cd /d C:\real-mini-township && npm run local:auto"`
+   * **Add arguments**: `/c "cd /d C:\real-mini-township && run_township_queue.bat --no-pause"`
 6. Click **Next**, check **Open the Properties dialog for this task when I click Finish**, and click **Finish**.
 7. In the Properties window:
-   * Go to the **Conditions** tab.
-   * **Uncheck** *"Start the task only if the computer is on AC power"* (so it runs even when running on battery).
-   * **Check** *"Wake the computer to run this task"* (optional).
+   * **Conditions** tab: Uncheck *"Start the task only if the computer is on AC power"*.
+   * **Settings** tab: Check *"Run task as soon as possible after a scheduled start is missed"*.
 8. Click **OK** to save.
 
 ---
 
-## 5. YouTube API Credentials in `.env` (For Local Direct Uploads)
+## 5. Storage Quota & GitHub Release Secrets
 
-If you want the local Windows runner to upload directly to your YouTube channel (rather than relying solely on GitHub Actions cloud runs), ensure your local `.env` file contains:
+### Local Storage Enforcement (2 GB Limit)
+* **Soft limit (1.8 GB)**: The runner stops generating new episodes once total folder size in `output/` + `queue_out/` reaches 1.8 GB, preventing laptop disk bloat.
+* **Hard cap (2.0 GB)**: Generation is strictly halted until GitHub Actions publishes pending episodes and frees local storage during the next startup cleanup.
+
+### GitHub Release Hosting (`GITHUB_TOKEN` in `.env`)
+To allow the local batch builder to upload large `.mp4` and `.jpg` assets to GitHub Releases, add your GitHub Personal Access Token to your local `.env`:
 
 ```env
-YOUTUBE_CLIENT_ID=your_client_id.apps.googleusercontent.com
-YOUTUBE_CLIENT_SECRET=your_client_secret
-YOUTUBE_REFRESH_TOKEN=your_refresh_token
-YOUTUBE_PRIVACY=public
+GITHUB_TOKEN=ghp_yourPersonalAccessTokenHere
 ```
 
-If these keys are omitted or if `--dry-run` is active, the runner will assemble the complete 1080x1920 Short and 3D thumbnail in `output/` and cleanly skip upload without throwing any errors.
+*(Token requires `repo` scope to create releases and upload assets).*
