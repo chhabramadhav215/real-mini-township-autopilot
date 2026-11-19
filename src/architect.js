@@ -713,7 +713,7 @@ function generateProceduralPlan(townKey, townMemory, nextEpisode) {
     const imagePrompt = `Real adult craftsman male hands with visible skin pores, subtle soil dust on knuckles, rolled-up dark denim work sleeves, and a matte silver wristwatch actively holding ${stage.tool} to ${stage.action} on the wooden diorama table. Extreme macro 45-degree isometric tilt-shift photography on a Sony A7RV 90mm f/2.8 lens, locked tripod perspective, razor-sharp macro focus on the miniature build, shallow depth of field, creamy bokeh workshop background, consistent 5500K directional studio lighting, 8k resolution, hyper-realistic diorama scale modeling.`;
 
     const nextAction = !isLast ? baseBlueprint.stages[idx + 1].action : "finishing the structure and wiping the work surface";
-    const motionPrompt = `Macro 45-degree isometric video: Craftsman male hands with rolled dark denim sleeves and silver wristwatch smoothly use ${stage.tool} to ${stage.action}, transitioning toward ${nextAction}. Realistic tactile micro movements of real hands and miniature materials, fixed tripod view.`;
+    const motionPrompt = `Extreme macro 45-degree isometric action video: Adult craftsman male hands with visible skin pores and silver wristwatch actively and continuously moving, using ${stage.tool} with vigorous working motions to ${stage.action}, loose miniature materials and dust shifting realistically, hands actively advancing work toward ${nextAction}. Dynamic tactile construction motion, real physical hands in motion, 60fps cinematic macro focus.`;
 
     return {
       stage_num: stage.stage_num,
