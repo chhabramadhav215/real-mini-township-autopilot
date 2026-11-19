@@ -23,11 +23,12 @@
     "cron_utc": "12:00 UTC",
     "cron_ist": "05:30 PM IST",
     "cron_schedule": "0 12 * * *",
-    "episode": 1,
+    "episode": 2,
     "camera_seed": 739215,
-    "diorama_anchor_prompt": "Dark walnut craftsman workbench diorama base with industrial green cutting grid border subtly visible at the frame edges, flat rich dark virgin soil, tiny wild weed sprout clusters, neutral crisp 5500K studio dual-softbox lighting with delicate specular highlights. Virgin untouched tabletop landscape. Completed addition: Compacted dual-lane asphalt boulevard with concrete curbs and painted lane markers.",
+    "diorama_anchor_prompt": "Dark walnut craftsman workbench diorama base with industrial green cutting grid border subtly visible at the frame edges, flat rich dark virgin soil, tiny wild weed sprout clusters, neutral crisp 5500K studio dual-softbox lighting with delicate specular highlights. Virgin untouched tabletop landscape. Completed addition: Compacted dual-lane asphalt boulevard with concrete curbs and painted lane markers. Visible on table: Compacted dual-lane asphalt boulevard with concrete curbs and painted lane markers. Completed addition: Subterranean concrete stormwater drainage culverts and cast-iron style catch basins.",
     "built_structures": [
-      "Compacted dual-lane asphalt boulevard with concrete curbs and painted lane markers"
+      "Compacted dual-lane asphalt boulevard with concrete curbs and painted lane markers",
+      "Subterranean concrete stormwater drainage culverts and cast-iron style catch basins"
     ],
     "active_multipart": null,
     "last_frame_path": "state/last_frame_smart_city.jpg",
@@ -37,6 +38,12 @@
         "title": "Clearing the Untouched Tabletop for the Metropolis",
         "subtitle_2word": "METRO GROUND",
         "completed_at": "2026-11-19T16:09:48.035Z"
+      },
+      {
+        "episode": 2,
+        "title": "Installing Subterranean Drainage Culverts & Sump Basins",
+        "subtitle_2word": "STORM DRAINAGE",
+        "completed_at": "2026-11-19T16:41:31.137Z"
       }
     ]
   },
