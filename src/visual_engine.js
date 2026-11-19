@@ -416,6 +416,13 @@ async function tryHFI2VSpaces(firstFramePath, lastFramePath, motionPrompt, hfTok
  * and cinematic crossfades.
  */
 async function createContinuousWorkingMotionVideo(firstFramePath, lastFramePath, stage, townSeed, destVideoPath, transitionsDir) {
+  if (!destVideoPath || typeof destVideoPath !== 'string') {
+    throw new TypeError(`[VisualEngine] destVideoPath must be a valid string path. Received: ${typeof destVideoPath} (${destVideoPath})`);
+  }
+  if (!transitionsDir || typeof transitionsDir !== 'string') {
+    transitionsDir = path.dirname(destVideoPath);
+  }
+
   console.log(`[VisualEngine] Synthesizing continuous working motion video -> ${path.basename(destVideoPath)}`);
 
   const actionFramePath = path.join(transitionsDir, `action_${stage.stage_num}.jpg`);

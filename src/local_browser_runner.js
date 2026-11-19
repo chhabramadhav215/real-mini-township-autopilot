@@ -11,7 +11,7 @@ const { processUploadAndStateCommit } = require('./uploader');
 /**
  * Local Windows Browser Automation Runner (Google Flow / Veo AI Video Clips)
  * Uses persistent Google Chrome/Chromium profile (.browser_profile) to automate
- * genuine text-to-video / image-to-video diorama clips on labs.google/fx/tools/flow.
+ * genuine text-to-video / image-to-video diorama clips on flow.google.com.
  *
  * Usage:
  *   npm run local:auto
@@ -113,6 +113,147 @@ async function extractThumbnailFrame(videoClipPath, outputImagePath) {
 }
 
 /**
+ * Save diagnostic screenshot and HTML dump to logs/ for instant verification
+ */
+async function saveDebugSnapshot(page, stageNum, note) {
+  try {
+    const logsDir = path.resolve('logs');
+    if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true });
+
+    const timestamp = Date.now();
+    const screenshotPath = path.join(logsDir, `flow_debug_stage_${stageNum}_${timestamp}.png`);
+    const htmlPath = path.join(logsDir, `flow_debug_stage_${stageNum}_${timestamp}.html`);
+
+    await page.screenshot({ path: screenshotPath, fullPage: true }).catch(() => {});
+    const htmlContent = await page.content().catch(() => '');
+    fs.writeFileSync(htmlPath, htmlContent, 'utf8');
+
+    console.log(`[LocalRunner] Debug snapshot saved:`);
+    console.log(`  Screenshot: ${screenshotPath}`);
+    console.log(`  HTML Dump:  ${htmlPath}`);
+    console.log(`  Page URL:   ${page.url()}`);
+    console.log(`  Page Title: ${await page.title().catch(() => '')}`);
+    console.log(`  Diagnosis:  ${note}`);
+  } catch (err) {
+    console.warn(`[LocalRunner] Could not save debug snapshot: ${err.message}`);
+  }
+}
+
+/**
+ * Ensure browser is inside an active Google Flow project workspace
+ * Handles flow.google.com project creation (+ New project) or opening an existing workspace
+ */
+async function ensureGoogleFlowWorkspace(page) {
+  console.log(`[LocalRunner] Checking Google Flow workspace state (Current URL: ${page.url()})...`);
+
+  // 1. Check if already inside an active project/editor
+  const isInsideProject = page.url().includes('/project/') || page.url().includes('/editor');
+  const promptCheck = page.locator('textarea, [contenteditable="true"], [role="textbox"]').first();
+  if (isInsideProject || await promptCheck.isVisible().catch(() => false)) {
+    console.log(`[LocalRunner] Active project workspace detected.`);
+    return true;
+  }
+
+  // 2. Check for "+ New project" button
+  console.log(`[LocalRunner] On Google Flow home/dashboard. Searching for "+ New project" trigger...`);
+  const newProjectSelectors = [
+    'button:has-text("New project")',
+    'button:has-text("+ New")',
+    'button:has-text("Create project")',
+    'a:has-text("New project")',
+    'a:has-text("Create project")',
+    '[aria-label*="New project" i]',
+    '[aria-label*="Create project" i]',
+    'div[role="button"]:has-text("New project")',
+    'div[role="button"]:has-text("Create")',
+    'div[role="button"]:has-text("+")',
+    'button:has-text("New")',
+    '[data-testid*="new-project" i]'
+  ];
+
+  for (const sel of newProjectSelectors) {
+    const el = page.locator(sel).first();
+    if (await el.isVisible().catch(() => false)) {
+      console.log(`[LocalRunner] Found project creation trigger: "${sel}". Clicking...`);
+      await el.click().catch(() => {});
+      await page.waitForTimeout(4000);
+      return true;
+    }
+  }
+
+  // 3. Fallback: Open first existing project card if available
+  console.log(`[LocalRunner] Searching for existing project card on dashboard...`);
+  const existingProjectSelectors = [
+    'a[href*="/project/"]',
+    'div[role="button"][data-project-id]',
+    '[data-testid*="project-card" i]',
+    'div[role="button"]:has-text("Project")',
+    'div[role="button"]:has-text("Untitled")'
+  ];
+
+  for (const sel of existingProjectSelectors) {
+    const el = page.locator(sel).first();
+    if (await el.isVisible().catch(() => false)) {
+      console.log(`[LocalRunner] Found existing project link: "${sel}". Opening...`);
+      await el.click().catch(() => {});
+      await page.waitForTimeout(4000);
+      return true;
+    }
+  }
+
+  console.warn(`[LocalRunner] Notice: Could not detect "+ New project" or existing project on dashboard.`);
+  return false;
+}
+
+/**
+ * Ensure Video (Veo) mode is active if a mode toggle exists
+ */
+async function ensureVideoMode(page) {
+  const videoModeSelectors = [
+    'button:has-text("Video")',
+    'button:has-text("Veo")',
+    '[role="tab"]:has-text("Video")',
+    'button:has-text("Text to video")',
+    '[aria-label*="Video" i]',
+    'div[role="tab"]:has-text("Video")'
+  ];
+
+  for (const sel of videoModeSelectors) {
+    const el = page.locator(sel).first();
+    if (await el.isVisible().catch(() => false)) {
+      const isSelected = await el.getAttribute('aria-selected').catch(() => null);
+      const className = await el.getAttribute('class').catch(() => '');
+      if (isSelected !== 'true' && !className.includes('selected') && !className.includes('active')) {
+        console.log(`[LocalRunner] Selecting Video (Veo) mode via "${sel}"...`);
+        await el.click().catch(() => {});
+        await page.waitForTimeout(1000);
+      }
+      break;
+    }
+  }
+}
+
+/**
+ * Ensure 9:16 portrait aspect ratio if toggle is available
+ */
+async function ensureVerticalRatio(page) {
+  const ratioSelectors = [
+    'button:has-text("9:16")',
+    '[aria-label*="9:16" i]',
+    'button:has-text("Portrait")',
+    '[data-value="9:16"]'
+  ];
+  for (const sel of ratioSelectors) {
+    const el = page.locator(sel).first();
+    if (await el.isVisible().catch(() => false)) {
+      console.log(`[LocalRunner] Setting 9:16 portrait ratio via "${sel}"...`);
+      await el.click().catch(() => {});
+      break;
+    }
+  }
+}
+
+/**
  * Automate Google Flow / Veo via Playwright
  */
 async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, options) {
@@ -152,14 +293,15 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
     const pages = browserContext.pages();
     page = pages.length > 0 ? pages[0] : await browserContext.newPage();
 
-    const flowUrl = process.env.GOOGLE_FLOW_URL || 'https://labs.google/fx/tools/flow';
+    // Prefer flow.google.com directly (handles redirect from labs.google/fx/tools/flow)
+    const flowUrl = process.env.GOOGLE_FLOW_URL || 'https://flow.google.com';
     console.log(`[LocalRunner] Navigating to Google Flow: ${flowUrl}...`);
-    await page.goto(flowUrl, { waitUntil: 'domcontentloaded', timeout: 45000 }).catch(e => {
+    await page.goto(flowUrl, { waitUntil: 'domcontentloaded', timeout: 60000 }).catch(e => {
       console.warn(`[LocalRunner] Page load notice: ${e.message}`);
     });
 
-    // Wait 3 seconds for client hydration
-    await page.waitForTimeout(3000);
+    // Wait 4 seconds for client hydration
+    await page.waitForTimeout(4000);
 
     // Check if user is logged in
     const pageContent = await page.content().catch(() => '');
@@ -169,6 +311,11 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
       console.warn(`[LocalRunner] If a sign-in prompt is visible, please complete login in the opened browser window.`);
       console.warn(`[LocalRunner] Or close this and run: npm run local:login\n`);
     }
+
+    // Ensure we are inside an active workspace
+    await ensureGoogleFlowWorkspace(page);
+    await ensureVideoMode(page);
+    await ensureVerticalRatio(page);
 
     // Process each stage
     for (let i = 0; i < plan.stages.length; i++) {
@@ -188,6 +335,10 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
         continue;
       }
 
+      // Check workspace state before prompt input
+      await ensureGoogleFlowWorkspace(page);
+      await ensureVideoMode(page);
+
       // High-detail miniature diorama construction video prompt optimized for Veo
       const veoPrompt = `Cinematic macro 45-degree isometric video: Smooth, steady motorized macro camera glide across 1:87 HO-scale miniature town diorama worksite. Real adult craftsman male hands with visible skin pores and rolled dark denim work sleeves calmly use ${stage.tool} to ${stage.action}. Visible diorama surroundings: miniature paved asphalt streets with painted lines, tiny concrete curbs, two-story brick townhouses, micro streetlamps, scale trees, and green grid cutting mat. Authentic scale modeling craftsmanship, real physical working motion, shallow depth of field, razor-sharp focus on the miniature build, 30fps.`;
 
@@ -196,38 +347,59 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
       try {
         // Find prompt input field
         const inputSelectors = [
-          'textarea[placeholder*="prompt" i]',
           'textarea[placeholder*="describe" i]',
+          'textarea[placeholder*="prompt" i]',
+          'textarea[placeholder*="video" i]',
+          'textarea[placeholder*="what you want" i]',
+          'textarea[aria-label*="prompt" i]',
+          'textarea[aria-label*="describe" i]',
           'div[contenteditable="true"]',
           'div[role="textbox"]',
           'textarea',
+          'input[type="text"][placeholder*="prompt" i]',
           'input[type="text"]'
         ];
 
         let promptInput = null;
-        for (const sel of inputSelectors) {
-          const el = page.locator(sel).first();
-          if (await el.isVisible().catch(() => false)) {
-            promptInput = el;
-            console.log(`[LocalRunner] Found prompt input using selector: "${sel}"`);
-            break;
+        for (let attempt = 0; attempt < 3; attempt++) {
+          for (const sel of inputSelectors) {
+            const el = page.locator(sel).first();
+            if (await el.isVisible().catch(() => false)) {
+              promptInput = el;
+              console.log(`[LocalRunner] Found prompt input using selector: "${sel}"`);
+              break;
+            }
           }
+          if (promptInput) break;
+          await page.waitForTimeout(2000);
         }
 
         if (promptInput) {
           console.log(`[LocalRunner] Entering Veo prompt for Stage ${stage.stage_num}...`);
-          await promptInput.click();
-          await promptInput.fill('');
-          await promptInput.fill(veoPrompt);
+          await promptInput.click().catch(() => {});
+          const tagName = await promptInput.evaluate(el => el.tagName.toLowerCase()).catch(() => 'textarea');
+
+          if (tagName === 'textarea' || tagName === 'input') {
+            await promptInput.fill('');
+            await promptInput.fill(veoPrompt);
+          } else {
+            // Contenteditable div
+            await page.keyboard.press('Control+A');
+            await page.keyboard.press('Backspace');
+            await page.keyboard.type(veoPrompt, { delay: 10 });
+          }
           await page.waitForTimeout(1000);
 
-          // Attempt to find and click Generate / Create button
+          // Find and click submit/generate button
           const buttonSelectors = [
             'button:has-text("Generate")',
             'button:has-text("Create")',
+            'button:has-text("Run")',
             'button[aria-label*="Generate" i]',
             'button[aria-label*="Submit" i]',
-            'button[type="submit"]'
+            'button[aria-label*="Send" i]',
+            'button[type="submit"]',
+            'button:has(svg)'
           ];
 
           let generateBtn = null;
@@ -240,47 +412,73 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
             }
           }
 
+          // Setup video download listener
+          let interceptedUrl = null;
+          const responseHandler = async (response) => {
+            try {
+              const url = response.url();
+              const contentType = response.headers()['content-type'] || '';
+              if ((contentType.includes('video/mp4') || url.endsWith('.mp4') || (url.includes('googlevideo') && contentType.includes('video'))) && response.status() === 200) {
+                interceptedUrl = url;
+              }
+            } catch (e) {}
+          };
+          page.on('response', responseHandler);
+
           if (generateBtn) {
             console.log(`[LocalRunner] Submitting generation request to Veo...`);
             await generateBtn.click();
+          } else {
+            console.log(`[LocalRunner] Pressing Control+Enter / Enter to submit prompt...`);
+            await page.keyboard.press('Control+Enter');
+          }
 
-            // Setup video download listener
-            let interceptedUrl = null;
-            const responseHandler = async (response) => {
-              try {
-                const url = response.url();
-                const contentType = response.headers()['content-type'] || '';
-                if ((contentType.includes('video/mp4') || url.endsWith('.mp4') || (url.includes('googlevideo') && contentType.includes('video'))) && response.status() === 200) {
-                  interceptedUrl = url;
-                }
-              } catch (e) {}
-            };
-            page.on('response', responseHandler);
+          console.log(`[LocalRunner] Waiting for Veo generation to complete (up to ${options.timeoutMs / 1000}s)...`);
+          const startTime = Date.now();
+          let videoFound = false;
 
-            console.log(`[LocalRunner] Waiting for Veo generation to complete (up to ${options.timeoutMs / 1000}s)...`);
-            const startTime = Date.now();
-            let videoFound = false;
+          while (Date.now() - startTime < options.timeoutMs) {
+            await page.waitForTimeout(5000);
 
-            while (Date.now() - startTime < options.timeoutMs) {
-              await page.waitForTimeout(5000);
-
-              // Check if intercepted video response occurred
-              if (interceptedUrl) {
-                console.log(`[LocalRunner] Intercepted video media response: ${interceptedUrl.slice(0, 80)}...`);
-                const videoBuffer = await page.request.get(interceptedUrl).then(r => r.body()).catch(() => null);
-                if (videoBuffer && videoBuffer.length > 50000) {
-                  fs.writeFileSync(rawClipPath, videoBuffer);
-                  videoFound = true;
-                  break;
-                }
+            // 1. Check if intercepted video response occurred
+            if (interceptedUrl) {
+              console.log(`[LocalRunner] Intercepted video media response: ${interceptedUrl.slice(0, 80)}...`);
+              const videoBuffer = await page.request.get(interceptedUrl).then(r => r.body()).catch(() => null);
+              if (videoBuffer && videoBuffer.length > 50000) {
+                fs.writeFileSync(rawClipPath, videoBuffer);
+                videoFound = true;
+                break;
               }
+            }
 
-              // Check for video element in DOM
-              const videoLocator = page.locator('video').first();
-              if (await videoLocator.isVisible().catch(() => false)) {
-                const src = await videoLocator.getAttribute('src').catch(() => null);
-                if (src && src.startsWith('http')) {
-                  console.log(`[LocalRunner] Detected video src in DOM: ${src.slice(0, 80)}...`);
+            // 2. Check for video element in DOM
+            const videoLocator = page.locator('video').first();
+            if (await videoLocator.isVisible().catch(() => false)) {
+              const src = await videoLocator.getAttribute('src').catch(() => null);
+              if (src) {
+                console.log(`[LocalRunner] Detected video src in DOM: ${src.slice(0, 80)}...`);
+                if (src.startsWith('blob:')) {
+                  // Extract blob as base64 via page evaluate
+                  const videoBase64 = await page.evaluate(async (videoSrc) => {
+                    try {
+                      const res = await fetch(videoSrc);
+                      const blob = await res.blob();
+                      return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                        reader.readAsDataURL(blob);
+                      });
+                    } catch (e) {
+                      return null;
+                    }
+                  }, src);
+
+                  if (videoBase64 && videoBase64.length > 50000) {
+                    fs.writeFileSync(rawClipPath, Buffer.from(videoBase64, 'base64'));
+                    videoFound = true;
+                    break;
+                  }
+                } else if (src.startsWith('http')) {
                   const videoBuffer = await page.request.get(src).then(r => r.body()).catch(() => null);
                   if (videoBuffer && videoBuffer.length > 50000) {
                     fs.writeFileSync(rawClipPath, videoBuffer);
@@ -289,33 +487,37 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
                   }
                 }
               }
-
-              // Check for Download button
-              const downloadBtn = page.locator('button:has-text("Download"), a[download]').first();
-              if (await downloadBtn.isVisible().catch(() => false)) {
-                try {
-                  const [download] = await Promise.all([
-                    page.waitForEvent('download', { timeout: 15000 }),
-                    downloadBtn.click()
-                  ]);
-                  await download.saveAs(rawClipPath);
-                  videoFound = true;
-                  break;
-                } catch (e) {}
-              }
             }
 
-            page.off('response', responseHandler);
-
-            if (videoFound && fs.existsSync(rawClipPath)) {
-              await standardizeClip(rawClipPath, finalClipPath);
-              clips.push(finalClipPath);
-              generated = true;
+            // 3. Check for Download button
+            const downloadBtn = page.locator('button:has-text("Download"), a[download], [aria-label*="Download" i]').first();
+            if (await downloadBtn.isVisible().catch(() => false)) {
+              try {
+                const [download] = await Promise.all([
+                  page.waitForEvent('download', { timeout: 15000 }),
+                  downloadBtn.click()
+                ]);
+                await download.saveAs(rawClipPath);
+                videoFound = true;
+                break;
+              } catch (e) {}
             }
           }
+
+          page.off('response', responseHandler);
+
+          if (videoFound && fs.existsSync(rawClipPath) && fs.statSync(rawClipPath).size > 50000) {
+            await standardizeClip(rawClipPath, finalClipPath);
+            clips.push(finalClipPath);
+            generated = true;
+          }
+        } else {
+          console.warn(`[LocalRunner] Could not locate prompt input on Google Flow.`);
+          await saveDebugSnapshot(page, stage.stage_num, 'Prompt input field not located in DOM');
         }
       } catch (err) {
         console.warn(`[LocalRunner] Flow automation notice for Stage ${stage.stage_num}: ${err.message}`);
+        await saveDebugSnapshot(page, stage.stage_num, `Exception: ${err.message}`);
       }
 
       // If Google Flow didn't return a clip or encountered a UI timeout, fall back seamlessly
@@ -326,8 +528,16 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
 
         const townSeed = townMemory.camera_seed || 739215;
         const keyframePath = await generateKeyframe(stage, townKey, plan.episode, townSeed, fallbackStagesDir);
-        const stageVideo = await createContinuousWorkingMotionVideo(keyframePath, keyframePath, stage, townKey, townSeed, 5.0, clipsDir);
-        await standardizeClip(stageVideo, finalClipPath);
+        const rawFallbackVideo = path.join(clipsDir, `fallback_clip_${stage.stage_num}.mp4`);
+        await createContinuousWorkingMotionVideo(
+          keyframePath,
+          keyframePath,
+          stage,
+          townSeed,
+          rawFallbackVideo,
+          fallbackStagesDir
+        );
+        await standardizeClip(rawFallbackVideo, finalClipPath);
         clips.push(finalClipPath);
       }
     }
