@@ -1,6 +1,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { spawnSync } = require('child_process');
 const { chromium } = require('playwright');
 const { planEpisode } = require('./architect');
@@ -317,6 +318,8 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
     await ensureVideoMode(page);
     await ensureVerticalRatio(page);
 
+    const downloadedHashes = new Set();
+
     // Process each stage
     for (let i = 0; i < plan.stages.length; i++) {
       const stage = plan.stages[i];
@@ -329,15 +332,32 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
       console.log(`Tool:   ${stage.tool}`);
       console.log(`======================================================`);
 
+      // Verify existing clip is unique and not a duplicate of a prior stage
       if (fs.existsSync(finalClipPath) && fs.statSync(finalClipPath).size > 100000) {
-        console.log(`[LocalRunner] Clip already exists for Stage ${stage.stage_num}: ${finalClipPath}`);
-        clips.push(finalClipPath);
-        continue;
+        const existingHash = crypto.createHash('sha256').update(fs.readFileSync(finalClipPath)).digest('hex');
+        if (downloadedHashes.has(existingHash)) {
+          console.warn(`[LocalRunner] Existing clip for Stage ${stage.stage_num} is an identical duplicate of a prior stage (${existingHash.slice(0, 10)}). Invalidating and regenerating...`);
+          try { fs.unlinkSync(finalClipPath); } catch (e) {}
+          try { if (fs.existsSync(rawClipPath)) fs.unlinkSync(rawClipPath); } catch (e) {}
+        } else {
+          console.log(`[LocalRunner] Verified unique existing clip for Stage ${stage.stage_num}: ${finalClipPath}`);
+          downloadedHashes.add(existingHash);
+          clips.push(finalClipPath);
+          continue;
+        }
       }
 
       // Check workspace state before prompt input
       await ensureGoogleFlowWorkspace(page);
       await ensureVideoMode(page);
+
+      // Snapshot all video sources currently in the DOM before submitting new prompt
+      const priorVideoSrcs = new Set(
+        await page.locator('video').evaluateAll(vids =>
+          vids.map(v => v.src || v.currentSrc).filter(Boolean)
+        ).catch(() => [])
+      );
+      console.log(`[LocalRunner] Prior video elements detected on page before Stage ${stage.stage_num}: ${priorVideoSrcs.size}`);
 
       // High-detail miniature diorama construction video prompt optimized for Veo
       const veoPrompt = `Cinematic macro 45-degree isometric video: Smooth, steady motorized macro camera glide across 1:87 HO-scale miniature town diorama worksite. Real adult craftsman male hands with visible skin pores and rolled dark denim work sleeves calmly use ${stage.tool} to ${stage.action}. Visible diorama surroundings: miniature paved asphalt streets with painted lines, tiny concrete curbs, two-story brick townhouses, micro streetlamps, scale trees, and green grid cutting mat. Authentic scale modeling craftsmanship, real physical working motion, shallow depth of field, razor-sharp focus on the miniature build, 30fps.`;
@@ -412,14 +432,16 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
             }
           }
 
-          // Setup video download listener
+          // Setup video download listener for responses initiated after submission
           let interceptedUrl = null;
           const responseHandler = async (response) => {
             try {
               const url = response.url();
               const contentType = response.headers()['content-type'] || '';
               if ((contentType.includes('video/mp4') || url.endsWith('.mp4') || (url.includes('googlevideo') && contentType.includes('video'))) && response.status() === 200) {
-                interceptedUrl = url;
+                if (!priorVideoSrcs.has(url)) {
+                  interceptedUrl = url;
+                }
               }
             } catch (e) {}
           };
@@ -438,54 +460,63 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
           let videoFound = false;
 
           while (Date.now() - startTime < options.timeoutMs) {
-            await page.waitForTimeout(5000);
+            await page.waitForTimeout(4000);
 
-            // 1. Check if intercepted video response occurred
-            if (interceptedUrl) {
-              console.log(`[LocalRunner] Intercepted video media response: ${interceptedUrl.slice(0, 80)}...`);
+            // 1. Inspect DOM video elements for a NEW video src not present before submission
+            const currentVideos = await page.locator('video').evaluateAll(vids => {
+              return vids.map(v => ({
+                src: v.src || v.currentSrc,
+                readyState: v.readyState,
+                duration: v.duration
+              })).filter(v => v.src && v.src.length > 5);
+            }).catch(() => []);
+
+            const newVideo = currentVideos.find(v => !priorVideoSrcs.has(v.src) && v.readyState >= 1 && (v.duration > 0 || isNaN(v.duration)));
+
+            if (newVideo) {
+              console.log(`[LocalRunner] Detected NEW video element for Stage ${stage.stage_num} (src: ${newVideo.src.slice(0, 80)}... readyState: ${newVideo.readyState}, duration: ${newVideo.duration})...`);
+
+              if (newVideo.src.startsWith('blob:')) {
+                const videoBase64 = await page.evaluate(async (videoSrc) => {
+                  try {
+                    const res = await fetch(videoSrc);
+                    const blob = await res.blob();
+                    return new Promise((resolve) => {
+                      const reader = new FileReader();
+                      reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                      reader.readAsDataURL(blob);
+                    });
+                  } catch (e) {
+                    return null;
+                  }
+                }, newVideo.src);
+
+                if (videoBase64 && videoBase64.length > 50000) {
+                  fs.writeFileSync(rawClipPath, Buffer.from(videoBase64, 'base64'));
+                  videoFound = true;
+                  priorVideoSrcs.add(newVideo.src);
+                  break;
+                }
+              } else if (newVideo.src.startsWith('http')) {
+                const videoBuffer = await page.request.get(newVideo.src).then(r => r.body()).catch(() => null);
+                if (videoBuffer && videoBuffer.length > 50000) {
+                  fs.writeFileSync(rawClipPath, videoBuffer);
+                  videoFound = true;
+                  priorVideoSrcs.add(newVideo.src);
+                  break;
+                }
+              }
+            }
+
+            // 2. Check intercepted video response initiated AFTER submission
+            if (interceptedUrl && !priorVideoSrcs.has(interceptedUrl)) {
+              console.log(`[LocalRunner] Intercepted new video media response: ${interceptedUrl.slice(0, 80)}...`);
               const videoBuffer = await page.request.get(interceptedUrl).then(r => r.body()).catch(() => null);
               if (videoBuffer && videoBuffer.length > 50000) {
                 fs.writeFileSync(rawClipPath, videoBuffer);
                 videoFound = true;
+                priorVideoSrcs.add(interceptedUrl);
                 break;
-              }
-            }
-
-            // 2. Check for video element in DOM
-            const videoLocator = page.locator('video').first();
-            if (await videoLocator.isVisible().catch(() => false)) {
-              const src = await videoLocator.getAttribute('src').catch(() => null);
-              if (src) {
-                console.log(`[LocalRunner] Detected video src in DOM: ${src.slice(0, 80)}...`);
-                if (src.startsWith('blob:')) {
-                  // Extract blob as base64 via page evaluate
-                  const videoBase64 = await page.evaluate(async (videoSrc) => {
-                    try {
-                      const res = await fetch(videoSrc);
-                      const blob = await res.blob();
-                      return new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.onloadend = () => resolve(reader.result.split(',')[1]);
-                        reader.readAsDataURL(blob);
-                      });
-                    } catch (e) {
-                      return null;
-                    }
-                  }, src);
-
-                  if (videoBase64 && videoBase64.length > 50000) {
-                    fs.writeFileSync(rawClipPath, Buffer.from(videoBase64, 'base64'));
-                    videoFound = true;
-                    break;
-                  }
-                } else if (src.startsWith('http')) {
-                  const videoBuffer = await page.request.get(src).then(r => r.body()).catch(() => null);
-                  if (videoBuffer && videoBuffer.length > 50000) {
-                    fs.writeFileSync(rawClipPath, videoBuffer);
-                    videoFound = true;
-                    break;
-                  }
-                }
               }
             }
 
@@ -507,9 +538,17 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
           page.off('response', responseHandler);
 
           if (videoFound && fs.existsSync(rawClipPath) && fs.statSync(rawClipPath).size > 50000) {
-            await standardizeClip(rawClipPath, finalClipPath);
-            clips.push(finalClipPath);
-            generated = true;
+            const clipHash = crypto.createHash('sha256').update(fs.readFileSync(rawClipPath)).digest('hex');
+            if (downloadedHashes.has(clipHash)) {
+              console.warn(`[LocalRunner] Downloaded clip for Stage ${stage.stage_num} has identical SHA256 to a previous stage. Invalidation triggered.`);
+              try { fs.unlinkSync(rawClipPath); } catch (e) {}
+              videoFound = false;
+            } else {
+              downloadedHashes.add(clipHash);
+              await standardizeClip(rawClipPath, finalClipPath);
+              clips.push(finalClipPath);
+              generated = true;
+            }
           }
         } else {
           console.warn(`[LocalRunner] Could not locate prompt input on Google Flow.`);
@@ -538,6 +577,8 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
           fallbackStagesDir
         );
         await standardizeClip(rawFallbackVideo, finalClipPath);
+        const fallbackHash = crypto.createHash('sha256').update(fs.readFileSync(finalClipPath)).digest('hex');
+        downloadedHashes.add(fallbackHash);
         clips.push(finalClipPath);
       }
     }

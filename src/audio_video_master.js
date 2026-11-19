@@ -115,16 +115,16 @@ async function generateNarration(plan, outputDir) {
 async function generateASMRFoley(asmrType, durationSeconds, destPath) {
   const d = Math.max(durationSeconds, 2.0);
 
-  // Soft, warm, acoustic workbench textures
+  // Soft, warm, acoustic workbench textures with zero harsh high-frequency noise
   const foleyPresets = {
-    dirt_scraping: `anoisesrc=c=pink:r=44100:a=0.2,bandpass=f=900:w=600,lowpass=f=3000,tremolo=f=3:d=0.5,volume=0.18`,
-    grass_trimming: `anoisesrc=c=white:r=44100:a=0.15,bandpass=f=2800:w=1500,tremolo=f=5:d=0.6,volume=0.15`,
-    cement_troweling: `anoisesrc=c=brown:r=44100:a=0.25,bandpass=f=600:w=400,lowpass=f=2500,tremolo=f=2:d=0.4,volume=0.18`,
-    brick_tapping: `aevalsrc='sin(900*2*PI*t)*exp(-30*mod(t,0.7))+0.2*sin(1800*2*PI*t)*exp(-40*mod(t,0.7))':s=44100,lowpass=f=3500,volume=0.2`,
-    spray_painting: `anoisesrc=c=white:r=44100:a=0.15,bandpass=f=3200:w=1800,volume=0.15`,
-    gravel_rolling: `anoisesrc=c=pink:r=44100:a=0.2,bandpass=f=1200:w=800,lowpass=f=3000,tremolo=f=4:d=0.6,volume=0.18`,
-    wood_cutting: `anoisesrc=c=brown:r=44100:a=0.2,bandpass=f=750:w=500,lowpass=f=2800,tremolo=f=6:d=0.5,volume=0.16`,
-    wire_tweezing: `aevalsrc='sin(2200*2*PI*t)*exp(-50*mod(t,0.9))+0.15*sin(3400*2*PI*t)*exp(-60*mod(t,0.9))':s=44100,volume=0.18`
+    dirt_scraping: `anoisesrc=c=brown:r=44100:a=0.06,bandpass=f=450:w=300,lowpass=f=1200,tremolo=f=1.5:d=0.7,volume=0.05`,
+    grass_trimming: `aevalsrc='0.08*sin(650*2*PI*t)*exp(-45*mod(t,1.4))+0.04*sin(1100*2*PI*t)*exp(-55*mod(t,1.4))':s=44100,lowpass=f=1800,volume=0.05`,
+    cement_troweling: `anoisesrc=c=brown:r=44100:a=0.06,bandpass=f=350:w=250,lowpass=f=1000,tremolo=f=1.2:d=0.6,volume=0.04`,
+    brick_tapping: `aevalsrc='0.12*sin(420*2*PI*t)*exp(-35*mod(t,1.1))+0.05*sin(840*2*PI*t)*exp(-45*mod(t,1.1))':s=44100,lowpass=f=1500,volume=0.06`,
+    spray_painting: `anoisesrc=c=pink:r=44100:a=0.03,bandpass=f=800:w=500,lowpass=f=1300,volume=0.03`,
+    gravel_rolling: `anoisesrc=c=brown:r=44100:a=0.06,bandpass=f=450:w=300,lowpass=f=1100,tremolo=f=2:d=0.6,volume=0.04`,
+    wood_cutting: `anoisesrc=c=brown:r=44100:a=0.06,bandpass=f=380:w=260,lowpass=f=1000,tremolo=f=2:d=0.5,volume=0.04`,
+    wire_tweezing: `aevalsrc='0.10*sin(750*2*PI*t)*exp(-40*mod(t,1.2))+0.03*sin(1200*2*PI*t)*exp(-50*mod(t,1.2))':s=44100,lowpass=f=1500,volume=0.05`
   };
 
   const filter = foleyPresets[asmrType] || foleyPresets.dirt_scraping;
@@ -133,7 +133,7 @@ async function generateASMRFoley(asmrType, durationSeconds, destPath) {
     '-f', 'lavfi',
     '-i', filter,
     '-t', `${d.toFixed(2)}`,
-    '-af', `afade=t=in:st=0:d=0.3,afade=t=out:st=${(d - 0.4).toFixed(2)}:d=0.4`,
+    '-af', `lowpass=f=1800,afade=t=in:st=0:d=0.4,afade=t=out:st=${(d - 0.4).toFixed(2)}:d=0.4`,
     '-y',
     destPath
   ];
@@ -366,19 +366,19 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
 
     console.log(`[AudioMaster] Mastering Segment ${i + 1}/${plan.stages.length} (Duration: ${segDuration.toFixed(2)}s, Voiceover: ${getMediaDuration(narrAudio).toFixed(2)}s)...`);
 
-    // Pad video if shorter than required narration segment duration
+    // Ensure continuous visual motion across segment duration (no frozen still-frame hold)
     let vFilter = '[0:v]';
-    if (videoDuration < segDuration) {
-      const padSec = (segDuration - videoDuration + 0.1).toFixed(2);
-      vFilter = `[0:v]tpad=stop_mode=clone:stop_duration=${padSec}[vpad];[vpad]`;
+    if (videoDuration > 0 && videoDuration < segDuration) {
+      const stretchRatio = (segDuration / videoDuration).toFixed(4);
+      vFilter = `[0:v]setpts=${stretchRatio}*PTS[vslow];[vslow]`;
     }
 
     const filterComplex = [
       `${vFilter}[3:v]overlay=50:90[vbadge]`,
       `[vbadge][4:v]overlay=50:1440[vout]`,
-      `[1:a]adelay=400|400,volume=1.05,highpass=f=80,lowpass=f=12000[anarr]`,
-      `[2:a]volume=0.15,afade=t=in:st=0:d=0.3,afade=t=out:st=${(segDuration - 0.5).toFixed(2)}:d=0.5[afoley]`,
-      `[anarr][afoley]amix=inputs=2:duration=longest:dropout_transition=0,volume=1.1,alimiter=limit=0.95[aout]`
+      `[1:a]adelay=400|400,volume=1.0,highpass=f=100,lowpass=f=7500,equalizer=f=3500:t=q:w=1.2:g=-3[anarr]`,
+      `[2:a]volume=0.04,highpass=f=120,lowpass=f=1800,afade=t=in:st=0:d=0.4,afade=t=out:st=${(segDuration - 0.5).toFixed(2)}:d=0.5[afoley]`,
+      `[anarr][afoley]amix=inputs=2:duration=longest:dropout_transition=0,volume=1.0,alimiter=limit=0.92[aout]`
     ].join(';');
 
     const segmentArgs = [
@@ -414,7 +414,7 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     concatInputs.push('-i', segmentPaths[i]);
     concatFilter.push(`[${i}:v][${i}:a]`);
   }
-  concatFilter.push(`concat=n=${segmentPaths.length}:v=1:a=1[vmaster][amaster]`);
+  concatFilter.push(`concat=n=${segmentPaths.length}:v=1:a=1[vmaster][amaster_raw];[amaster_raw]lowpass=f=8000[amaster]`);
 
   const concatArgs = [
     ...concatInputs,
