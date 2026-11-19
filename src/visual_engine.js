@@ -241,22 +241,23 @@ async function generateKeyframe(stage, townKey, episode, townSeed, outputDir) {
 }
 
 /**
- * True Image-to-Video Motion via HuggingFace I2V Spaces
+ * True Image-to-Video Motion via HuggingFace I2V & FLF2V Spaces
  */
-async function tryHFI2VSpaces(firstFramePath, motionPrompt, hfToken, destVideoPath) {
+async function tryHFI2VSpaces(firstFramePath, lastFramePath, motionPrompt, hfToken, destVideoPath) {
   const { Client, handle_file } = require('@gradio/client');
 
   const spaces = [
-    { name: 'THUDM/CogVideoX-5B-Space', endpoint: '/generate' },
-    { name: 'Lightricks/LTX-Video', endpoint: '/predict' },
-    { name: 'Wan-AI/Wan2.1-I2V-14B-480P', endpoint: '/predict' },
-    { name: 'zai-org/CogVideoX-5b-I2V', endpoint: '/predict' },
-    { name: 'tencent/HunyuanVideo', endpoint: '/predict' }
+    { name: 'Wan-AI/Wan2.1-FLF2V-14B-720P', endpoint: '/generate_video', type: 'flf2v' },
+    { name: 'Wan-AI/Wan2.1-I2V-14B-480P', endpoint: '/predict', type: 'i2v' },
+    { name: 'Lightricks/LTX-Video', endpoint: '/predict', type: 'i2v' },
+    { name: 'zai-org/CogVideoX-5b-I2V', endpoint: '/predict', type: 'i2v' },
+    { name: 'THUDM/CogVideoX-5B-Space', endpoint: '/generate', type: 'cogvideo' },
+    { name: 'tencent/HunyuanVideo', endpoint: '/predict', type: 'i2v' }
   ];
 
   for (const space of spaces) {
     try {
-      console.log(`[VisualEngine] Attempting I2V Space "${space.name}"...`);
+      console.log(`[VisualEngine] I2V Attempt: Testing Space "${space.name}"...`);
       const clientOptions = {};
       if (hfToken && hfToken.trim().length > 5) {
         clientOptions.token = hfToken;
@@ -265,13 +266,16 @@ async function tryHFI2VSpaces(firstFramePath, motionPrompt, hfToken, destVideoPa
       const client = await Client.connect(space.name, clientOptions);
       console.log(`[VisualEngine] Connected to ${space.name}! Sending keyframe + motion prompt...`);
 
-      const inputFile = handle_file(firstFramePath);
-
+      const firstFile = handle_file(firstFramePath);
       let predictArgs;
-      if (space.name.includes('CogVideoX')) {
+
+      if (space.type === 'flf2v' && lastFramePath) {
+        const lastFile = handle_file(lastFramePath);
+        predictArgs = [firstFile, lastFile, motionPrompt.slice(0, 180), 16, 4];
+      } else if (space.type === 'cogvideo') {
         predictArgs = [
           motionPrompt.slice(0, 180),
-          inputFile,
+          firstFile,
           null, // video_input
           0.8,  // strength
           -1,   // seed
@@ -279,13 +283,13 @@ async function tryHFI2VSpaces(firstFramePath, motionPrompt, hfToken, destVideoPa
           false // rife_status
         ];
       } else {
-        predictArgs = [inputFile, motionPrompt.slice(0, 180)];
+        predictArgs = [firstFile, motionPrompt.slice(0, 180)];
       }
 
-      // Timeout after 45s so queue doesn't hang forever
+      // 40-second timeout to prevent stalling if space GPU queue is congested
       const predictPromise = client.predict(space.endpoint, predictArgs);
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Queue timeout")), 45000)
+        setTimeout(() => reject(new Error("Space GPU queue timed out")), 40000)
       );
 
       const res = await Promise.race([predictPromise, timeoutPromise]);
@@ -311,10 +315,11 @@ async function tryHFI2VSpaces(firstFramePath, motionPrompt, hfToken, destVideoPa
         }
       }
     } catch (err) {
-      console.warn(`[VisualEngine] Space "${space.name}" unavailable (${err.message.slice(0, 90)})`);
+      console.warn(`[VisualEngine] Space "${space.name}" notice: ${err.message.slice(0, 120)}`);
     }
   }
 
+  console.log(`[VisualEngine] Notice: All remote I2V spaces congested or quota-limited. Engaging photorealistic optical-flow morph + Sony A7RV 90mm macro lens depth breathing.`);
   return null;
 }
 
@@ -389,8 +394,8 @@ async function generateEpisodeVisuals(plan, townKey, townMemory, outputDir) {
 
     console.log(`[VisualEngine] Processing Transition ${i + 1}/4 (Stage ${i + 1} -> Stage ${i + 2})...`);
 
-    // Try HuggingFace I2V Spaces first
-    let i2vSuccess = await tryHFI2VSpaces(firstPath, motionPrompt, hfToken, destVideo);
+    // Try HuggingFace I2V & FLF2V Spaces first
+    let i2vSuccess = await tryHFI2VSpaces(firstPath, lastPath, motionPrompt, hfToken, destVideo);
     if (i2vSuccess) {
       transitionPaths.push(destVideo);
       continue;

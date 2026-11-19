@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 /**
- * Town Architect Engine (Gemini 2.5 Flash Free API + Deterministic Civil Engineering Fallback)
- * Generates continuous 5-stage progressive diorama construction plans.
+ * Town Architect Engine (Gemini 2.5 Flash Free API + Multi-Episode Civil Engineering Blueprints)
+ * Generates continuous 5-stage progressive diorama construction plans with locked continuity.
  */
 
 const CRAFTSMAN_HANDS_DESCRIPTION = 
@@ -12,100 +12,8 @@ const CRAFTSMAN_HANDS_DESCRIPTION =
 const CAMERA_BASE_PROMPT = 
   "Extreme macro 45-degree isometric tilt-shift photography on a Sony A7RV 90mm f/2.8 lens, 8k resolution, razor-sharp focus on the center miniature build, soft creamy bokeh workbench background, locked tripod perspective, consistent directional 5500K workshop lighting";
 
-// Procedural episode templates for fallback / offline generation
+// Comprehensive catalog of realistic civil-engineering scenarios for all 3 series
 const PROCEDURAL_BLUEPRINTS = {
-  mountain_village: [
-    {
-      episode: 1,
-      title: "Clearing the Untouched Alpine Ground",
-      subtitle_2word: "GROUND CLEARING",
-      problem: "Dense wild alpine moss and jagged rocks prevent building any trail.",
-      solution: "Trim overgrown brush, level the mountain dirt, and lay a crushed granite foundation road.",
-      structures_added: "Crushed granite mountain road base, compacted earth foundation",
-      stages: [
-        {
-          stage_num: 1,
-          action: "Trimming wild moss and overgrown grass using miniature precision shears",
-          tool: "miniature brass grass trimmers",
-          asmr_type: "grass_trimming",
-          narration: "We start from scratch on the untouched pine workbench, trimming away the wild mountain moss to uncover the raw soil."
-        },
-        {
-          stage_num: 2,
-          action: "Scraping and leveling uneven mountain dirt with a miniature steel rake",
-          tool: "miniature steel rake and wooden tamper",
-          asmr_type: "dirt_scraping",
-          narration: "Every grain of alpine dirt is leveled and compacted, preparing a rock-solid foundation for the village trail."
-        },
-        {
-          stage_num: 3,
-          action: "Spreading fine grey crushed granite stone along the cleared route with a mini metal trowel",
-          tool: "miniature steel trowel",
-          asmr_type: "gravel_rolling",
-          narration: "A layer of fine crushed granite creates an all-weather road that won't wash away in mountain storms."
-        },
-        {
-          stage_num: 4,
-          action: "Rolling and packing the granite gravel firmly using a heavy solid brass hand roller",
-          tool: "heavy miniature brass roller",
-          asmr_type: "gravel_rolling",
-          narration: "Using a miniature solid brass roller, we compress the gravel until it forms a glassy, durable roadbed."
-        },
-        {
-          stage_num: 5,
-          action: "Placing micro granite curbstones along the finished trail using precision tweezers",
-          tool: "precision watchmaker tweezers",
-          asmr_type: "brick_tapping",
-          narration: "Finally, individual granite curbstones lock the road in place. Our mountain village now has its first permanent avenue."
-        }
-      ]
-    },
-    {
-      episode: 2,
-      title: "Building the Timber Lumber Mill",
-      subtitle_2word: "LUMBER MILL",
-      problem: "The mountain village needs building lumber from local pines.",
-      solution: "Erect a miniature timber water-powered lumber mill beside the mountain runoff.",
-      structures_added: "Timber lumber mill with rotating water wheel and log staging deck",
-      stages: [
-        {
-          stage_num: 1,
-          action: "Digging a micro millrace channel into the dirt base using a miniature metal spade",
-          tool: "miniature brass spade",
-          asmr_type: "dirt_scraping",
-          narration: "To power our lumber mill, we carve a miniature millrace canal through the mountain slope."
-        },
-        {
-          stage_num: 2,
-          action: "Laying dry-stacked slate stone foundation blocks using fine tweezers",
-          tool: "precision tweezers and epoxy adhesive",
-          asmr_type: "brick_tapping",
-          narration: "Dry-stacked slate foundation stones are bonded one by one to withstand heavy water pressure."
-        },
-        {
-          stage_num: 3,
-          action: "Assembling rustic timber post-and-beam frame with mini wooden dowels",
-          tool: "fine tweezers and micro clamps",
-          asmr_type: "wood_cutting",
-          narration: "Handcrafted miniature pine beams are slotted together to form the sturdy mill framing."
-        },
-        {
-          stage_num: 4,
-          action: "Mounting the detailed miniature wooden paddle wheel onto the brass axle",
-          tool: "precision tweezers and micro oiler",
-          asmr_type: "wood_cutting",
-          narration: "The precision wooden water wheel is calibrated to turn freely with authentic hydrodynamic paddles."
-        },
-        {
-          stage_num: 5,
-          action: "Shingling the timber roof with cedar shakes and setting up micro cut pine logs",
-          tool: "miniature tweezers and fine brush",
-          asmr_type: "wood_cutting",
-          narration: "Finished with miniature cedar roof shakes and miniature log stacks, our mountain lumber mill is ready for production."
-        }
-      ]
-    }
-  ],
   smart_city: [
     {
       episode: 1,
@@ -114,6 +22,8 @@ const PROCEDURAL_BLUEPRINTS = {
       problem: "Uneven raw dark loam and wild weeds cover the urban tabletop grid.",
       solution: "Clear the weed brush, level the high-density soil, and pave the dual-lane main boulevard.",
       structures_added: "Compacted dual-lane asphalt boulevard with concrete curbs and painted lane markers",
+      is_multipart: false,
+      multipart_info: null,
       stages: [
         {
           stage_num: 1,
@@ -154,50 +64,385 @@ const PROCEDURAL_BLUEPRINTS = {
     },
     {
       episode: 2,
-      title: "Building the Smart EV Charging Station",
-      subtitle_2word: "EV CHARGER",
-      problem: "Electric autonomous shuttles have no power infrastructure along the new boulevard.",
-      solution: "Excavate underground conduit trench, install battery vaults, and erect high-speed solar EV chargers.",
-      structures_added: "Solar-canopied EV charging depot with 4 glowing micro charging pods and safety bollards",
+      title: "Installing Subterranean Drainage Culverts & Sump Basins",
+      subtitle_2word: "STORM DRAINAGE",
+      problem: "Heavy urban runoff during monsoon season causes localized flooding on Avenue One.",
+      solution: "Excavate deep roadside drainage channels, install slotted concrete box culverts, and drop in laser-cut brass catch basins.",
+      structures_added: "Subterranean concrete stormwater drainage culverts and cast-iron style catch basins",
+      is_multipart: false,
+      multipart_info: null,
       stages: [
         {
           stage_num: 1,
-          action: "Excavating a neat utility trench alongside the boulevard curb using a miniature trenching spade",
+          action: "Excavating parallel drainage trenches along both curbs of the asphalt avenue using a micro trenching spade",
           tool: "miniature stainless trenching spade",
           asmr_type: "dirt_scraping",
-          narration: "We cut a clean subterranean utility trench adjacent to Avenue One to house high-voltage micro wiring."
+          narration: "To prevent stormwater accumulation, we cut deep roadside utility trenches on both sides of Avenue One."
         },
         {
           stage_num: 2,
-          action: "Threading micro copper conduits into the trench and pouring miniature rapid-setting concrete pads",
-          tool: "precision tweezers and micro syringe",
-          asmr_type: "cement_troweling",
-          narration: "Insulated micro conduits are laid and anchored in fast-curing miniature concrete foundation pads."
+          action: "Bedding the trenches with fine aggregate pea gravel using a miniature brass scoop",
+          tool: "miniature brass scoop and tamp",
+          asmr_type: "gravel_rolling",
+          narration: "A clean bed of graded pea gravel provides a self-draining foundation beneath the culvert pipes."
         },
         {
           stage_num: 3,
-          action: "Mounting the sleek tempered-glass solar canopy frame onto the concrete pad",
-          tool: "fine tweezers and micro clamps",
+          action: "Lowering slotted miniature concrete drainage pipes into the trench using precision watchmaker tweezers",
+          tool: "precision watchmaker tweezers",
           asmr_type: "wire_tweezing",
-          narration: "An architectural solar canopy frame made of etched stainless steel is securely fastened over the stalls."
+          narration: "Using precision tweezers, pre-cast concrete stormwater conduits are lowered and joined seam to seam."
         },
         {
           stage_num: 4,
-          action: "Installing four detailed miniature EV charging pedestals with tiny illuminated display screens",
-          tool: "fine watchmaker tweezers",
-          asmr_type: "wire_tweezing",
-          narration: "Four ultra-fast micro charging pedestals are wired into the subterranean grid."
+          action: "Pouring fast-setting micro mortar around the pipe joints with an adhesive syringe",
+          tool: "micro mortar syringe and trowel",
+          asmr_type: "cement_troweling",
+          narration: "High-strength mortar seals every pipe collar to ensure a flood-proof underground hydraulic network."
         },
         {
           stage_num: 5,
-          action: "Planting miniature urban safety bollards and spraying green electric-vehicle bay markings",
-          tool: "miniature stencil and micro airbrush",
+          action: "Seating photo-etched brass storm drain grates flush with the roadway curb",
+          tool: "fine tweezers and silicone mallet",
+          asmr_type: "brick_tapping",
+          narration: "Finally, photo-etched brass catch-basin grates are tapped flush into the curbs, completing the city drainage system."
+        }
+      ]
+    },
+    {
+      episode: 3,
+      title: "Pothole Emergency Repair & Bitumen Seal Coating",
+      subtitle_2word: "ROAD REPAIR",
+      problem: "Heavy scale-truck traffic created an uneven fissure and pothole on Avenue One.",
+      solution: "Saw-cut the damaged asphalt perimeter, excavate loose base material, compact new binder, and hot-pour bitumen sealant.",
+      structures_added: "Repaved asphalt patch with tar-sealed perimeter seams and high-visibility road work cones",
+      is_multipart: false,
+      multipart_info: null,
+      stages: [
+        {
+          stage_num: 1,
+          action: "Scoring a clean rectangular repair perimeter around the damaged asphalt with a miniature diamond saw blade",
+          tool: "miniature diamond scoring wheel",
+          asmr_type: "wood_cutting",
+          narration: "Proper civil repair starts with clean rectangular cut lines around the cracked roadway surface."
+        },
+        {
+          stage_num: 2,
+          action: "Chiseling out the fractured asphalt sub-base using a micro hardened steel chisel and hammer",
+          tool: "miniature cold chisel and brass mallet",
+          asmr_type: "brick_tapping",
+          narration: "With a micro chisel and brass mallet, loose debris is chipped away down to the stable sub-grade."
+        },
+        {
+          stage_num: 3,
+          action: "Brushing on a sticky black tack coat primer with a miniature horsehair brush",
+          tool: "fine horsehair applicator brush",
+          asmr_type: "cement_troweling",
+          narration: "A rich bitumen tack coat creates a watertight adhesive bond between the old road and new asphalt."
+        },
+        {
+          stage_num: 4,
+          action: "Troweling fresh hot-mix asphalt paste into the patch and leveling with an aluminum screed",
+          tool: "miniature steel trowel and tamper",
+          asmr_type: "cement_troweling",
+          narration: "Fresh high-density asphalt compound is packed tightly into the void, eliminating any future subsidence."
+        },
+        {
+          stage_num: 5,
+          action: "Compacting the patch with a heavy brass roller and piping black rubberized crack sealant along the seams",
+          tool: "solid brass hand roller and fine needle dispenser",
+          asmr_type: "gravel_rolling",
+          narration: "Rolled glass-smooth and sealed along the edges, the repaired lane is stronger than the day it was poured."
+        }
+      ]
+    },
+    {
+      episode: 4,
+      title: "Excavating Underground Fuel Storage Vaults (Part 1 of 2)",
+      subtitle_2word: "FUEL VAULT",
+      problem: "The city's emergency vehicles and construction machinery face a severe fuel distribution shortage.",
+      solution: "Excavate a deep reinforced vault pit beside Avenue One and install dual subterranean fuel storage cylinders with leak barriers.",
+      structures_added: "Deep reinforced concrete underground fuel containment vault with twin brass fuel cylinders",
+      is_multipart: true,
+      multipart_info: { part: 1, total_parts: 2, title: "Metropolis Fuel Depot & Charging Hub" },
+      stages: [
+        {
+          stage_num: 1,
+          action: "Marking out a 120mm rectangular pit and excavating deep soil alongside Avenue One with a miniature excavator shovel",
+          tool: "miniature steel spade and scoop",
+          asmr_type: "dirt_scraping",
+          narration: "Part one of our fuel depot begins with deep subterranean excavation for hazardous liquid containment."
+        },
+        {
+          stage_num: 2,
+          action: "Erecting micro corrugated steel sheet-pile shoring walls to secure the excavation pit edges",
+          tool: "precision tweezers and micro hammer",
+          asmr_type: "wire_tweezing",
+          narration: "Interlocking corrugated sheet piles are driven around the perimeter to prevent soil cave-in during deep work."
+        },
+        {
+          stage_num: 3,
+          action: "Pouring a self-leveling fast-cure concrete slab at the bottom of the vault",
+          tool: "miniature concrete spatula and syringe",
+          asmr_type: "cement_troweling",
+          narration: "A reinforced concrete anchor pad is poured to hold the heavy fuel tanks firmly in place."
+        },
+        {
+          stage_num: 4,
+          action: "Lowering twin turned-brass underground fuel storage tanks onto the concrete cradle",
+          tool: "precision watchmaker tweezers",
+          asmr_type: "wire_tweezing",
+          narration: "Machined brass fuel cylinders with detailed micro manhole covers are positioned in their concrete saddles."
+        },
+        {
+          stage_num: 5,
+          action: "Backfilling the tank vault with fine white quartz silica sand up to the roadway subgrade",
+          tool: "miniature brass scoop and leveler",
+          asmr_type: "gravel_rolling",
+          narration: "Non-combustible quartz sand is packed around the tanks, completing the secure underground storage vault."
+        }
+      ]
+    },
+    {
+      episode: 5,
+      title: "Building the Twin-Pump Petrol Station & Neon Canopy (Part 2 of 2)",
+      subtitle_2word: "PETROL DEPOT",
+      problem: "The underground tanks are installed, but vehicles need a street-level pumping island and canopy shelter.",
+      solution: "Pour the reinforced concrete island apron, erect a modern illuminated canopy structure, and install twin vintage fuel dispensers.",
+      structures_added: "Modern street-level fuel station with illuminated canopy, twin chrome fuel dispensers, and safety bollards",
+      is_multipart: true,
+      multipart_info: { part: 2, total_parts: 2, title: "Metropolis Fuel Depot & Charging Hub" },
+      stages: [
+        {
+          stage_num: 1,
+          action: "Casting an elevated concrete fuel dispenser island apron with yellow safety curbs over the vault",
+          tool: "miniature steel trowel",
+          asmr_type: "cement_troweling",
+          narration: "Part two begins by pouring the reinforced concrete pump island with safety-yellow curbed borders."
+        },
+        {
+          stage_num: 2,
+          action: "Mounting two detailed miniature chrome fuel dispenser pumps onto the island pad",
+          tool: "precision watchmaker tweezers",
+          asmr_type: "wire_tweezing",
+          narration: "Two chrome fuel dispensers with miniature analog dial faces and flexible rubber hoses are fastened down."
+        },
+        {
+          stage_num: 3,
+          action: "Erecting a brushed aluminum cantilever canopy support column onto the concrete foundation",
+          tool: "fine tweezers and micro hex wrench",
+          asmr_type: "wire_tweezing",
+          narration: "A structural steel canopy frame is bolted into place, engineered to shelter vehicles in all weather conditions."
+        },
+        {
+          stage_num: 4,
+          action: "Affixing a translucent blue illuminated canopy roof with micro solar panels on the crown",
+          tool: "precision tweezers and UV cure lamp",
+          asmr_type: "wood_cutting",
+          narration: "A sleek blue acrylic canopy with miniature solar arrays is locked over the refueling lanes."
+        },
+        {
+          stage_num: 5,
+          action: "Planting steel impact bollards and painting yellow hazard crosshatch bay lines on the apron",
+          tool: "micro airbrush and brass stencil",
           asmr_type: "spray_painting",
-          narration: "With safety bollards locked and bays painted electric green, our smart city has its first clean energy hub."
+          narration: "With safety bollards placed and chevron markings sprayed, Metropolis Station One is fully operational."
+        }
+      ]
+    },
+    {
+      episode: 6,
+      title: "Wiring the Micro Solar Streetlamp Grid",
+      subtitle_2word: "SOLAR LAMPS",
+      problem: "Nighttime darkness along Avenue One creates hazardous conditions for scale autonomous shuttles.",
+      solution: "Trench underground micro wiring conduit and erect 6 modern solar-assisted LED streetlamps along the curbs.",
+      structures_added: "Array of 6 modern stainless-steel curved solar streetlamps with genuine micro LED illumination",
+      is_multipart: false,
+      multipart_info: null,
+      stages: [
+        {
+          stage_num: 1,
+          action: "Drilling precision 3mm anchor holes through the concrete sidewalk curbs with a miniature pin vise",
+          tool: "miniature brass pin vise hand drill",
+          asmr_type: "dirt_scraping",
+          narration: "To illuminate Avenue One, we drill laser-aligned foundation sockets through the concrete sidewalk curbs."
+        },
+        {
+          stage_num: 2,
+          action: "Threading ultra-fine insulated copper magnet wire through the underground curb conduit",
+          tool: "micro tweezers and needle-nose pliers",
+          asmr_type: "wire_tweezing",
+          narration: "Micro electrical wiring is routed through the subterranean channels to supply continuous clean power."
+        },
+        {
+          stage_num: 3,
+          action: "Lowering curved stainless steel architectural lamp posts into each pre-drilled anchor socket",
+          tool: "watchmaker tweezers",
+          asmr_type: "brick_tapping",
+          narration: "Custom turned stainless steel lamp posts are seated into each foundation and trued with a micro plumb line."
+        },
+        {
+          stage_num: 4,
+          action: "Affixing miniature photovoltaic solar panels and high-efficiency luminaire heads to the post crests",
+          tool: "fine tweezers and micro glue applicator",
+          asmr_type: "wire_tweezing",
+          narration: "Photovoltaic solar collector heads are bonded atop each arm, creating an autonomous off-grid lighting array."
+        },
+        {
+          stage_num: 5,
+          action: "Powering on the micro SMD LED warm-white diodes to cast realistic scale pools of light across the asphalt",
+          tool: "precision tweezers and micro switch",
+          asmr_type: "spray_painting",
+          narration: "Power is energized. Warm streetlamp glow illuminates the dark pavement, turning Avenue One into a vibrant night corridor."
         }
       ]
     }
   ],
+
+  mountain_village: [
+    {
+      episode: 1,
+      title: "Clearing the Untouched Alpine Ground",
+      subtitle_2word: "GROUND CLEARING",
+      problem: "Dense wild alpine moss and jagged rocks prevent building any trail.",
+      solution: "Trim overgrown brush, level the mountain dirt, and lay a crushed granite foundation road.",
+      structures_added: "Crushed granite mountain road base, compacted earth foundation",
+      is_multipart: false,
+      multipart_info: null,
+      stages: [
+        {
+          stage_num: 1,
+          action: "Trimming wild moss and overgrown grass using miniature precision shears",
+          tool: "miniature brass grass trimmers",
+          asmr_type: "grass_trimming",
+          narration: "We start from scratch on the untouched pine workbench, trimming away the wild mountain moss to uncover the raw soil."
+        },
+        {
+          stage_num: 2,
+          action: "Scraping and leveling uneven mountain dirt with a miniature steel rake",
+          tool: "miniature steel rake and wooden tamper",
+          asmr_type: "dirt_scraping",
+          narration: "Every grain of alpine dirt is leveled and compacted, preparing a rock-solid foundation for the village trail."
+        },
+        {
+          stage_num: 3,
+          action: "Spreading fine grey crushed granite stone along the cleared route with a mini metal trowel",
+          tool: "miniature steel trowel",
+          asmr_type: "gravel_rolling",
+          narration: "A layer of fine crushed granite creates an all-weather road that won't wash away in mountain storms."
+        },
+        {
+          stage_num: 4,
+          action: "Rolling and packing the granite gravel firmly using a heavy solid brass hand roller",
+          tool: "heavy miniature brass roller",
+          asmr_type: "gravel_rolling",
+          narration: "Using a miniature solid brass roller, we compress the gravel until it forms a glassy, durable roadbed."
+        },
+        {
+          stage_num: 5,
+          action: "Placing micro granite curbstones along the finished trail using precision tweezers",
+          tool: "precision watchmaker tweezers",
+          asmr_type: "brick_tapping",
+          narration: "Finally, individual granite curbstones lock the road in place. Our mountain village now has its first permanent avenue."
+        }
+      ]
+    },
+    {
+      episode: 2,
+      title: "Building the Dry-Stacked Stone Retaining Wall",
+      subtitle_2word: "RETAINING WALL",
+      problem: "Spring thaw runoff causes alpine topsoil to slide toward the newly cleared road.",
+      solution: "Erect a traditional dry-stacked alpine slate retaining wall along the hillside terrace.",
+      structures_added: "Terraced dry-stacked mountain slate retaining wall with gravel weep holes",
+      is_multipart: false,
+      multipart_info: null,
+      stages: [
+        {
+          stage_num: 1,
+          action: "Carving a stepped foundation trench along the hillside slope with a miniature brass spade",
+          tool: "miniature brass spade",
+          asmr_type: "dirt_scraping",
+          narration: "To prevent mountain mudslides, we excavate a tiered foundation shelf into the alpine dirt bank."
+        },
+        {
+          stage_num: 2,
+          action: "Laying heavy granite base stones flat into the footing using precision tweezers",
+          tool: "precision stone tweezers",
+          asmr_type: "brick_tapping",
+          narration: "The largest slate blocks form a gravity-anchored footing, tilted slightly back into the hillside for strength."
+        },
+        {
+          stage_num: 3,
+          action: "Dry-stacking courses of fractured natural slate stones with interlocking staggered joints",
+          tool: "fine tweezers and stone mallet",
+          asmr_type: "brick_tapping",
+          narration: "Stone after stone is fitted dry without mortar, allowing hydrostatic water pressure to freely escape."
+        },
+        {
+          stage_num: 4,
+          action: "Backfilling behind the slate wall with crushed alpine drainage gravel",
+          tool: "miniature brass scoop",
+          asmr_type: "gravel_rolling",
+          narration: "Coarse crushed gravel behind the wall provides continuous sub-surface drainage, shielding the trail."
+        },
+        {
+          stage_num: 5,
+          action: "Placing wide flat alpine capstones along the wall crest and adding micro wild alpine ferns",
+          tool: "precision tweezers and micro brush",
+          asmr_type: "grass_trimming",
+          narration: "With smooth capstones aligned and tiny wild mountain ferns planted in the joints, the terrace is rock-solid."
+        }
+      ]
+    },
+    {
+      episode: 3,
+      title: "Handcrafting the Timber Trestle Ravine Bridge",
+      subtitle_2word: "TIMBER BRIDGE",
+      problem: "A deep mountain crevasse divides the village from the upper alpine timber stands.",
+      solution: "Construct a hand-hewn rustic pine timber trestle bridge across the ravine gap.",
+      structures_added: "Rustic heavy pine timber trestle road bridge with safety log railings",
+      is_multipart: false,
+      multipart_info: null,
+      stages: [
+        {
+          stage_num: 1,
+          action: "Chiseling bridge abutment seats into the rocky ravine cliffs with a micro chisel",
+          tool: "micro cold chisel and mallet",
+          asmr_type: "brick_tapping",
+          narration: "We carve level masonry bridge abutments into the opposing rock cliffs across the mountain ravine."
+        },
+        {
+          stage_num: 2,
+          action: "Assembling A-frame timber bent supports using hand-notched miniature pine beams",
+          tool: "fine tweezers and micro clamps",
+          asmr_type: "wood_cutting",
+          narration: "Hand-hewn pine timbers are joined with miniature mortise and tenon notches to build the structural trestle bents."
+        },
+        {
+          stage_num: 3,
+          action: "Spanning the heavy pine log stringers across the ravine gap onto the abutments",
+          tool: "precision tweezers",
+          asmr_type: "wood_cutting",
+          narration: "Massive miniature pine stringer logs span the divide, locked together with solid brass micro drift pins."
+        },
+        {
+          stage_num: 4,
+          action: "Laying individual rough-sawn timber road decking planks one by one across the stringers",
+          tool: "watchmaker tweezers",
+          asmr_type: "brick_tapping",
+          narration: "Rough-sawn wood deck planks are secured crosswise, creating an authentic clattering timber roadway."
+        },
+        {
+          stage_num: 5,
+          action: "Installing weathered split-rail cedar guardrails along both sides of the bridge span",
+          tool: "micro tweezers and needle applicator",
+          asmr_type: "wood_cutting",
+          narration: "Split-rail cedar safety barriers complete the span. The mountain crevasse is officially bridged."
+        }
+      ]
+    }
+  ],
+
   desert_town: [
     {
       episode: 1,
@@ -206,6 +451,8 @@ const PROCEDURAL_BLUEPRINTS = {
       problem: "Loose shifting red desert sand and dry tumbleweeds make travel impossible.",
       solution: "Clear shifting sand dunes, grade the clay base, and install interlocking desert adobe pavers.",
       structures_added: "Interlocking terracotta stone desert road with sandstone drainage trenches",
+      is_multipart: false,
+      multipart_info: null,
       stages: [
         {
           stage_num: 1,
@@ -251,6 +498,8 @@ const PROCEDURAL_BLUEPRINTS = {
       problem: "The desert outpost cannot survive without a secure deep underground water supply.",
       solution: "Drill a miniature artesian borehole and construct a traditional stone masonry cistern.",
       structures_added: "Deep masonry stone water well with brass hand pump and elevated stone cistern tank",
+      is_multipart: false,
+      multipart_info: null,
       stages: [
         {
           stage_num: 1,
@@ -314,20 +563,14 @@ The town builds progressively on the exact same spot without jarring scene jumps
 
 ${nextEpisode === 1 ? `EPISODE 1 SPECIAL RULE:
 This is Episode 1! The tabletop is 100% untouched wild overgrown terrain (weeds, wild dirt, uneven rocks). Giant craftsman hands enter with miniature tools to clear the weeds, level the soil, and lay the first foundation road.` : `EPISODE ${nextEpisode} RULE:
-Invent a realistic civil-engineering problem arising from the existing town (e.g., mud -> asphalt, dark streets -> streetlamps, fuel shortage -> 2-part gas station, river -> bridge). Solve it step-by-step.`}
+Invent a realistic civil-engineering problem arising from the existing town (e.g., mud -> asphalt, drainage flooding, parking shortage, fuel depot, river bridge). Solve it step-by-step.`}
 
 CRITICAL VISUAL SPECIFICATIONS FOR ALL 5 STAGES:
-1. Every stage image prompt MUST incorporate:
-   - Camera: "${CAMERA_BASE_PROMPT}"
-   - Table Base: "${townMemory.diorama_anchor_prompt}"
-   - Existing structures: Keep all previously built structures visible in their exact spatial positions.
-   - Hands: "${CRAFTSMAN_HANDS_DESCRIPTION}"
-   - Hand action: Craftsman hands visibly holding a specific miniature tool and performing the physical work.
-   - Stage progression: Stage 1 to 5 must show the structure physically growing on the exact same spot.
-2. Motion prompts: For each transition between stages, describe how the craftsman's hands smoothly move, manipulate tools, and install the miniature piece.
+1. Every stage image prompt MUST incorporate real adult craftsman male hands, skin pores, rolled dark denim sleeves, silver wristwatch, holding miniature tools at the front of the prompt.
+2. Motion prompts: For each transition between stages, describe how the craftsman's hands smoothly move and install the miniature piece.
 3. ASMR Foley type: Select from ["grass_trimming", "dirt_scraping", "cement_troweling", "brick_tapping", "spray_painting", "gravel_rolling", "wood_cutting", "wire_tweezing"].
 4. Narration: 1-2 calm, documentary-style US English sentences per stage explaining the craftsmanship.
-5. Thumbnail Subtitle: Exactly 2 bold uppercase words (e.g. "FOUNDATION ROAD", "MICRO ASPHALT", "EV CHARGER").
+5. Thumbnail Subtitle: Exactly 2 bold uppercase words (e.g. "METRO GROUND", "STORM DRAINAGE", "ROAD REPAIR", "FUEL VAULT").
 
 OUTPUT REQUIREMENT:
 Output ONLY valid JSON matching this exact structure:
@@ -358,16 +601,57 @@ Output ONLY valid JSON matching this exact structure:
 }
 
 /**
- * Call Gemini 2.5 Flash Free API
+ * Call Gemini REST API with clean diagnostics for both ?key= and x-goog-api-key header
  */
 async function callGemini(prompt, apiKey) {
   const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
-  let lastError = null;
+  let lastDiagnosis = null;
 
   for (const model of models) {
+    // Strategy A: x-goog-api-key header (standard Google Cloud / AI Studio REST header)
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-      const response = await fetch(url, {
+      const urlHeader = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+      console.log(`[Architect] Calling Gemini ${model} via x-goog-api-key header...`);
+      const resHeader = await fetch(urlHeader, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey
+        },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.7,
+            topP: 0.95,
+            responseMimeType: "application/json"
+          }
+        })
+      });
+
+      if (resHeader.ok) {
+        const data = await resHeader.json();
+        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (rawText) {
+          const parsed = JSON.parse(rawText.trim());
+          if (parsed.stages && parsed.stages.length === 5) {
+            console.log(`[Architect] Gemini ${model} call SUCCEEDED via x-goog-api-key header!`);
+            return parsed;
+          }
+        }
+      } else {
+        const errText = await resHeader.text();
+        lastDiagnosis = `HTTP ${resHeader.status} (${resHeader.statusText}): ${errText.slice(0, 250)}`;
+        console.warn(`[Architect] Gemini (${model} header) returned ${lastDiagnosis}`);
+      }
+    } catch (e) {
+      lastDiagnosis = e.message;
+    }
+
+    // Strategy B: URL Query Parameter ?key=
+    try {
+      const urlQuery = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      console.log(`[Architect] Calling Gemini ${model} via URL query parameter...`);
+      const resQuery = await fetch(urlQuery, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -380,38 +664,37 @@ async function callGemini(prompt, apiKey) {
         })
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Gemini API error (${model}): ${response.status} ${errorText}`);
+      if (resQuery.ok) {
+        const data = await resQuery.json();
+        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (rawText) {
+          const parsed = JSON.parse(rawText.trim());
+          if (parsed.stages && parsed.stages.length === 5) {
+            console.log(`[Architect] Gemini ${model} call SUCCEEDED via ?key= parameter!`);
+            return parsed;
+          }
+        }
+      } else {
+        const errText = await resQuery.text();
+        lastDiagnosis = `HTTP ${resQuery.status} (${resQuery.statusText}): ${errText.slice(0, 250)}`;
+        console.warn(`[Architect] Gemini (${model} query) returned ${lastDiagnosis}`);
       }
-
-      const data = await response.json();
-      const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!rawText) throw new Error("Empty candidate response from Gemini API");
-
-      const parsed = JSON.parse(rawText.trim());
-      if (parsed.stages && parsed.stages.length === 5) {
-        return parsed;
-      }
-      throw new Error("Gemini response did not contain 5 stages");
-    } catch (err) {
-      lastError = err;
-      // Try next model fallback
+    } catch (e) {
+      lastDiagnosis = e.message;
     }
   }
 
-  throw lastError || new Error("Failed to call Gemini API across models");
+  throw new Error(`Gemini API Authentication Diagnosis: ${lastDiagnosis}`);
 }
 
 /**
- * Procedural Fallback Architect when offline or Gemini API key not present
+ * Procedural Fallback Architect when offline or Gemini API key hits error/quota
  */
 function generateProceduralPlan(townKey, townMemory, nextEpisode) {
   const blueprints = PROCEDURAL_BLUEPRINTS[townKey] || PROCEDURAL_BLUEPRINTS.smart_city;
   const blueprintIndex = (nextEpisode - 1) % blueprints.length;
   const baseBlueprint = blueprints[blueprintIndex];
 
-  // Adjust for episode number if beyond template count
   const episodeTitle = nextEpisode <= blueprints.length 
     ? baseBlueprint.title 
     : `Expansion Phase ${nextEpisode}: ${baseBlueprint.title}`;
@@ -450,8 +733,8 @@ function generateProceduralPlan(townKey, townMemory, nextEpisode) {
     subtitle_2word: baseBlueprint.subtitle_2word,
     problem: baseBlueprint.problem,
     solution: baseBlueprint.solution,
-    is_multipart: false,
-    multipart_info: null,
+    is_multipart: baseBlueprint.is_multipart || false,
+    multipart_info: baseBlueprint.multipart_info || null,
     updated_anchor_prompt: updatedAnchor,
     structures_added: baseBlueprint.structures_added,
     stages: stages
@@ -471,25 +754,26 @@ async function planEpisode(townKey, townMemory, forcedEpisode = null) {
 
   if (apiKey && apiKey.trim().length > 5) {
     try {
-      console.log(`[Architect] Contacting Gemini 2.5 Flash API...`);
+      console.log(`[Architect] Contacting Gemini 2.5 Flash API (Key prefix: ${apiKey.slice(0, 8)}...)...`);
       const prompt = buildGeminiPrompt(townKey, townMemory, nextEpisode);
       const plan = await callGemini(prompt, apiKey);
       console.log(`[Architect] Successfully generated episode plan via Gemini: "${plan.title}"`);
       return plan;
     } catch (err) {
-      console.warn(`[Architect] Gemini API warning: ${err.message}. Falling back to procedural diorama blueprint.`);
+      console.warn(`[Architect] Gemini Notice: ${err.message}. Engaging continuous civil-engineering scenario generator.`);
     }
   } else {
-    console.log(`[Architect] GEMINI_API_KEY not provided or in offline mode. Using procedural diorama blueprint.`);
+    console.log(`[Architect] GEMINI_API_KEY not provided. Using continuous civil-engineering scenario generator.`);
   }
 
   const plan = generateProceduralPlan(townKey, townMemory, nextEpisode);
-  console.log(`[Architect] Procedural plan ready: "${plan.title}" [${plan.subtitle_2word}] (5 stages)`);
+  console.log(`[Architect] Scenario Plan Engaged: Episode ${plan.episode} - "${plan.title}" [${plan.subtitle_2word}] (5 stages)`);
   return plan;
 }
 
 module.exports = {
   planEpisode,
   CRAFTSMAN_HANDS_DESCRIPTION,
-  CAMERA_BASE_PROMPT
+  CAMERA_BASE_PROMPT,
+  PROCEDURAL_BLUEPRINTS
 };
