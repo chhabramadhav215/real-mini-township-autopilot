@@ -426,11 +426,11 @@ function generateProceduralPlan(townKey, townMemory, nextEpisode) {
     const isFirst = idx === 0;
     const isLast = idx === 4;
     
-    // Construct strict photorealistic prompt adhering to locked camera & hands
-    const imagePrompt = `${CAMERA_BASE_PROMPT}. Diorama Tabletop Base: ${townMemory.diorama_anchor_prompt}. ${builtSoFar} Current construction focus in center frame: ${stage.action}. ${CRAFTSMAN_HANDS_DESCRIPTION} entering the frame holding ${stage.tool}, executing delicate physical work on the tabletop. Highly detailed tactile textures, visible dust particles, razor sharp focus on the miniature build, locked 45-degree isometric angle, photorealistic diorama photography.`;
+    // Front-load the craftsman hands, miniature tools, and action so every AI model focuses directly on the hands & build
+    const imagePrompt = `Real adult craftsman male hands with visible skin pores, subtle soil dust on knuckles, rolled-up dark denim work sleeves, and a matte silver wristwatch actively holding ${stage.tool} to ${stage.action} on the wooden diorama table. Extreme macro 45-degree isometric tilt-shift photography on a Sony A7RV 90mm f/2.8 lens, locked tripod perspective, razor-sharp macro focus on the miniature build, shallow depth of field, creamy bokeh workshop background, consistent 5500K directional studio lighting, 8k resolution, hyper-realistic diorama scale modeling.`;
 
     const nextAction = !isLast ? baseBlueprint.stages[idx + 1].action : "finishing the structure and wiping the work surface";
-    const motionPrompt = `Extreme macro 45-degree isometric video: Craftsman male hands with rolled dark denim sleeves and silver wristwatch smoothly use ${stage.tool} to ${stage.action}, transitioning seamlessly toward ${nextAction}. The camera remains locked on a fixed tripod with zero camera shake. Subtle tactile micro movements, ultra-smooth craftsmanship transition.`;
+    const motionPrompt = `Macro 45-degree isometric video: Craftsman male hands with rolled dark denim sleeves and silver wristwatch smoothly use ${stage.tool} to ${stage.action}, transitioning toward ${nextAction}. Realistic tactile micro movements of real hands and miniature materials, fixed tripod view.`;
 
     return {
       stage_num: stage.stage_num,
