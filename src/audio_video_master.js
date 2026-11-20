@@ -74,9 +74,19 @@ async function generateNarration(plan, outputDir) {
         const generatedAudio = result.audioFilePath;
 
         if (fs.existsSync(generatedAudio) && fs.statSync(generatedAudio).size > 500) {
-          fs.copyFileSync(generatedAudio, destMp3);
+          // Accelerate narration to a crisp, punchy short-form reel pacing (1.12x speed)
+          try {
+            await runFFmpeg([
+              '-i', generatedAudio,
+              '-af', 'atempo=1.12',
+              '-y',
+              destMp3
+            ]);
+          } catch (e) {
+            fs.copyFileSync(generatedAudio, destMp3);
+          }
           fs.rmSync(tempSubDir, { recursive: true, force: true });
-          console.log(`[AudioMaster] Generated TTS narration for Stage ${stage.stage_num} via AndrewNeural`);
+          console.log(`[AudioMaster] Generated punchy TTS narration for Stage ${stage.stage_num} via AndrewNeural (1.12x)`);
           synthesized = true;
           // Short delay between requests to respect edge socket reset
           await new Promise(r => setTimeout(r, 600));
@@ -141,6 +151,31 @@ async function generateASMRFoley(asmrType, durationSeconds, destPath) {
 }
 
 /**
+ * Procedural Energetic Background Music Bed Generator
+ * Synthesizes a driving, modern rhythmic musical bed using FFmpeg lavfi:
+ * - 124 BPM subtle kick/sub-bass rhythm (mod(t, 0.484))
+ * - Warm polyphonic harmonic chord bed (frequencies: 220, 261.6, 329.6, 392 Hz)
+ * - Shaker/percussion texture providing forward momentum (mod(t, 0.242))
+ * - Clean bandpass filter (80Hz to 3200Hz) so voiceover stays crisp and intelligible
+ */
+async function generateBackgroundMusic(durationSeconds, destPath) {
+  const d = Math.max(durationSeconds, 4.0).toFixed(2);
+  const filterExpr = `aevalsrc='0.12*sin(110*2*PI*t)*exp(-30*mod(t,0.484)) + 0.04*sin(220*2*PI*t)*cos(2*PI*0.12*t) + 0.05*sin(261.6*2*PI*t)*cos(2*PI*0.12*t) + 0.05*sin(329.6*2*PI*t)*sin(2*PI*0.12*t) + 0.02*(2*random(0)-1)*exp(-40*mod(t,0.242))':s=44100`;
+
+  const args = [
+    '-f', 'lavfi',
+    '-i', filterExpr,
+    '-t', `${d}`,
+    '-af', `highpass=f=80,lowpass=f=3200,afade=t=in:st=0:d=0.5,afade=t=out:st=${(d - 0.6).toFixed(2)}:d=0.6`,
+    '-y',
+    destPath
+  ];
+
+  await runFFmpeg(args);
+  return destPath;
+}
+
+/**
  * Create color-coded Top-Left Episode Badge SVG
  */
 function createBadgeOverlay(townKey, townMemory, episodeNum, destSvgPath) {
@@ -176,18 +211,24 @@ function createBadgeOverlay(townKey, townMemory, episodeNum, destSvgPath) {
 }
 
 /**
- * Create lower-center dynamic subtitle SVG
+ * Create lower-center high-retention short-form subtitle overlay
+ * Features crisp typography, high-contrast yellow/white gradient, bold dark stroke, and drop shadow
  */
 function createSubtitleOverlay(text, destSvgPath) {
-  const cleanText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  
-  // Wrap lines if longer than 36 characters
-  const words = cleanText.split(' ');
+  const cleanText = (text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .trim();
+
+  // Split into punchy 3-5 word lines (max ~28 chars per line)
+  const words = cleanText.split(/\s+/);
   const lines = [];
   let currentLine = '';
 
   for (const w of words) {
-    if ((currentLine + ' ' + w).length > 36) {
+    if ((currentLine + ' ' + w).length > 28) {
       lines.push(currentLine.trim());
       currentLine = w;
     } else {
@@ -196,20 +237,23 @@ function createSubtitleOverlay(text, destSvgPath) {
   }
   if (currentLine) lines.push(currentLine.trim());
 
-  const svgHeight = lines.length === 1 ? 90 : 130;
-  const line1Y = lines.length === 1 ? 58 : 48;
-  const line2Y = 94;
+  const displayLines = lines.slice(0, 2);
+  const svgHeight = displayLines.length === 1 ? 100 : 154;
+  const line1Y = displayLines.length === 1 ? 64 : 58;
+  const line2Y = 118;
 
   const svg = `<svg width="980" height="${svgHeight}" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <filter id="textGlow" x="-10%" y="-10%" width="130%" height="130%">
-        <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.9"/>
+      <filter id="captionShadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.95"/>
       </filter>
     </defs>
-    <!-- Dark Translucent Backdrop Pill -->
-    <rect x="0" y="0" width="980" height="${svgHeight}" rx="20" fill="#000000" fill-opacity="0.65" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
-    <text x="490" y="${line1Y}" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="800" fill="#ffffff" text-anchor="middle" filter="url(#textGlow)">${lines[0] || ''}</text>
-    ${lines[1] ? `<text x="490" y="${line2Y}" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="800" fill="#fde047" text-anchor="middle" filter="url(#textGlow)">${lines[1]}</text>` : ''}
+    <!-- Subtle Modern Frosted Pill Backing -->
+    <rect x="16" y="8" width="948" height="${svgHeight - 16}" rx="22" fill="#000000" fill-opacity="0.52" stroke="rgba(255,255,255,0.20)" stroke-width="2"/>
+    <!-- Line 1: High-Contrast Crisp White -->
+    <text x="490" y="${line1Y}" font-family="system-ui, -apple-system, Arial, Helvetica, sans-serif" font-size="44" font-weight="900" fill="#ffffff" stroke="#000000" stroke-width="4.5" stroke-linejoin="round" text-anchor="middle" filter="url(#captionShadow)" letter-spacing="1">${displayLines[0] || ''}</text>
+    <!-- Line 2: High-Retention Accent Yellow -->
+    ${displayLines[1] ? `<text x="490" y="${line2Y}" font-family="system-ui, -apple-system, Arial, Helvetica, sans-serif" font-size="42" font-weight="900" fill="#fde047" stroke="#000000" stroke-width="4.5" stroke-linejoin="round" text-anchor="middle" filter="url(#captionShadow)" letter-spacing="1">${displayLines[1]}</text>` : ''}
   </svg>`;
 
   fs.writeFileSync(destSvgPath, svg, 'utf8');
@@ -287,10 +331,10 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
   // 2. Render Stage 5 Grand Finale Reveal video clip (so the completed town is fully revealed & narrated)
   const finaleVideoPath = path.join(outputDir, 'finale_reveal.mp4');
   if (!fs.existsSync(finaleVideoPath) || fs.statSync(finaleVideoPath).size < 10000) {
-    console.log(`[AudioMaster] Rendering cinematic grand finale reveal for Stage 5...`);
+    console.log(`[AudioMaster] Rendering cinematic grand finale reveal for Stage 5 (Transformation Climax)...`);
     const finaleArgs = [
-      '-loop', '1', '-t', '5.5', '-i', finalStagePath,
-      '-vf', "scale=w='2*trunc((1080*(1.18-0.12*(t/5.5)))/2)':h='2*trunc((1920*(1.18-0.12*(t/5.5)))/2)':eval=frame,crop=1080:1920:'(in_w-1080)*(0.65-0.35*(t/5.5))':'(in_h-1920)*(0.35+0.30*(t/5.5))',scale=1080:1920:out_range=tv,format=yuv420p,settb=AVTB,setpts=PTS-STARTPTS",
+      '-loop', '1', '-t', '3.8', '-i', finalStagePath,
+      '-vf', "scale=w='2*trunc((1080*(1.20-0.16*(t/3.8)))/2)':h='2*trunc((1920*(1.20-0.16*(t/3.8)))/2)':eval=frame,crop=1080:1920:'(in_w-1080)*(0.70-0.40*(t/3.8))':'(in_h-1920)*(0.30+0.35*(t/3.8))',scale=1080:1920:out_range=tv,format=yuv420p,settb=AVTB,setpts=PTS-STARTPTS",
       '-r', '30',
       '-c:v', 'libx264',
       '-preset', 'veryfast',
@@ -318,8 +362,11 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     const stage = plan.stages[i];
     const narrAudio = narrationPaths[i] || narrationPaths[0];
     const narrDuration = getMediaDuration(narrAudio);
-    // Give 0.40s pre-roll + full narration + 0.60s post-roll settling time so speech is never cut off
-    const segDuration = Math.max(narrDuration + 1.0, 4.5);
+    // Crisp, fast-paced reel timing: 0.25s pre-roll + voiceover + 0.35s post-roll
+    const isClimax = (i === plan.stages.length - 1);
+    const minDur = isClimax ? 3.4 : 2.6;
+    const maxDur = isClimax ? 4.2 : 3.8;
+    const segDuration = Math.min(Math.max(narrDuration + 0.6, minDur), maxDur);
     segDurations.push(segDuration);
 
     const foleyPath = path.join(foleyDir, `foley_${i + 1}.wav`);
@@ -346,17 +393,20 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
 
     console.log(`[AudioMaster] Mastering Segment ${i + 1}/${plan.stages.length} (Duration: ${segDuration.toFixed(2)}s, Voiceover: ${getMediaDuration(narrAudio).toFixed(2)}s)...`);
 
-    // Ensure continuous visual motion across segment duration (no frozen still-frame hold)
+    // Ensure continuous visual motion across segment duration without sluggish slow-motion
     let vFilter = '[0:v]';
     if (videoDuration > 0 && videoDuration < segDuration) {
-      const stretchRatio = (segDuration / videoDuration).toFixed(4);
-      vFilter = `[0:v]setpts=${stretchRatio}*PTS[vslow];[vslow]`;
+      const stretch = Math.min(segDuration / videoDuration, 1.15);
+      const padSec = Math.max(0, segDuration - videoDuration * stretch);
+      vFilter = `[0:v]setpts=${stretch.toFixed(4)}*PTS${padSec > 0.05 ? `,tpad=stop_mode=clone:stop_duration=${padSec.toFixed(2)}` : ''}[vcut];[vcut]`;
+    } else if (videoDuration > segDuration) {
+      vFilter = `[0:v]trim=duration=${segDuration.toFixed(2)},setpts=PTS-STARTPTS[vcut];[vcut]`;
     }
 
     const filterComplex = [
-      `${vFilter}[3:v]overlay=50:1440[vout]`,
-      `[1:a]adelay=400|400,volume=1.0,highpass=f=100,lowpass=f=7500,equalizer=f=3500:t=q:w=1.2:g=-3[anarr]`,
-      `[2:a]volume=0.035,highpass=f=120,lowpass=f=1500,afade=t=in:st=0:d=0.4,afade=t=out:st=${(segDuration - 0.5).toFixed(2)}:d=0.5[afoley]`,
+      `${vFilter}[3:v]overlay=50:1380[vout]`,
+      `[1:a]adelay=250|250,volume=1.0,highpass=f=100,lowpass=f=7500,equalizer=f=3500:t=q:w=1.2:g=-3[anarr]`,
+      `[2:a]volume=0.035,highpass=f=120,lowpass=f=1500,afade=t=in:st=0:d=0.3,afade=t=out:st=${(segDuration - 0.4).toFixed(2)}:d=0.4[afoley]`,
       `[anarr][afoley]amix=inputs=2:duration=longest:dropout_transition=0,volume=1.0,alimiter=limit=0.92[aout]`
     ].join(';');
 
@@ -384,15 +434,30 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     segmentPaths.push(segmentDest);
   }
 
-  // 5. Concatenate all 5 segments with re-encoding to guarantee 100% continuous, zero-dropout audio & video
-  console.log(`[AudioMaster] Concatenating ${segmentPaths.length} segments with seamless audio remuxing...`);
+  // 5. Generate Continuous Energetic Background Music Bed with Smooth Ducking
+  const totalMasterDuration = segDurations.reduce((a, b) => a + b, 0);
+  const climaxStartTime = segDurations.slice(0, segDurations.length - 1).reduce((a, b) => a + b, 0);
+
+  console.log(`[AudioMaster] Generating energetic rhythmic background music bed (${totalMasterDuration.toFixed(1)}s, Climax at ${climaxStartTime.toFixed(1)}s)...`);
+  const bgmDir = path.join(outputDir, 'bgm');
+  if (!fs.existsSync(bgmDir)) fs.mkdirSync(bgmDir, { recursive: true });
+  const bgmPath = path.join(bgmDir, 'bgm_bed.wav');
+  await generateBackgroundMusic(totalMasterDuration + 2.0, bgmPath);
+
+  // Concatenate all 5 segments and mix with background music (smooth ducking under voice, swell at transformation climax)
+  console.log(`[AudioMaster] Concatenating ${segmentPaths.length} segments with master background music ducking...`);
   const concatFilter = [];
   const concatInputs = [];
   for (let i = 0; i < segmentPaths.length; i++) {
     concatInputs.push('-i', segmentPaths[i]);
     concatFilter.push(`[${i}:v][${i}:a]`);
   }
-  concatFilter.push(`concat=n=${segmentPaths.length}:v=1:a=1[vmaster][amaster_raw];[amaster_raw]lowpass=f=8000[amaster]`);
+  const bgmInputIndex = segmentPaths.length;
+  concatInputs.push('-i', bgmPath);
+
+  concatFilter.push(`concat=n=${segmentPaths.length}:v=1:a=1[vmaster][aspeech];`);
+  concatFilter.push(`[${bgmInputIndex}:a]volume='if(gte(t,${climaxStartTime.toFixed(2)}), 0.20, 0.08)':eval=frame[abgm_ducked];`);
+  concatFilter.push(`[aspeech][abgm_ducked]amix=inputs=2:duration=first:dropout_transition=0,volume=1.0,alimiter=limit=0.94[amaster]`);
 
   const concatArgs = [
     ...concatInputs,
@@ -425,6 +490,7 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
 module.exports = {
   generateNarration,
   generateASMRFoley,
+  generateBackgroundMusic,
   createBadgeOverlay,
   createSubtitleOverlay,
   generateThumbnail,

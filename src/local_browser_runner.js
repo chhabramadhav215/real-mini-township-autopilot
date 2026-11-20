@@ -637,8 +637,27 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
       );
       console.log(`[LocalRunner] Prior video elements detected on page before Stage ${stage.stage_num}: ${priorVideoSrcs.size}`);
 
-      // High-detail authentic real-world construction video prompt optimized for Veo
-      const veoPrompt = `Cinematic 4K real-world construction process video: Smooth, steady motorized camera tracking across the active building worksite. Skilled adult craftsman male hands with visible skin texture and rolled dark denim work sleeves calmly use ${stage.tool} to ${stage.action}. Authentic construction surroundings: concrete foundations, structural framing, building materials, clean ground worksite, and natural construction environment. Real physical construction craftsmanship, genuine working motion, steady camera angle, razor-sharp focus on the active build, 30fps.`;
+      // High-detail authentic real-world construction video prompt optimized for Veo with dynamic visual variety
+      let shotAngle = 'Smooth, steady motorized camera tracking across the active building worksite';
+      let lightingMood = 'Natural daylight and clean worksite lighting';
+      if (stage.stage_num === 1) {
+        shotAngle = 'Wide establishing cinematic shot with dramatic push-in, capturing the full site challenge';
+        lightingMood = 'Crisp morning directional sunlight with long rich shadows';
+      } else if (stage.stage_num === 2) {
+        shotAngle = 'Dynamic low-angle motorized tracking dolly shot gliding alongside the active equipment';
+        lightingMood = 'Natural bright daytime worksite lighting';
+      } else if (stage.stage_num === 3) {
+        shotAngle = 'Extreme razor-sharp macro close-up detail shot with shallow depth of field focusing on material bonding';
+        lightingMood = 'Clean architectural directional lighting highlighting concrete and steel textures';
+      } else if (stage.stage_num === 4) {
+        shotAngle = 'Medium fast-action construction view showing structural components converging into place';
+        lightingMood = 'Natural afternoon documentary worksite lighting';
+      } else {
+        shotAngle = 'Grand cinematic wide pull-back reveal showcasing the complete, pristine transformed structure';
+        lightingMood = 'Dramatic warm golden-hour glow casting rich highlights across the finished build';
+      }
+
+      const veoPrompt = `Cinematic 4K real-world construction process video: ${shotAngle}. Skilled adult craftsman male hands with visible skin texture and rolled dark denim work sleeves use ${stage.tool} to ${stage.action}. Authentic construction surroundings: concrete foundations, structural framing, building materials, clean ground worksite, and natural construction environment. ${lightingMood}, real physical construction craftsmanship, genuine working motion, steady camera angle, razor-sharp focus on the active build, 30fps.`;
 
       let generated = false;
 

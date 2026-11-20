@@ -56,9 +56,10 @@ async function cleanAndScaleImage(inputPath, outputPath) {
 
 /**
  * Verify integrity and minimum resolution/detail of an image file
+ * Rejects corrupted, blank, or low-detail/warped image frames
  */
 function verifyImageFile(imagePath) {
-  if (!fs.existsSync(imagePath)) return false;
+  if (!imagePath || !fs.existsSync(imagePath)) return false;
   const size = fs.statSync(imagePath).size;
   if (size < 35000) return false; // Detailed 1080x1920 images are typically > 40KB
   try {
@@ -74,6 +75,19 @@ function verifyImageFile(imagePath) {
     const stream = info.streams && info.streams[0];
     if (!stream || !stream.width || !stream.height) return false;
     if (stream.width < 720 || stream.height < 1080) return false;
+
+    // Check decode integrity to reject truncated/corrupted/warped frames
+    const decodeCheck = spawnSync('ffmpeg', [
+      '-v', 'error',
+      '-i', imagePath,
+      '-f', 'null',
+      '-'
+    ]);
+    if (decodeCheck.status !== 0 || (decodeCheck.stderr && decodeCheck.stderr.toString().length > 100)) {
+      console.warn(`[VisualEngine] Corrupted or invalid image stream detected: ${path.basename(imagePath)}. Rejecting.`);
+      return false;
+    }
+
     return true;
   } catch (e) {
     return false;
@@ -84,12 +98,28 @@ function verifyImageFile(imagePath) {
  * Sanitize and format a photorealistic civil engineering worksite prompt.
  * Strictly eliminates deformed human limb/hand close-ups, miniature/diorama terms,
  * clay/doll/statue figurines, and surreal morphing objects.
+ * Enforces dynamic visual variety across cuts (wide establishing -> tracking -> macro -> assembly -> grand reveal).
  */
 function buildSanitizedEngineeringPrompt(stage, townKey) {
   const cleanTool = (stage.tool || 'construction equipment').trim();
   const cleanAction = (stage.action || 'assembling structure').trim();
+  const stageNum = stage.stage_num || 1;
 
   let basePrompt = stage.image_prompt || '';
+
+  // Dynamic camera angle & lighting per stage
+  let stageFraming = 'Medium-to-wide architectural construction angle';
+  if (stageNum === 1) {
+    stageFraming = 'Wide establishing cinematic angle, dramatic morning sunlight across raw worksite';
+  } else if (stageNum === 2) {
+    stageFraming = 'Dynamic low-angle motorized tracking shot following subsoil excavation and foundation grading';
+  } else if (stageNum === 3) {
+    stageFraming = 'Razor-sharp macro close-up detail shot with shallow depth of field focusing on material bonding and tool precision';
+  } else if (stageNum === 4) {
+    stageFraming = 'Medium fast-action construction view showing structural components converging into place';
+  } else {
+    stageFraming = 'Grand cinematic wide pull-back reveal under warm golden-hour glow showcasing the complete transformed structure';
+  }
 
   // Strip human close-up triggers that produce distorted/weird hands or surreal mannequins
   basePrompt = basePrompt
@@ -104,18 +134,18 @@ function buildSanitizedEngineeringPrompt(stage, townKey) {
     .replace(/hands actively using/gi, 'heavy-duty tools aligned on')
     .replace(/hands actively/gi, 'equipment in position')
     .replace(/hands using/gi, 'equipment applying')
-    .replace(/close-up construction angle/gi, 'wide to medium architectural construction view')
-    .replace(/extreme close-up/gi, 'medium worksite perspective')
+    .replace(/close-up construction angle/gi, stageFraming)
+    .replace(/extreme close-up/gi, 'macro worksite perspective')
     .replace(/macro lens/gi, '35mm cinema lens')
     .replace(/miniature|diorama|ho-scale|1:87|cutting mat|tweezers|scale model/gi, 'real-world construction');
 
   // If no base prompt was available or it was too short, build a fresh crisp prompt
   if (!basePrompt || basePrompt.length < 50) {
-    basePrompt = `Stage ${stage.stage_num}/5: Authentic real-world civil engineering worksite photography. Medium-to-wide architectural construction angle showing ${cleanAction}. Heavy-duty ${cleanTool} actively placed on the physical build surface. Ground-level view showing authentic building materials, compacted sub-base, and genuine structural elements under assembly. Shot on Sony FX6 cinema camera, natural daylight, razor-sharp focus on materials and structural alignment, 8k resolution, highly detailed realistic engineering.`;
+    basePrompt = `Stage ${stageNum}/5: Authentic real-world civil engineering worksite photography. ${stageFraming} showing ${cleanAction}. Heavy-duty ${cleanTool} actively placed on the physical build surface. Ground-level view showing authentic building materials, compacted sub-base, and genuine structural elements under assembly. Shot on Sony FX6 cinema camera, natural daylight, razor-sharp focus on materials and structural alignment, 8k resolution, highly detailed realistic engineering.`;
   }
 
   // Append explicit negative guidance / realism enforcement
-  const cleanPrompt = `${basePrompt.trim()} Clean civil engineering scene, wide-to-medium architectural shot, sharp focus on physical structural materials. Zero human limb distortions, no disembodied hands, no surreal clay or wooden figures, no toy people, no figurines. Crisp photorealistic 8k documentary cinematography.`;
+  const cleanPrompt = `${basePrompt.trim()} Clean civil engineering scene, ${stageFraming}, sharp focus on physical structural materials. Zero human limb distortions, no disembodied hands, no surreal clay or wooden figures, no toy people, no figurines. Crisp photorealistic 8k documentary cinematography.`;
 
   return cleanPrompt;
 }
