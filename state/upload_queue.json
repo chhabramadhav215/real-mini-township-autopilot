@@ -252,7 +252,90 @@
           }
         ]
       }
+    },
+    {
+      "id": "queue_mountain_village_ep2",
+      "townKey": "mountain_village",
+      "episode": 2,
+      "title": "Building the Dry-Stacked Stone Retaining Wall",
+      "subtitle_2word": "RETAINING WALL",
+      "problem": "Spring thaw runoff causes alpine topsoil to slide toward the newly cleared road.",
+      "solution": "Erect a traditional dry-stacked alpine slate retaining wall along the hillside terrace.",
+      "tag_name": "queue-mountain_village-ep2",
+      "release_id": null,
+      "video_asset_name": "mountain_village_ep2.mp4",
+      "thumb_asset_name": "mountain_village_ep2_thumb.jpg",
+      "video_download_url": null,
+      "thumb_download_url": null,
+      "local_video_path": "C:\\real-mini-township\\queue_out\\mountain_village_ep2\\mountain_village_ep2.mp4",
+      "local_thumb_path": "C:\\real-mini-township\\queue_out\\mountain_village_ep2\\mountain_village_ep2_thumb.jpg",
+      "created_at": "2026-11-20T14:12:54.057Z",
+      "uploaded": false,
+      "uploaded_at": null,
+      "plan": {
+        "episode": 2,
+        "title": "Building the Dry-Stacked Stone Retaining Wall",
+        "subtitle_2word": "RETAINING WALL",
+        "problem": "Spring thaw runoff causes alpine topsoil to slide toward the newly cleared road.",
+        "solution": "Erect a traditional dry-stacked alpine slate retaining wall along the hillside terrace.",
+        "is_multipart": false,
+        "multipart_info": null,
+        "updated_anchor_prompt": "Rugged alpine mountain terrain site, natural rock grain texture, surrounded by raw granite rock fragments, wild moss, mountain loam soil, warm morning natural daylight. Virgin ground on building site. Completed addition: Terraced dry-stacked mountain slate retaining wall with gravel weep holes.",
+        "structures_added": "Terraced dry-stacked mountain slate retaining wall with gravel weep holes",
+        "stages": [
+          {
+            "stage_num": 1,
+            "title": "Stage 1: Carving",
+            "action": "Carving a stepped foundation trench along the hillside slope with a steel trenching spade",
+            "tool": "trenching spade",
+            "image_prompt": "Stage 1/5 of Building the Dry-Stacked Stone Retaining Wall: Authentic real-world civil engineering worksite photography showing Carving a stepped foundation trench along the hillside slope with a steel trenching spade with trenching spade. Wide-to-medium documentary construction angle showing the structure under assembly: Carving a stepped foundation trench along the hillside slope with a steel trenching spade, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and clean worksite lighting, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Professional camera tracks Carving a stepped foundation trench along the hillside slope with a steel trenching spade with trenching spade, progressing cleanly toward setting heavy granite foundation stones flat into the footing using setting tongs. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "dirt_scraping",
+            "narration": "To prevent mountain mudslides, we excavate a tiered foundation shelf into the alpine dirt bank."
+          },
+          {
+            "stage_num": 2,
+            "title": "Stage 2: Setting",
+            "action": "Setting heavy granite foundation stones flat into the footing using setting tongs",
+            "tool": "stone setting tongs",
+            "image_prompt": "Stage 2/5 of Building the Dry-Stacked Stone Retaining Wall: Authentic real-world civil engineering worksite photography showing Setting heavy granite foundation stones flat into the footing using setting tongs with stone setting tongs. Wide-to-medium documentary construction angle showing the structure under assembly: Setting heavy granite foundation stones flat into the footing using setting tongs, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and clean worksite lighting, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Professional camera tracks Setting heavy granite foundation stones flat into the footing using setting tongs with stone setting tongs, progressing cleanly toward dry-stacking courses of fractured natural slate stones with interlocking staggered joints. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "brick_tapping",
+            "narration": "The largest slate blocks form a gravity-anchored footing, tilted slightly back into the hillside for strength."
+          },
+          {
+            "stage_num": 3,
+            "title": "Stage 3: Dry-stacking",
+            "action": "Dry-stacking courses of fractured natural slate stones with interlocking staggered joints",
+            "tool": "stonemason hammer and chisel",
+            "image_prompt": "Stage 3/5 of Building the Dry-Stacked Stone Retaining Wall: Authentic real-world civil engineering worksite photography showing Dry-stacking courses of fractured natural slate stones with interlocking staggered joints with stonemason hammer and chisel. Wide-to-medium documentary construction angle showing the structure under assembly: Dry-stacking courses of fractured natural slate stones with interlocking staggered joints, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and clean worksite lighting, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Professional camera tracks Dry-stacking courses of fractured natural slate stones with interlocking staggered joints with stonemason hammer and chisel, progressing cleanly toward backfilling behind the slate wall with crushed alpine drainage gravel using a utility scoop. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "brick_tapping",
+            "narration": "Stone after stone is fitted dry without mortar, allowing hydrostatic water pressure to freely escape."
+          },
+          {
+            "stage_num": 4,
+            "title": "Stage 4: Backfilling",
+            "action": "Backfilling behind the slate wall with crushed alpine drainage gravel using a utility scoop",
+            "tool": "drainage gravel scoop",
+            "image_prompt": "Stage 4/5 of Building the Dry-Stacked Stone Retaining Wall: Authentic real-world civil engineering worksite photography showing Backfilling behind the slate wall with crushed alpine drainage gravel using a utility scoop with drainage gravel scoop. Wide-to-medium documentary construction angle showing the structure under assembly: Backfilling behind the slate wall with crushed alpine drainage gravel using a utility scoop, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and clean worksite lighting, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Professional camera tracks Backfilling behind the slate wall with crushed alpine drainage gravel using a utility scoop with drainage gravel scoop, progressing cleanly toward setting wide flat capstones along the wall crest and pointing joints with a setting mallet. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "gravel_rolling",
+            "narration": "Coarse crushed gravel behind the wall provides continuous sub-surface drainage, shielding the trail."
+          },
+          {
+            "stage_num": 5,
+            "title": "Stage 5: Setting",
+            "action": "Setting wide flat capstones along the wall crest and pointing joints with a setting mallet",
+            "tool": "masonry trowel and setting mallet",
+            "image_prompt": "Stage 5/5 of Building the Dry-Stacked Stone Retaining Wall: Authentic real-world civil engineering worksite photography showing Setting wide flat capstones along the wall crest and pointing joints with a setting mallet with masonry trowel and setting mallet. Wide-to-medium documentary construction angle showing the structure under assembly: Setting wide flat capstones along the wall crest and pointing joints with a setting mallet, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and clean worksite lighting, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Professional camera tracks Setting wide flat capstones along the wall crest and pointing joints with a setting mallet with masonry trowel and setting mallet, progressing cleanly toward inspecting and finalizing the completed structure. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "grass_trimming",
+            "narration": "With smooth capstones aligned and securely tapped into the joints, the terrace is rock-solid."
+          }
+        ]
+      }
     }
   ],
-  "last_updated": "2026-11-20T06:51:16.434Z"
+  "last_updated": "2026-11-20T14:12:54.071Z"
 }
