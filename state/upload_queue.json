@@ -418,7 +418,90 @@
           }
         ]
       }
+    },
+    {
+      "id": "queue_desert_town_ep2",
+      "townKey": "desert_town",
+      "episode": 2,
+      "title": "Drilling the Artesian Well & Water Cistern",
+      "subtitle_2word": "WATER CISTERN",
+      "problem": "The desert outpost cannot survive without a secure deep underground water supply.",
+      "solution": "Drill a deep artesian borehole and construct a traditional stone masonry cistern.",
+      "tag_name": "queue-desert_town-ep2",
+      "release_id": null,
+      "video_asset_name": "desert_town_ep2.mp4",
+      "thumb_asset_name": "desert_town_ep2_thumb.jpg",
+      "video_download_url": null,
+      "thumb_download_url": null,
+      "local_video_path": "C:\\real-mini-township\\queue_out\\desert_town_ep2\\desert_town_ep2.mp4",
+      "local_thumb_path": "C:\\real-mini-township\\queue_out\\desert_town_ep2\\desert_town_ep2_thumb.jpg",
+      "created_at": "2026-11-20T15:12:42.270Z",
+      "uploaded": false,
+      "uploaded_at": null,
+      "plan": {
+        "episode": 2,
+        "title": "Drilling the Artesian Well & Water Cistern",
+        "subtitle_2word": "WATER CISTERN",
+        "problem": "The desert outpost cannot survive without a secure deep underground water supply.",
+        "solution": "Drill a deep artesian borehole and construct a traditional stone masonry cistern.",
+        "is_multipart": false,
+        "multipart_info": null,
+        "updated_anchor_prompt": "Arid desert construction ground site, red sandstone dust, dense clay earth surface with desert scrub and rough gravel, golden hour directional natural sunlight. Virgin ground on building site. Completed addition: Deep masonry stone water well with brass hand pump and elevated stone cistern tank.",
+        "structures_added": "Deep masonry stone water well with brass hand pump and elevated stone cistern tank",
+        "stages": [
+          {
+            "stage_num": 1,
+            "title": "Stage 1: Drilling",
+            "action": "Drilling a circular borehole deep into the dense clay ground using a heavy manual auger drill",
+            "tool": "manual auger drill",
+            "image_prompt": "Stage 1/5 of Drilling the Artesian Well & Water Cistern: Authentic real-world civil engineering worksite photography showing Drilling a circular borehole deep into the dense clay ground using a heavy manual auger drill with manual auger drill. Wide establishing construction angle showing the full raw site challenge showing the structure under assembly: Drilling a circular borehole deep into the dense clay ground using a heavy manual auger drill, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. crisp morning directional sunlight with rich long shadows, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Dramatic establishing push-in and upward tilt across the active construction site. Professional camera tracks Drilling a circular borehole deep into the dense clay ground using a heavy manual auger drill with manual auger drill, progressing cleanly toward inserting a slotted steel well casing sleeve into the drilled shaft using alignment clamps. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "dirt_scraping",
+            "narration": "In a desert with zero rainfall, survival means hitting the aquifer. Watch how deep we drill."
+          },
+          {
+            "stage_num": 2,
+            "title": "Stage 2: Inserting",
+            "action": "Inserting a slotted steel well casing sleeve into the drilled shaft using alignment clamps",
+            "tool": "alignment clamps",
+            "image_prompt": "Stage 2/5 of Drilling the Artesian Well & Water Cistern: Authentic real-world civil engineering worksite photography showing Inserting a slotted steel well casing sleeve into the drilled shaft using alignment clamps with alignment clamps. Dynamic low-angle motorized tracking shot capturing rapid subsoil progress showing the structure under assembly: Inserting a slotted steel well casing sleeve into the drilled shaft using alignment clamps, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. bright clear daytime construction lighting, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth low-angle lateral tracking dolly glide across the active construction site. Professional camera tracks Inserting a slotted steel well casing sleeve into the drilled shaft using alignment clamps with alignment clamps, progressing cleanly toward building a circular red sandstone wellhead using shaped masonry stones and wet mortar. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "wire_tweezing",
+            "narration": "A manual auger bores deep into the clay, driving a slotted steel casing to prevent collapse."
+          },
+          {
+            "stage_num": 3,
+            "title": "Stage 3: Building",
+            "action": "Building a circular red sandstone wellhead using shaped masonry stones and wet mortar",
+            "tool": "masonry trowel and stone hammer",
+            "image_prompt": "Stage 3/5 of Drilling the Artesian Well & Water Cistern: Authentic real-world civil engineering worksite photography showing Building a circular red sandstone wellhead using shaped masonry stones and wet mortar with masonry trowel and stone hammer. Razor-sharp macro close-up detail angle with shallow cinematic depth of field focusing on material bonding showing the structure under assembly: Building a circular red sandstone wellhead using shaped masonry stones and wet mortar, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. high-contrast directional architectural lighting highlighting physical textures, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Precise macro push-in and diagonal tracking glide across the active construction site. Professional camera tracks Building a circular red sandstone wellhead using shaped masonry stones and wet mortar with masonry trowel and stone hammer, progressing cleanly toward assembling the weathered timber a-frame hoist and heavy copper bucket with steel chain. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "brick_tapping",
+            "narration": "A circular sandstone wellhead is built course by course with authentic lime mortar."
+          },
+          {
+            "stage_num": 4,
+            "title": "Stage 4: Assembling",
+            "action": "Assembling the weathered timber A-frame hoist and heavy copper bucket with steel chain",
+            "tool": "rigging hardware and pliers",
+            "image_prompt": "Stage 4/5 of Drilling the Artesian Well & Water Cistern: Authentic real-world civil engineering worksite photography showing Assembling the weathered timber A-frame hoist and heavy copper bucket with steel chain with rigging hardware and pliers. Medium fast-action construction perspective showing structural components converging into place showing the structure under assembly: Assembling the weathered timber A-frame hoist and heavy copper bucket with steel chain, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. natural afternoon documentary worksite lighting, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Dynamic lateral sweep tracking active assembly across the active construction site. Professional camera tracks Assembling the weathered timber A-frame hoist and heavy copper bucket with steel chain with rigging hardware and pliers, progressing cleanly toward testing the hand pump and filling the well bucket with fresh clear water from the aquifer. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "wood_cutting",
+            "narration": "A timber A-frame hoist and heavy copper bucket are rigged over the shaft."
+          },
+          {
+            "stage_num": 5,
+            "title": "Stage 5: Testing",
+            "action": "Testing the hand pump and filling the well bucket with fresh clear water from the aquifer",
+            "tool": "bucket line and clean water pour",
+            "image_prompt": "Stage 5/5 of Drilling the Artesian Well & Water Cistern: Authentic real-world civil engineering worksite photography showing Testing the hand pump and filling the well bucket with fresh clear water from the aquifer with bucket line and clean water pour. Grand cinematic wide pull-back reveal showcasing the complete, pristine transformed structure showing the structure under assembly: Testing the hand pump and filling the well bucket with fresh clear water from the aquifer, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. dramatic warm golden-hour glow casting rich highlights across the finished build, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Majestic sweeping pull-back and elevation reveal across the active construction site. Professional camera tracks Testing the hand pump and filling the well bucket with fresh clear water from the aquifer with bucket line and clean water pour, progressing cleanly toward inspecting and celebrating the completed transformation. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "wire_tweezing",
+            "narration": "The hand pump is primed—and crystal clear water flows from the desert aquifer!"
+          }
+        ]
+      }
     }
   ],
-  "last_updated": "2026-11-20T14:28:09.635Z"
+  "last_updated": "2026-11-20T15:12:42.271Z"
 }
