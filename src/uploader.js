@@ -16,29 +16,27 @@ const { google } = require('googleapis');
  */
 function generateEpisodeSocialContent(plan, townKey, townMemory) {
   const epFormatted = String(plan.episode).padStart(2, '0');
-  const badgeLabel = townMemory.badge_text || "TOWN";
 
-  const title = `EP ${epFormatted} | ${plan.title} | Miniature ${townMemory.name} #shorts`;
+  const title = `${plan.title} | ${townMemory.name} Construction #shorts`;
 
-  const description = `🏗️ ${badgeLabel} SERIES • EPISODE ${epFormatted}
-Build: ${plan.title}
-Two-Word Focus: ${plan.subtitle_2word}
+  const description = `🏗️ Construction Process: ${plan.title}
+Focus: ${plan.subtitle_2word}
 
 Civil Engineering Challenge:
 ${plan.problem}
 
-Miniature Solution:
+Construction Solution:
 ${plan.solution}
 
-Crafted with genuine miniature construction techniques on a locked 45° isometric diorama workbench. Real materials, precision scale modeling, and authentic ASMR sounds.
+Authentic real-world construction and workshop craftsmanship. Real materials, precision engineering, and authentic ASMR sounds.
 
-Watch the town grow day by day from untouched wild soil into a thriving scale civilization!
+Watch the structure develop step by step!
 
-#miniature #diorama #asmr #craftsman #satisfying #scalemodel #shorts #reels #stopmotion #diy`;
+#construction #building #craftsman #asmr #satisfying #engineering #process #shorts #reels #diy`;
 
   const hashtags = [
-    '#miniature', '#diorama', '#asmr', '#satisfying', 
-    '#craftsman', '#scalemodel', '#shorts', '#reels'
+    '#construction', '#building', '#asmr', '#satisfying', 
+    '#craftsman', '#engineering', '#process', '#shorts', '#reels'
   ];
 
   return { title, description, hashtags };
@@ -71,7 +69,7 @@ async function uploadToYouTube(videoPath, thumbPath, socialContent) {
         snippet: {
           title: socialContent.title.slice(0, 100),
           description: socialContent.description,
-          tags: ['miniature', 'diorama', 'asmr', 'shorts', 'craftsman', 'satisfying', 'scale model'],
+          tags: ['construction', 'building', 'asmr', 'shorts', 'craftsman', 'satisfying', 'engineering', 'process'],
           categoryId: '26', // Howto & Style
           defaultLanguage: 'en',
           defaultAudioLanguage: 'en'

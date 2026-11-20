@@ -12,7 +12,7 @@ const { processUploadAndStateCommit } = require('./uploader');
 /**
  * Local Windows Browser Automation Runner (Google Flow / Veo AI Video Clips)
  * Uses persistent Google Chrome/Chromium profile (.browser_profile) to automate
- * genuine text-to-video / image-to-video diorama clips on flow.google.com.
+ * genuine text-to-video / image-to-video real-world construction process clips on flow.google.com.
  *
  * Usage:
  *   npm run local:auto
@@ -470,8 +470,8 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
       );
       console.log(`[LocalRunner] Prior video elements detected on page before Stage ${stage.stage_num}: ${priorVideoSrcs.size}`);
 
-      // High-detail miniature diorama construction video prompt optimized for Veo
-      const veoPrompt = `Cinematic macro 45-degree isometric video: Smooth, steady motorized macro camera glide across 1:87 HO-scale miniature town diorama worksite. Real adult craftsman male hands with visible skin pores and rolled dark denim work sleeves calmly use ${stage.tool} to ${stage.action}. Visible diorama surroundings: miniature paved asphalt streets with painted lines, tiny concrete curbs, two-story brick townhouses, micro streetlamps, scale trees, and green grid cutting mat. Authentic scale modeling craftsmanship, real physical working motion, shallow depth of field, razor-sharp focus on the miniature build, 30fps.`;
+      // High-detail authentic real-world construction video prompt optimized for Veo
+      const veoPrompt = `Cinematic 4K real-world construction process video: Smooth, steady motorized camera tracking across the active building worksite. Skilled adult craftsman male hands with visible skin texture and rolled dark denim work sleeves calmly use ${stage.tool} to ${stage.action}. Authentic construction surroundings: concrete foundations, structural framing, building materials, clean ground worksite, and natural construction environment. Real physical construction craftsmanship, genuine working motion, steady camera angle, razor-sharp focus on the active build, 30fps.`;
 
       let generated = false;
 
@@ -743,8 +743,7 @@ async function runLocalAutomation() {
   const nextEpisode = (townMemory.episode || 0) + 1;
 
   console.log(`Series Name:       "${townMemory.name}"`);
-  console.log(`Current Episode:   ${townMemory.episode} -> Next: Episode ${nextEpisode}`);
-  console.log(`Diorama Badge:     ${townMemory.badge_text} (${townMemory.badge_color})\n`);
+  console.log(`Current Episode:   ${townMemory.episode} -> Next: Episode ${nextEpisode}\n`);
 
   const outputDir = path.resolve('output', `${townKey}_ep${nextEpisode}`);
   const clipsDir = path.join(outputDir, 'clips');

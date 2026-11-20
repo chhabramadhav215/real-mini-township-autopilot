@@ -7,10 +7,9 @@ const { MsEdgeTTS, OUTPUT_FORMAT } = require('msedge-tts');
  * Audio/Video Master:
  * - Edge-TTS Narration (en-US-AndrewNeural)
  * - ASMR Construction Foley Synthesis & Mixing
- * - Color-Coded Episode Badge Burn-In (VILLAGE • EP XX / CITY • EP XX / DESERT • EP XX)
  * - Lower-Center Dynamic Captions
- * - 3D Episode Thumbnail Generator
- * - Final Vertical Video (1080x1920) Assembly
+ * - Real-World Construction Process Thumbnail Generator
+ * - Final Vertical Video (1080x1920) Assembly (Zero Badges / Zero Distracting Overlays)
  */
 
 function runFFmpeg(args) {
@@ -59,7 +58,7 @@ async function generateNarration(plan, outputDir) {
       continue;
     }
 
-    const text = stage.narration || `Stage ${stage.stage_num}: precision miniature construction.`;
+    const text = stage.narration || `Stage ${stage.stage_num}: authentic construction process.`;
     let synthesized = false;
 
     // Retry with delay and fresh instance for robust Edge TTS synthesis
@@ -218,51 +217,36 @@ function createSubtitleOverlay(text, destSvgPath) {
 }
 
 /**
- * Generate 3D Episode Thumbnail from Stage 5 Keyframe
+ * Generate Real-World Construction Process Thumbnail from Stage 5 Keyframe
  */
 async function generateThumbnail(stage5Path, townKey, townMemory, episodeNum, subtitle2Word, destThumbPath) {
-  console.log(`[AudioMaster] Generating 3D Episode Thumbnail -> ${path.basename(destThumbPath)}`);
+  console.log(`[AudioMaster] Generating Construction Process Thumbnail -> ${path.basename(destThumbPath)}`);
 
   const thumbSvgPath = destThumbPath.replace(/\.jpg$/, '_overlay.svg');
-  const badgeColor = townMemory.badge_color || "#2563eb";
-  const epText = `EP ${String(episodeNum).padStart(2, '0')}`;
-  const subText = (subtitle2Word || "DIORAMA BUILD").toUpperCase();
+  const subText = (subtitle2Word || "CONSTRUCTION PROCESS").toUpperCase();
 
   const svg = `<svg width="1080" height="1920" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <filter id="heavy3d" x="-20%" y="-20%" width="140%" height="140%">
         <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.95"/>
       </filter>
-      <linearGradient id="gradEp" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="60%" stop-color="#f8fafc"/>
-        <stop offset="100%" stop-color="#cbd5e1"/>
-      </linearGradient>
       <linearGradient id="gradSub" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#fef08a"/>
         <stop offset="100%" stop-color="#eab308"/>
       </linearGradient>
     </defs>
-    <!-- Vignette Frame Edges -->
-    <rect x="0" y="0" width="1080" height="1920" fill="none" stroke="#000000" stroke-width="40" stroke-opacity="0.5"/>
+    <!-- Subtle Dark Vignette Frame Border -->
+    <rect x="0" y="0" width="1080" height="1920" fill="none" stroke="#000000" stroke-width="32" stroke-opacity="0.4"/>
 
-    <!-- Top Badge Strip -->
-    <rect x="60" y="100" width="460" height="96" rx="28" fill="${badgeColor}" fill-opacity="0.9" filter="url(#heavy3d)"/>
-    <text x="290" y="165" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="3">${townMemory.badge_text || "TOWN"} SERIES</text>
-
-    <!-- Center-Bottom 3D Episode Title Block -->
+    <!-- Center-Bottom Clean Construction Headline Block -->
     <!-- Dark Glass Panel -->
-    <rect x="60" y="1420" width="960" height="380" rx="36" fill="#0b0f19" fill-opacity="0.88" stroke="rgba(255,255,255,0.25)" stroke-width="3" filter="url(#heavy3d)"/>
+    <rect x="60" y="1520" width="960" height="280" rx="32" fill="#0b0f19" fill-opacity="0.88" stroke="rgba(255,255,255,0.22)" stroke-width="2.5" filter="url(#heavy3d)"/>
     
-    <!-- 3D Episode Tag -->
-    <rect x="100" y="1460" width="260" height="84" rx="20" fill="${badgeColor}" filter="url(#heavy3d)"/>
-    <text x="230" y="1520" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="4">${epText}</text>
-    
-    <!-- 2-Word Bold Headline -->
-    <text x="100" y="1630" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="900" fill="url(#gradSub)" filter="url(#heavy3d)" letter-spacing="2">${subText}</text>
+    <!-- 2-Word Bold Topic Headline -->
+    <text x="100" y="1635" font-family="Arial, Helvetica, sans-serif" font-size="68" font-weight="900" fill="url(#gradSub)" filter="url(#heavy3d)" letter-spacing="2">${subText}</text>
     
     <!-- Subtitle Footnote -->
-    <text x="100" y="1720" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#94a3b8" letter-spacing="1">100% AUTONOMOUS HYPER-REALISTIC DIORAMA</text>
+    <text x="100" y="1725" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" fill="#94a3b8" letter-spacing="2">REAL-WORLD CONSTRUCTION PROCESS</text>
   </svg>`;
 
   fs.writeFileSync(thumbSvgPath, svg, 'utf8');
@@ -343,11 +327,7 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     foleyPaths.push(foleyPath);
   }
 
-  // 4. Generate Top-Left Episode Badge
-  const badgeSvgPath = path.join(outputDir, 'badge_overlay.svg');
-  createBadgeOverlay(townKey, townMemory, plan.episode, badgeSvgPath);
-
-  // 5. Combine each segment: Video Track + Sync Narration & Foley + Subtitle + Badge
+  // 4. Combine each segment: Video Track + Sync Narration & Foley + Clean Subtitle (Zero Badges)
   const segmentPaths = [];
   const segmentsDir = path.join(outputDir, 'segments');
   if (!fs.existsSync(segmentsDir)) fs.mkdirSync(segmentsDir, { recursive: true });
@@ -374,10 +354,9 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     }
 
     const filterComplex = [
-      `${vFilter}[3:v]overlay=50:90[vbadge]`,
-      `[vbadge][4:v]overlay=50:1440[vout]`,
+      `${vFilter}[3:v]overlay=50:1440[vout]`,
       `[1:a]adelay=400|400,volume=1.0,highpass=f=100,lowpass=f=7500,equalizer=f=3500:t=q:w=1.2:g=-3[anarr]`,
-      `[2:a]volume=0.04,highpass=f=120,lowpass=f=1800,afade=t=in:st=0:d=0.4,afade=t=out:st=${(segDuration - 0.5).toFixed(2)}:d=0.5[afoley]`,
+      `[2:a]volume=0.035,highpass=f=120,lowpass=f=1500,afade=t=in:st=0:d=0.4,afade=t=out:st=${(segDuration - 0.5).toFixed(2)}:d=0.5[afoley]`,
       `[anarr][afoley]amix=inputs=2:duration=longest:dropout_transition=0,volume=1.0,alimiter=limit=0.92[aout]`
     ].join(';');
 
@@ -385,7 +364,6 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
       '-i', transVideo,
       '-i', narrAudio,
       '-i', foleyAudio,
-      '-i', badgeSvgPath,
       '-i', subSvgPath,
       '-filter_complex', filterComplex,
       '-map', '[vout]',
@@ -406,7 +384,7 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     segmentPaths.push(segmentDest);
   }
 
-  // 6. Concatenate all 5 segments with re-encoding to guarantee 100% continuous, zero-dropout audio & video
+  // 5. Concatenate all 5 segments with re-encoding to guarantee 100% continuous, zero-dropout audio & video
   console.log(`[AudioMaster] Concatenating ${segmentPaths.length} segments with seamless audio remuxing...`);
   const concatFilter = [];
   const concatInputs = [];
@@ -431,9 +409,8 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
   ];
 
   await runFFmpeg(concatArgs);
-  if (fs.existsSync(badgeSvgPath)) fs.unlinkSync(badgeSvgPath);
 
-  // 7. Generate 3D Episode Thumbnail
+  // 6. Generate Clean Construction Process Thumbnail
   await generateThumbnail(finalStagePath, townKey, townMemory, plan.episode, plan.subtitle_2word, finalThumbPath);
 
   const finalDuration = getMediaDuration(finalVideoPath);

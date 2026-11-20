@@ -238,7 +238,7 @@ async function runLocalQueueBuilder() {
     console.log(`Civil Challenge: ${plan.problem}`);
     console.log(`Solution:        ${plan.solution}\n`);
 
-    // Step B: Generate 5 Diorama Video Clips via Google Flow / Veo
+    // Step B: Generate 5 Construction Video Clips via Google Flow / Veo
     console.log(`--- [2/4] VIDEO GENERATION (GOOGLE FLOW / VEO) ---`);
     const clips = await generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, options);
     console.log(`Collected ${clips.length} standardized video clips for assembly.\n`);
@@ -258,7 +258,7 @@ async function runLocalQueueBuilder() {
 
     const masterResult = await assembleMasterVideo(plan, townKey, townMemory, visualResult, episodeOutputDir);
     console.log(`Master Video Assembled: ${masterResult.finalVideoPath}`);
-    console.log(`3D Thumbnail Created:   ${masterResult.finalThumbPath}\n`);
+    console.log(`Thumbnail Created:      ${masterResult.finalThumbPath}\n`);
 
     // Step D: Upload to GitHub Release Asset
     console.log(`--- [4/4] GITHUB RELEASE ASSET DISPATCH & QUEUE COMMIT ---`);
@@ -273,7 +273,7 @@ async function runLocalQueueBuilder() {
         const release = await getOrCreateRelease(
           releaseTagName,
           `${townMemory.name} - Ep ${nextEp} (${plan.subtitle_2word})`,
-          `Pre-rendered real-motion diorama construction build for ${townMemory.name} Episode ${nextEp}: "${plan.title}"`
+          `Pre-rendered real-motion construction build for ${townMemory.name} Episode ${nextEp}: "${plan.title}"`
         );
         releaseId = release.id;
 

@@ -4,11 +4,11 @@ const { spawn } = require('child_process');
 
 /**
  * Visual Engine:
- * 100% Photorealistic Diorama Generation (Zero Placeholder Boxes / Zero Watermarks)
+ * 100% Photorealistic Construction Process Generation (Zero Placeholder Boxes / Zero Watermarks)
  * - Primary Keyframes: HuggingFace FLUX.1-schnell / FLUX.1-dev (@gradio/client + HF API)
  * - Secondary Keyframes: Pollinations Flux with 4% Bottom Crop (Watermark-Free) & Exponential Backoff
  * - True I2V Motion: HuggingFace Spaces (LTX-Video, Wan2.1, CogVideoX, HunyuanVideo)
- * - Bulletproof Fallback: Photorealistic Optical-Flow Morph & Handheld Macro Lens Breathing
+ * - Bulletproof Fallback: Photorealistic Optical-Flow Morph & Continuous Working Motion
  */
 
 function runFFmpeg(args) {
@@ -70,7 +70,7 @@ async function tryGradioFlux(prompt, seed, hfToken, destPath) {
       }
 
       const client = await Client.connect(spaceName, clientOptions);
-      console.log(`[VisualEngine] Connected to ${spaceName}. Generating photorealistic diorama photo...`);
+      console.log(`[VisualEngine] Connected to ${spaceName}. Generating photorealistic construction photo...`);
 
       const result = await client.predict('/infer', {
         prompt: prompt,
@@ -219,7 +219,7 @@ async function generateKeyframe(stage, townKey, episode, townSeed, outputDir) {
   }
 
   const prompt = stage.image_prompt || 
-    `Stage ${stage.stage_num}/5: Real craftsman adult male hands holding ${stage.tool || 'miniature tool'} to ${stage.action || 'building road'} on a detailed 1:87 scale miniature town diorama worksite. Visible miniature infrastructure with tiny brick townhouses, micro asphalt streets, tiny streetlamps, and green cutting mat. Macro 45-degree isometric tilt-shift photography on Sony A7RV 90mm f/2.8 lens, razor sharp focus, creamy bokeh, warm 5500K studio lighting, 8k resolution.`;
+    `Stage ${stage.stage_num}/5: Authentic real-world construction process. Skilled adult craftsman hands actively using ${stage.tool || 'heavy-duty tool'} to ${stage.action || 'build structure'} on the active building worksite. Crisp work-in-progress angle showing the physical structure under assembly, authentic raw materials, and clean site surroundings. Professional documentary construction photography on Sony FX6, razor-sharp focus on the physical build, natural daylight, 8k resolution.`;
 
   // Use stage-specific seed to guarantee each stage produces a distinct, progressive scene
   const stageSeed = (townSeed + (stage.stage_num * 1047) + (episode * 79)) % 1000000;
@@ -431,7 +431,7 @@ async function createContinuousWorkingMotionVideo(firstFramePath, lastFramePath,
   if (!fs.existsSync(actionFramePath) || fs.statSync(actionFramePath).size < 10000) {
     try {
       console.log(`[VisualEngine] Generating intermediate mid-action working frame for Stage ${stage.stage_num}...`);
-      const actionPrompt = `Stage ${stage.stage_num}/5 mid-action: Real craftsman adult male hands actively using ${stage.tool} to ${stage.action} on 1:87 scale miniature town diorama. Close-up worksite view showing ${stage.action}, miniature asphalt streets, tiny curbs, scale townhouses, and green grid cutting mat. Macro 45-degree isometric tilt-shift photography on Sony A7RV 90mm lens, razor-sharp focus on the build, warm 5500K studio lighting, 8k resolution.`;
+      const actionPrompt = `Stage ${stage.stage_num}/5 mid-action: Authentic real-world construction process. Skilled craftsman hands actively using ${stage.tool} to ${stage.action} on the building worksite. Close-up construction angle showing physical materials, steady work in progress, and clean structural site surroundings. Professional documentary construction cinematography, sharp focus on the physical build, natural daylight, 8k resolution.`;
       const actionSeed = (townSeed + (stage.stage_num * 2089) + (stage.stage_num * 33)) % 1000000;
       await tryPollinationsFlux(actionPrompt, actionSeed, actionFramePath);
     } catch (e) {

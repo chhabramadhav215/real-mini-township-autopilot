@@ -39,7 +39,7 @@ async function runTownshipAutopilot(targetTownKey = null) {
   console.log(`Current Episode: ${townMemory.episode}`);
   console.log(`Color Badge: ${townMemory.badge_text} (${townMemory.badge_color})`);
   console.log(`Fixed Camera Seed: ${townMemory.camera_seed}`);
-  console.log(`Diorama Anchor: "${townMemory.diorama_anchor_prompt}"\n`);
+  console.log(`Worksite Anchor: "${townMemory.diorama_anchor_prompt}"\n`);
 
   // ---------------------------------------------------------------------------
   // STEP 0: HYBRID LOCAL QUEUE CHECK (Pre-rendered Google Flow / Veo Releases)
@@ -142,7 +142,7 @@ async function runTownshipAutopilot(targetTownKey = null) {
   console.log(`--- [2/4] VISUAL ENGINE GENERATION ---`);
   const visualResult = await generateEpisodeVisuals(plan, townKey, townMemory, outputDir);
   console.log(`Generated ${visualResult.keyframePaths.length} locked-angle keyframes.`);
-  console.log(`Generated ${visualResult.transitionPaths.length} smooth diorama transitions.\n`);
+  console.log(`Generated ${visualResult.transitionPaths.length} smooth construction transitions.\n`);
 
   // STEP 3: AUDIO/VIDEO MASTERING (Narration, ASMR Foley, Badges, Subtitles, Master Video & Thumbnail)
   console.log(`--- [3/4] AUDIO/VIDEO MASTERING ---`);
