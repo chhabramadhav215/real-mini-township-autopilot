@@ -218,31 +218,270 @@ async function ensureGoogleFlowWorkspace(page) {
 }
 
 /**
- * Ensure Video (Veo) mode is active if a mode toggle exists
+ * Helper to check if an element, text, or aria-label refers to Omni video editing mode
+ * rather than standard text-to-video / image-to-video generation.
+ */
+function isOmniOrEditElement(text = '', ariaLabel = '') {
+  const combined = `${text} ${ariaLabel}`.trim().toLowerCase();
+  if (!combined) return false;
+  return (
+    combined.includes('omni') ||
+    combined.includes('edit a video with omni') ||
+    combined.includes('edit with omni') ||
+    combined.includes('edit a video') ||
+    combined.includes('edit video') ||
+    combined.includes('video-editing') ||
+    combined.includes('video editing')
+  );
+}
+
+/**
+ * Detect whether Google Flow is currently in Omni video-editing mode
+ * (e.g. side panel prompting "To edit a video with Omni, you'll need a video in your project first")
+ */
+async function checkIsOmniModeActive(page) {
+  if (!page) return false;
+  return await page.evaluate(() => {
+    try {
+      const body = document.body;
+      if (!body) return false;
+      const bodyText = (body.innerText || body.textContent || '');
+
+      if (
+        bodyText.includes("To edit a video with Omni") ||
+        bodyText.includes("you'll need a video in your project first") ||
+        bodyText.includes("Generate a new video first")
+      ) {
+        return true;
+      }
+
+      // Check active tabs / selected pills
+      const activeTabs = Array.from(document.querySelectorAll(
+        '[role="tab"][aria-selected="true"], [role="tab"].active, [role="tab"].selected, button[aria-selected="true"], div[class*="active" i][role="tab"]'
+      ));
+      for (const tab of activeTabs) {
+        const text = ((tab.innerText || '') + ' ' + (tab.getAttribute('aria-label') || '')).toLowerCase();
+        if (text.includes('omni') || text.includes('edit a video') || text.includes('edit with')) {
+          return true;
+        }
+      }
+
+      // Check side panel heading or drawer title
+      const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, div[class*="header" i], div[class*="title" i]'));
+      for (const h of headings) {
+        const t = (h.innerText || '').trim().toLowerCase();
+        if (t === 'edit a video with omni' || t === 'edit with omni' || t === 'omni video editor') {
+          return true;
+        }
+      }
+
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }).catch(() => false);
+}
+
+/**
+ * Recovers Google Flow from Omni video-editing mode back to standard video generation.
+ * If the side panel shows "To edit a video with Omni, you'll need a video in your project first"
+ * or "Generate a new video first", it selects "Generate a new video first" or switches back
+ * to standard video generation mode before filling and submitting the stage prompt.
+ */
+async function handleOmniModeRecovery(page) {
+  if (!page) return false;
+
+  try {
+    const isOmni = await checkIsOmniModeActive(page);
+    if (!isOmni) return false;
+
+    console.log(`[LocalRunner] Omni video-editing mode detected on side panel. Switching back to standard video generation...`);
+
+    // 1. Primary Action: Click "Generate a new video first" button/link/pill
+    const generateFirstSelectors = [
+      'button:has-text("Generate a new video first")',
+      'a:has-text("Generate a new video first")',
+      'div[role="button"]:has-text("Generate a new video first")',
+      'span[role="button"]:has-text("Generate a new video first")',
+      '[aria-label*="Generate a new video first" i]',
+      'button:has-text("Generate a new video")',
+      'a:has-text("Generate a new video")',
+      'div[role="button"]:has-text("Generate a new video")',
+      'button:has-text("Generate new video")',
+      'button:has-text("Generate video first")'
+    ];
+
+    for (const sel of generateFirstSelectors) {
+      const el = page.locator(sel).first();
+      if (await el.isVisible().catch(() => false)) {
+        console.log(`[LocalRunner] Found recovery trigger: "${sel}". Clicking "Generate a new video first"...`);
+        await el.click({ force: true }).catch(() => {});
+        await page.waitForTimeout(1500);
+        if (!(await checkIsOmniModeActive(page))) {
+          console.log(`[LocalRunner] Successfully exited Omni mode and restored standard video generation.`);
+          return true;
+        }
+      }
+    }
+
+    // Also try DOM traversal for "Generate a new video first" in case of custom elements or shadow roots
+    const clickedViaDOM = await page.evaluate(() => {
+      try {
+        const clickables = Array.from(document.querySelectorAll('button, a, div[role="button"], span[role="button"], span, p'));
+        for (const el of clickables) {
+          const text = (el.innerText || el.textContent || '').trim().toLowerCase();
+          if (
+            text.includes('generate a new video first') ||
+            text === 'generate a new video' ||
+            text.startsWith('generate a new video') ||
+            text.includes('generate video first')
+          ) {
+            if (el.offsetParent !== null || el.getClientRects().length > 0) {
+              el.click();
+              return `DOM clickable ("${text}")`;
+            }
+          }
+        }
+        return null;
+      } catch (e) {
+        return null;
+      }
+    }).catch(() => null);
+
+    if (clickedViaDOM) {
+      console.log(`[LocalRunner] Clicked recovery element via ${clickedViaDOM}.`);
+      await page.waitForTimeout(1500);
+      if (!(await checkIsOmniModeActive(page))) {
+        console.log(`[LocalRunner] Successfully exited Omni mode and restored standard video generation.`);
+        return true;
+      }
+    }
+
+    // 2. Secondary Action: Switch tabs to standard video generation (e.g. "Text to video", "Veo", or "Video")
+    const standardGenSelectors = [
+      'button:has-text("Text to video")',
+      '[role="tab"]:has-text("Text to video")',
+      'div[role="button"]:has-text("Text to video")',
+      'button:has-text("Generate video")',
+      'button:has-text("Create video")',
+      'button:has-text("Veo")',
+      '[role="tab"]:has-text("Veo")',
+      'button:text-is("Video")',
+      '[role="tab"]:text-is("Video")',
+      'div[role="tab"]:text-is("Video")',
+      'button:text-is("Generate")',
+      '[role="tab"]:text-is("Generate")',
+      'button:text-is("Create")',
+      '[role="tab"]:text-is("Create")'
+    ];
+
+    for (const sel of standardGenSelectors) {
+      const loc = page.locator(sel);
+      const count = await loc.count().catch(() => 0);
+      for (let idx = 0; idx < count; idx++) {
+        const el = loc.nth(idx);
+        if (await el.isVisible().catch(() => false)) {
+          const text = (await el.innerText().catch(() => '')).trim();
+          const aria = (await el.getAttribute('aria-label').catch(() => '')).trim();
+          if (isOmniOrEditElement(text, aria)) continue;
+
+          console.log(`[LocalRunner] Switching tab to standard video generation via "${sel}" (label: "${text || aria}")...`);
+          await el.click({ force: true }).catch(() => {});
+          await page.waitForTimeout(1500);
+          if (!(await checkIsOmniModeActive(page))) {
+            console.log(`[LocalRunner] Successfully exited Omni mode and restored standard video generation.`);
+            return true;
+          }
+          break;
+        }
+      }
+    }
+
+    // 3. Tertiary Action: Click Back or Close button on Omni side panel
+    const backSelectors = [
+      'button[aria-label*="Back" i]',
+      'button[aria-label*="Close" i]',
+      'div[role="button"][aria-label*="Back" i]',
+      'div[role="button"][aria-label*="Close" i]',
+      'button:has-text("Back")',
+      'button:has-text("Cancel")'
+    ];
+
+    for (const sel of backSelectors) {
+      const el = page.locator(sel).first();
+      if (await el.isVisible().catch(() => false)) {
+        console.log(`[LocalRunner] Clicking back/close button in Omni panel via "${sel}"...`);
+        await el.click({ force: true }).catch(() => {});
+        await page.waitForTimeout(1000);
+        if (!(await checkIsOmniModeActive(page))) {
+          console.log(`[LocalRunner] Successfully exited Omni mode.`);
+          return true;
+        }
+      }
+    }
+
+    // 4. Fallback: Dismiss floating side overlay with Escape
+    await page.keyboard.press('Escape').catch(() => {});
+    await page.waitForTimeout(500);
+    return !(await checkIsOmniModeActive(page));
+  } catch (err) {
+    console.warn(`[LocalRunner] Omni recovery notice: ${err.message}`);
+    return false;
+  }
+}
+
+/**
+ * Ensure Video (Veo) mode is active if a mode toggle exists.
+ * Strictly prevents clicking or activating "Edit a video with Omni" or any Omni mode option.
  */
 async function ensureVideoMode(page) {
+  // 1. Recover from Omni mode if active
+  await handleOmniModeRecovery(page);
+
+  // 2. Selectors for standard video generation, avoiding any generic "video" matches that could catch Omni
   const videoModeSelectors = [
-    'button:has-text("Video")',
-    'button:has-text("Veo")',
-    '[role="tab"]:has-text("Video")',
     'button:has-text("Text to video")',
-    '[aria-label*="Video" i]',
-    'div[role="tab"]:has-text("Video")'
+    '[role="tab"]:has-text("Text to video")',
+    'button:has-text("Veo")',
+    '[role="tab"]:has-text("Veo")',
+    'button:has-text("Generate video")',
+    'button:has-text("Create video")',
+    'button:text-is("Video")',
+    '[role="tab"]:text-is("Video")',
+    'div[role="tab"]:text-is("Video")',
+    'button:text-matches("^\\s*Video\\s*$", "i")',
+    '[role="tab"]:text-matches("^\\s*Video\\s*$", "i")',
+    'div[role="tab"]:text-matches("^\\s*Video\\s*$", "i")'
   ];
 
   for (const sel of videoModeSelectors) {
-    const el = page.locator(sel).first();
-    if (await el.isVisible().catch(() => false)) {
-      const isSelected = await el.getAttribute('aria-selected').catch(() => null);
-      const className = await el.getAttribute('class').catch(() => '');
-      if (isSelected !== 'true' && !className.includes('selected') && !className.includes('active')) {
-        console.log(`[LocalRunner] Selecting Video (Veo) mode via "${sel}"...`);
-        await el.click().catch(() => {});
-        await page.waitForTimeout(1000);
+    const loc = page.locator(sel);
+    const count = await loc.count().catch(() => 0);
+    for (let idx = 0; idx < count; idx++) {
+      const el = loc.nth(idx);
+      if (await el.isVisible().catch(() => false)) {
+        const text = (await el.innerText().catch(() => '')).trim();
+        const aria = (await el.getAttribute('aria-label').catch(() => '')).trim();
+
+        // Strictly verify this is NOT an Omni or edit mode option
+        if (isOmniOrEditElement(text, aria)) {
+          console.log(`[LocalRunner] Skipping Omni/Edit mode option: "${text || aria}"`);
+          continue;
+        }
+
+        const isSelected = await el.getAttribute('aria-selected').catch(() => null);
+        const className = await el.getAttribute('class').catch(() => '');
+        if (isSelected !== 'true' && !className.includes('selected') && !className.includes('active')) {
+          console.log(`[LocalRunner] Selecting Video (Veo) mode via "${sel}" (label: "${text || aria}")...`);
+          await el.click({ force: true }).catch(() => {});
+          await page.waitForTimeout(1000);
+        }
+        return true;
       }
-      break;
     }
   }
+
+  return false;
 }
 
 /**
@@ -578,6 +817,7 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
 
     // Ensure we are inside an active workspace
     await ensureGoogleFlowWorkspace(page);
+    await handleOmniModeRecovery(page);
     await ensureVideoMode(page);
     await ensureVerticalRatio(page);
     await handleCreditConfirmationDialog(page);
@@ -622,6 +862,7 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
       // Ensure any floating preview modal or inspector panel is closed
       await page.keyboard.press('Escape').catch(() => {});
       await ensureGoogleFlowWorkspace(page);
+      await handleOmniModeRecovery(page);
       await ensureVideoMode(page);
       await handleCreditConfirmationDialog(page);
 
@@ -687,6 +928,8 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
         for (let attempt = 0; attempt < 4; attempt++) {
           await page.keyboard.press('Escape').catch(() => {});
           await handleCreditConfirmationDialog(page);
+          await handleOmniModeRecovery(page);
+          await ensureVideoMode(page);
 
           for (const sel of inputSelectors) {
             const loc = page.locator(sel);
@@ -710,6 +953,13 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
         }
 
         if (promptInput) {
+          // If workspace somehow reverted to Omni mode, recover before entering text
+          if (await checkIsOmniModeActive(page)) {
+            console.log(`[LocalRunner] Omni mode detected prior to filling prompt. Recovering...`);
+            await handleOmniModeRecovery(page);
+            await ensureVideoMode(page);
+          }
+
           console.log(`[LocalRunner] Entering Veo prompt for Stage ${stage.stage_num}...`);
           await promptInput.scrollIntoViewIfNeeded().catch(() => {});
           await promptInput.click({ force: true }).catch(() => {});
@@ -779,13 +1029,22 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
 
             if (generationStarted) break;
 
-            // Check if prompt was cleared or generation status indicators appeared
+            // Check if prompt was cleared, generation status indicators appeared, or if stuck in Omni mode
             const statusCheck = await page.evaluate((inputEl) => {
               try {
                 const currentVal = (inputEl ? (inputEl.innerText || inputEl.value || '') : '').trim();
+                const bodyText = document.body ? (document.body.innerText || '') : '';
+
+                if (
+                  bodyText.includes("To edit a video with Omni") ||
+                  bodyText.includes("you'll need a video in your project first") ||
+                  bodyText.includes("Generate a new video first")
+                ) {
+                  return { started: false, reason: 'stuck in Omni video-editing mode', isOmniMode: true };
+                }
+
                 if (currentVal.length < 5) return { started: true, reason: 'prompt input cleared' };
 
-                const bodyText = document.body.innerText || '';
                 if (
                   bodyText.includes('generation has started') ||
                   bodyText.includes('Your video generation has started') ||
@@ -810,6 +1069,17 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
               break;
             }
 
+            if (statusCheck.isOmniMode) {
+              console.warn(`[LocalRunner] Generation blocked by Omni mode. Triggering recovery and re-submitting...`);
+              await handleOmniModeRecovery(page);
+              await ensureVideoMode(page);
+              await promptInput.focus().catch(() => {});
+              await promptInput.press('Enter').catch(() => {});
+              await page.keyboard.press('Enter').catch(() => {});
+              await clickPromptSubmitButton(page, promptInput);
+              continue;
+            }
+
             // Retry submitting if prompt is still unsubmitted after ~2s
             if (verifyAttempt < 2) {
               console.warn(`[LocalRunner] Generation did not start yet (${statusCheck.reason}). Retrying submit button click and Enter...`);
@@ -830,7 +1100,13 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
             // 1. Periodically check and auto-approve credit confirmation dialog if it popped up during queuing
             await handleCreditConfirmationDialog(page);
 
-            // 2. Inspect all DOM video elements (both direct src and nested <source src="...">)
+            // 2. Periodically check if Omni mode somehow hijacked the workspace
+            if (await checkIsOmniModeActive(page)) {
+              console.warn(`[LocalRunner] Omni mode detected during generation wait. Attempting recovery...`);
+              await handleOmniModeRecovery(page);
+            }
+
+            // 3. Inspect all DOM video elements (both direct src and nested <source src="...">)
             const domVideos = await page.evaluate(() => {
               const elements = Array.from(document.querySelectorAll('video'));
               return elements.map(v => {
@@ -1221,6 +1497,10 @@ module.exports = {
   runLocalAutomation,
   generateClipsViaGoogleFlow,
   handleCreditConfirmationDialog,
+  handleOmniModeRecovery,
+  checkIsOmniModeActive,
+  isOmniOrEditElement,
+  ensureVideoMode,
   clickPromptSubmitButton,
   standardizeClip,
   extractThumbnailFrame
