@@ -335,7 +335,90 @@
           }
         ]
       }
+    },
+    {
+      "id": "queue_smart_city_ep6",
+      "townKey": "smart_city",
+      "episode": 6,
+      "title": "Wiring the Modern Solar Streetlamp Grid",
+      "subtitle_2word": "SOLAR LAMPS",
+      "problem": "Nighttime darkness along Avenue One creates hazardous conditions for vehicular traffic.",
+      "solution": "Trench underground wiring conduit and erect 6 modern solar-assisted LED streetlamps along the curbs.",
+      "tag_name": "queue-smart_city-ep6",
+      "release_id": null,
+      "video_asset_name": "smart_city_ep6.mp4",
+      "thumb_asset_name": "smart_city_ep6_thumb.jpg",
+      "video_download_url": null,
+      "thumb_download_url": null,
+      "local_video_path": "C:\\real-mini-township\\queue_out\\smart_city_ep6\\smart_city_ep6.mp4",
+      "local_thumb_path": "C:\\real-mini-township\\queue_out\\smart_city_ep6\\smart_city_ep6_thumb.jpg",
+      "created_at": "2026-11-20T14:27:05.706Z",
+      "uploaded": false,
+      "uploaded_at": null,
+      "plan": {
+        "episode": 6,
+        "title": "Wiring the Modern Solar Streetlamp Grid",
+        "subtitle_2word": "SOLAR LAMPS",
+        "problem": "Nighttime darkness along Avenue One creates hazardous conditions for vehicular traffic.",
+        "solution": "Trench underground wiring conduit and erect 6 modern solar-assisted LED streetlamps along the curbs.",
+        "is_multipart": false,
+        "multipart_info": null,
+        "updated_anchor_prompt": "Urban civil construction worksite, compacted dual-lane asphalt boulevard with concrete curbs and painted lane markers, subterranean concrete stormwater drainage culverts, repaved asphalt patch, and reinforced concrete underground fuel containment vault with twin cylinders. Visible on site: Compacted dual-lane asphalt boulevard with concrete curbs and painted lane markers; Subterranean concrete stormwater drainage culverts and cast-iron style catch basins; Repaved asphalt patch with tar-sealed perimeter seams and high-visibility road work cones; Deep reinforced concrete underground fuel containment vault with twin brass fuel cylinders. Completed addition: Array of 6 modern stainless-steel curved solar streetlamps with bright LED luminaires.",
+        "structures_added": "Array of 6 modern stainless-steel curved solar streetlamps with bright LED luminaires",
+        "stages": [
+          {
+            "stage_num": 1,
+            "title": "Stage 1: Drilling",
+            "action": "Drilling precision anchor sockets through the concrete sidewalk curbs using a rotary hammer drill",
+            "tool": "rotary hammer drill",
+            "image_prompt": "Stage 1/5 of Wiring the Modern Solar Streetlamp Grid: Authentic real-world civil engineering worksite photography showing Drilling precision anchor sockets through the concrete sidewalk curbs using a rotary hammer drill with rotary hammer drill. Wide-to-medium documentary construction angle showing the structure under assembly: Drilling precision anchor sockets through the concrete sidewalk curbs using a rotary hammer drill, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and clean worksite lighting, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Professional camera tracks Drilling precision anchor sockets through the concrete sidewalk curbs using a rotary hammer drill with rotary hammer drill, progressing cleanly toward threading insulated copper electrical conduit through the underground curb raceway. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "dirt_scraping",
+            "narration": "To illuminate Avenue One, we drill foundation anchor sockets through the concrete sidewalk curbs."
+          },
+          {
+            "stage_num": 2,
+            "title": "Stage 2: Threading",
+            "action": "Threading insulated copper electrical conduit through the underground curb raceway",
+            "tool": "wire strippers and needle-nose pliers",
+            "image_prompt": "Stage 2/5 of Wiring the Modern Solar Streetlamp Grid: Authentic real-world civil engineering worksite photography showing Threading insulated copper electrical conduit through the underground curb raceway with wire strippers and needle-nose pliers. Wide-to-medium documentary construction angle showing the structure under assembly: Threading insulated copper electrical conduit through the underground curb raceway, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and clean worksite lighting, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Professional camera tracks Threading insulated copper electrical conduit through the underground curb raceway with wire strippers and needle-nose pliers, progressing cleanly toward lowering curved stainless steel lamp posts into each pre-drilled anchor socket with setting clamps. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "wire_tweezing",
+            "narration": "Electrical wiring is routed through the subterranean channels to supply continuous clean power."
+          },
+          {
+            "stage_num": 3,
+            "title": "Stage 3: Lowering",
+            "action": "Lowering curved stainless steel lamp posts into each pre-drilled anchor socket with setting clamps",
+            "tool": "setting clamp and alignment level",
+            "image_prompt": "Stage 3/5 of Wiring the Modern Solar Streetlamp Grid: Authentic real-world civil engineering worksite photography showing Lowering curved stainless steel lamp posts into each pre-drilled anchor socket with setting clamps with setting clamp and alignment level. Wide-to-medium documentary construction angle showing the structure under assembly: Lowering curved stainless steel lamp posts into each pre-drilled anchor socket with setting clamps, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and clean worksite lighting, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Professional camera tracks Lowering curved stainless steel lamp posts into each pre-drilled anchor socket with setting clamps with setting clamp and alignment level, progressing cleanly toward affixing photovoltaic solar panels and high-efficiency luminaire heads to the post crests. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "brick_tapping",
+            "narration": "Curved stainless steel lamp posts are seated into each foundation and checked with an alignment level."
+          },
+          {
+            "stage_num": 4,
+            "title": "Stage 4: Affixing",
+            "action": "Affixing photovoltaic solar panels and high-efficiency luminaire heads to the post crests",
+            "tool": "hex driver and fastener tool",
+            "image_prompt": "Stage 4/5 of Wiring the Modern Solar Streetlamp Grid: Authentic real-world civil engineering worksite photography showing Affixing photovoltaic solar panels and high-efficiency luminaire heads to the post crests with hex driver and fastener tool. Wide-to-medium documentary construction angle showing the structure under assembly: Affixing photovoltaic solar panels and high-efficiency luminaire heads to the post crests, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and clean worksite lighting, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Professional camera tracks Affixing photovoltaic solar panels and high-efficiency luminaire heads to the post crests with hex driver and fastener tool, progressing cleanly toward powering on the led warm-white luminaires to cast clean light pools across the asphalt. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "wire_tweezing",
+            "narration": "Photovoltaic solar collector heads are secured atop each arm, creating an autonomous off-grid lighting array."
+          },
+          {
+            "stage_num": 5,
+            "title": "Stage 5: Powering",
+            "action": "Powering on the LED warm-white luminaires to cast clean light pools across the asphalt",
+            "tool": "electrical testing meter and switch",
+            "image_prompt": "Stage 5/5 of Wiring the Modern Solar Streetlamp Grid: Authentic real-world civil engineering worksite photography showing Powering on the LED warm-white luminaires to cast clean light pools across the asphalt with electrical testing meter and switch. Wide-to-medium documentary construction angle showing the structure under assembly: Powering on the LED warm-white luminaires to cast clean light pools across the asphalt, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and clean worksite lighting, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Professional camera tracks Powering on the LED warm-white luminaires to cast clean light pools across the asphalt with electrical testing meter and switch, progressing cleanly toward inspecting and finalizing the completed structure. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "spray_painting",
+            "narration": "Power is energized. Clean streetlamp glow illuminates the dark pavement, turning Avenue One into a vibrant corridor."
+          }
+        ]
+      }
     }
   ],
-  "last_updated": "2026-11-20T14:13:27.072Z"
+  "last_updated": "2026-11-20T14:27:05.708Z"
 }
