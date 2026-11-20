@@ -11,7 +11,7 @@ const CRAFTSMAN_HANDS_DESCRIPTION =
   "Authentic skilled construction craftsman hands with natural skin texture, subtle dried cement and fine stone dust on knuckles, rolled-up dark denim work sleeves, bare wrists with no jewelry or wristwatches, holding heavy-duty construction tools";
 
 const CAMERA_BASE_PROMPT = 
-  "Cinematic 4K real-world construction site cinematography: locked eye-level and crisp 45-degree documentary angle, natural daylight and construction work lighting, razor-sharp focus on the active building structure and materials, genuine depth of field, real gravel and concrete foundations, Sony FX6 cinema camera, authentic physical construction process";
+  "Cinematic 720p, 5s duration real-world construction site cinematography: locked eye-level and crisp 45-degree documentary angle, natural daylight and construction work lighting, razor-sharp focus on the active building structure and materials, genuine depth of field, real gravel and concrete foundations, Sony FX6 cinema camera, authentic physical construction process";
 
 // Comprehensive catalog of realistic civil-engineering construction scenarios for all 3 series
 const PROCEDURAL_BLUEPRINTS = {
@@ -559,7 +559,7 @@ Active Multi-Part Project: ${JSON.stringify(townMemory.active_multipart)}
 
 YOUR MISSION:
 Plan Episode ${nextEpisode} as a seamless, authentic step-by-step real-world construction / building process video.
-The camera is locked at a professional documentary eye-level or 45-degree angle (Sony FX6 4K) capturing the active building structure and worksite.
+The camera is locked at a professional documentary eye-level or 45-degree angle (Sony FX6 720p, 5s duration) capturing the active building structure and worksite.
 The project builds progressively in realistic stages without jumping to unrelated buildings or conflicting structures.
 
 STRICT REQUIREMENTS (ZERO TOY / DIORAMA / MINIATURE FRAMING):
@@ -752,7 +752,7 @@ function generateProceduralPlan(townKey, townMemory, nextEpisode) {
     const imagePrompt = `Stage ${stage.stage_num}/5 of ${baseBlueprint.title}: Authentic real-world civil engineering worksite photography showing ${stage.action} with ${stage.tool}. ${angleStyle} showing the structure under assembly: ${stage.action}, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. ${lightingStyle}, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.`;
 
     const nextActionDesc = !isLast ? baseBlueprint.stages[idx + 1].action.toLowerCase() : "inspecting and celebrating the completed transformation";
-    const motionPrompt = `Cinematic real-world construction process video: ${motionCamera} across the active construction site. Professional camera tracks ${stage.action} with ${stage.tool}, progressing cleanly toward ${nextActionDesc}. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.`;
+    const motionPrompt = `Cinematic real-world construction process video (720p, 5s duration): ${motionCamera} across the active construction site. Professional camera tracks ${stage.action} with ${stage.tool}, progressing cleanly toward ${nextActionDesc}. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.`;
 
     return {
       stage_num: stage.stage_num,

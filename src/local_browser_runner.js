@@ -757,6 +757,131 @@ async function clickPromptSubmitButton(page, promptInput) {
 }
 
 /**
+ * Detects whether the Google Flow assistant (Omni 1.2 Flash) has replied asking to confirm
+ * 720p resolution or preferred duration (e.g., "Would you like to generate this video in 720p...").
+ */
+async function checkIsResolutionConfirmationPrompt(page) {
+  if (!page) return false;
+  return await page.evaluate(() => {
+    try {
+      const body = document.body;
+      if (!body) return false;
+      const text = (body.innerText || body.textContent || '');
+      return (
+        text.includes("Would you like to generate this video in 720p") ||
+        text.includes("Would you like me to generate this video in 720p") ||
+        text.includes("preferred duration") ||
+        text.includes("generate at up to 720p resolution") ||
+        text.includes("generate this video in 720p") ||
+        (text.includes("720p") && text.includes("duration") && (text.includes("Omni") || text.includes("preferred") || text.includes("confirm")))
+      );
+    } catch (e) {
+      return false;
+    }
+  }).catch(() => false);
+}
+
+/**
+ * Automatically replies to the assistant's resolution/duration confirmation prompt:
+ * Fills and submits "Yes, generate this video in 720p with 5s duration."
+ * using active composer + Enter + circular -> arrow click logic.
+ */
+async function handleResolutionConfirmation(page) {
+  if (!page) return false;
+
+  try {
+    const isPrompted = await checkIsResolutionConfirmationPrompt(page);
+    if (!isPrompted) return false;
+
+    console.log(`[LocalRunner] Flow assistant resolution/duration confirmation detected.`);
+    const confirmMessage = "Yes, generate this video in 720p with 5s duration.";
+
+    const inputSelectors = [
+      'div[class*="composer" i] div[contenteditable="true"]',
+      'div[class*="composer" i] textarea',
+      'div[class*="prompt" i] div[contenteditable="true"]',
+      'div[class*="prompt" i] textarea',
+      'div[class*="footer" i] div[contenteditable="true"]',
+      'footer div[contenteditable="true"]',
+      'textarea[placeholder*="describe" i]',
+      'textarea[placeholder*="prompt" i]',
+      'textarea[placeholder*="video" i]',
+      'textarea[placeholder*="what you want" i]',
+      'textarea[aria-label*="prompt" i]',
+      'textarea[aria-label*="describe" i]',
+      'div[contenteditable="true"]',
+      'div[role="textbox"]',
+      'textarea',
+      'input[type="text"][placeholder*="prompt" i]',
+      'input[type="text"]'
+    ];
+
+    let composerInput = null;
+    for (const sel of inputSelectors) {
+      const loc = page.locator(sel);
+      const count = await loc.count().catch(() => 0);
+      if (count > 0) {
+        for (let idx = count - 1; idx >= 0; idx--) {
+          const candidate = loc.nth(idx);
+          if (await candidate.isVisible().catch(() => false)) {
+            composerInput = candidate;
+            break;
+          }
+        }
+        if (composerInput) break;
+      }
+    }
+
+    if (!composerInput) {
+      console.warn(`[LocalRunner] Could not locate active composer input to confirm resolution.`);
+      return false;
+    }
+
+    console.log(`[LocalRunner] Auto-confirming: "${confirmMessage}"...`);
+    await composerInput.scrollIntoViewIfNeeded().catch(() => {});
+    await composerInput.click({ force: true }).catch(() => {});
+    await composerInput.focus().catch(() => {});
+    await page.waitForTimeout(200);
+
+    let filled = false;
+    try {
+      await composerInput.fill('');
+      await composerInput.fill(confirmMessage);
+      filled = true;
+    } catch (e) {}
+
+    if (!filled) {
+      await composerInput.evaluate((el, text) => {
+        el.focus();
+        el.innerText = text;
+        if ('value' in el) el.value = text;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      }, confirmMessage).catch(() => {});
+    }
+
+    await composerInput.dispatchEvent('input').catch(() => {});
+    await composerInput.dispatchEvent('change').catch(() => {});
+    await page.waitForTimeout(300);
+
+    // Focus + Enter + Click circular submit/arrow button
+    await composerInput.focus().catch(() => {});
+    await composerInput.press('Enter').catch(() => {});
+    await page.keyboard.press('Enter').catch(() => {});
+    await clickPromptSubmitButton(page, composerInput);
+    await page.waitForTimeout(1000);
+
+    // Watch for credit confirmation dialog immediately following confirmation
+    await handleCreditConfirmationDialog(page);
+
+    return true;
+  } catch (err) {
+    console.warn(`[LocalRunner] Notice handling resolution confirmation: ${err.message}`);
+    return false;
+  }
+}
+
+/**
  * Automate Google Flow / Veo via Playwright
  */
 async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, options) {
@@ -898,7 +1023,7 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
         lightingMood = 'Dramatic warm golden-hour glow casting rich highlights across the finished build';
       }
 
-      const veoPrompt = `Cinematic 4K real-world construction process video: ${shotAngle}. Skilled adult craftsman male hands with visible skin texture and rolled dark denim work sleeves use ${stage.tool} to ${stage.action}. Authentic construction surroundings: concrete foundations, structural framing, building materials, clean ground worksite, and natural construction environment. ${lightingMood}, real physical construction craftsmanship, genuine working motion, steady camera angle, razor-sharp focus on the active build, 30fps.`;
+      const veoPrompt = `Cinematic 720p, 5s duration real-world construction process video: ${shotAngle}. Skilled adult craftsman male hands with visible skin texture and rolled dark denim work sleeves use ${stage.tool} to ${stage.action}. Authentic construction surroundings: concrete foundations, structural framing, building materials, clean ground worksite, and natural construction environment. ${lightingMood}, real physical construction craftsmanship, genuine working motion, steady camera angle, razor-sharp focus on the active build, 30fps.`;
 
       let generated = false;
 
@@ -1016,6 +1141,7 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
 
           // Submission verification & retry watchdog
           let generationStarted = false;
+          let confirmedResolutionThisStage = false;
           for (let verifyAttempt = 0; verifyAttempt < 3; verifyAttempt++) {
             // Rapid credit approval watchdog (500ms intervals)
             for (let cCheck = 0; cCheck < 4; cCheck++) {
@@ -1029,7 +1155,7 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
 
             if (generationStarted) break;
 
-            // Check if prompt was cleared, generation status indicators appeared, or if stuck in Omni mode
+            // Check if prompt was cleared, generation status indicators appeared, or if stuck in Omni mode/resolution prompt
             const statusCheck = await page.evaluate((inputEl) => {
               try {
                 const currentVal = (inputEl ? (inputEl.innerText || inputEl.value || '') : '').trim();
@@ -1041,6 +1167,16 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
                   bodyText.includes("Generate a new video first")
                 ) {
                   return { started: false, reason: 'stuck in Omni video-editing mode', isOmniMode: true };
+                }
+
+                if (
+                  bodyText.includes("Would you like to generate this video in 720p") ||
+                  bodyText.includes("Would you like me to generate this video in 720p") ||
+                  bodyText.includes("preferred duration") ||
+                  bodyText.includes("generate at up to 720p resolution") ||
+                  bodyText.includes("generate this video in 720p")
+                ) {
+                  return { started: false, reason: 'assistant asks to confirm 720p/duration', isResolutionPrompt: true };
                 }
 
                 if (currentVal.length < 5) return { started: true, reason: 'prompt input cleared' };
@@ -1067,6 +1203,15 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
               generationStarted = true;
               console.log(`[LocalRunner] Generation initiation confirmed (${statusCheck.reason}).`);
               break;
+            }
+
+            if (statusCheck.isResolutionPrompt && !confirmedResolutionThisStage) {
+              console.log(`[LocalRunner] Assistant asked for 720p/duration confirmation. Auto-confirming...`);
+              const confirmed = await handleResolutionConfirmation(page);
+              if (confirmed) {
+                confirmedResolutionThisStage = true;
+              }
+              continue;
             }
 
             if (statusCheck.isOmniMode) {
@@ -1106,7 +1251,16 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
               await handleOmniModeRecovery(page);
             }
 
-            // 3. Inspect all DOM video elements (both direct src and nested <source src="...">)
+            // 3. Detect if assistant replies asking to confirm 720p resolution or preferred duration (at most once per stage)
+            if (!confirmedResolutionThisStage) {
+              const confirmed = await handleResolutionConfirmation(page);
+              if (confirmed) {
+                confirmedResolutionThisStage = true;
+                console.log(`[LocalRunner] 720p/5s duration confirmation submitted for Stage ${stage.stage_num}. Continuing wait...`);
+              }
+            }
+
+            // 4. Inspect all DOM video elements (both direct src and nested <source src="...">)
             const domVideos = await page.evaluate(() => {
               const elements = Array.from(document.querySelectorAll('video'));
               return elements.map(v => {
@@ -1501,6 +1655,8 @@ module.exports = {
   checkIsOmniModeActive,
   isOmniOrEditElement,
   ensureVideoMode,
+  checkIsResolutionConfirmationPrompt,
+  handleResolutionConfirmation,
   clickPromptSubmitButton,
   standardizeClip,
   extractThumbnailFrame

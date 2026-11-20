@@ -101,8 +101,8 @@ function verifyImageFile(imagePath) {
  * Enforces dynamic visual variety across cuts (wide establishing -> tracking -> macro -> assembly -> grand reveal).
  */
 function buildSanitizedEngineeringPrompt(stage, townKey) {
-  const cleanTool = (stage.tool || 'construction equipment').trim();
-  const cleanAction = (stage.action || 'assembling structure').trim();
+  const cleanTool = (stage.tool || 'construction equipment').trim().replace(/\b4k\b/gi, '720p, 5s duration');
+  const cleanAction = (stage.action || 'assembling structure').trim().replace(/\b4k\b/gi, '720p, 5s duration');
   const stageNum = stage.stage_num || 1;
 
   let basePrompt = stage.image_prompt || '';
@@ -137,7 +137,8 @@ function buildSanitizedEngineeringPrompt(stage, townKey) {
     .replace(/close-up construction angle/gi, stageFraming)
     .replace(/extreme close-up/gi, 'macro worksite perspective')
     .replace(/macro lens/gi, '35mm cinema lens')
-    .replace(/miniature|diorama|ho-scale|1:87|cutting mat|tweezers|scale model/gi, 'real-world construction');
+    .replace(/miniature|diorama|ho-scale|1:87|cutting mat|tweezers|scale model/gi, 'real-world construction')
+    .replace(/\b4k\b/gi, '720p, 5s duration');
 
   // If no base prompt was available or it was too short, build a fresh crisp prompt
   if (!basePrompt || basePrompt.length < 50) {
@@ -147,7 +148,7 @@ function buildSanitizedEngineeringPrompt(stage, townKey) {
   // Append explicit negative guidance / realism enforcement
   const cleanPrompt = `${basePrompt.trim()} Clean civil engineering scene, ${stageFraming}, sharp focus on physical structural materials. Zero human limb distortions, no disembodied hands, no surreal clay or wooden figures, no toy people, no figurines. Crisp photorealistic 8k documentary cinematography.`;
 
-  return cleanPrompt;
+  return cleanPrompt.replace(/\b4k\b/gi, '720p, 5s duration');
 }
 
 /**
