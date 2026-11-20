@@ -169,7 +169,90 @@
           }
         ]
       }
+    },
+    {
+      "id": "queue_desert_town_ep1",
+      "townKey": "desert_town",
+      "episode": 1,
+      "title": "Grading the Desert Route & Interlocking Pavements",
+      "subtitle_2word": "DESERT ROADS",
+      "problem": "Loose shifting red desert sand and dry tumbleweeds make travel impossible.",
+      "solution": "Clear shifting sand dunes, grade the clay base, and install interlocking desert adobe pavers.",
+      "tag_name": "queue-desert_town-ep1",
+      "release_id": null,
+      "video_asset_name": "desert_town_ep1.mp4",
+      "thumb_asset_name": "desert_town_ep1_thumb.jpg",
+      "video_download_url": null,
+      "thumb_download_url": null,
+      "local_video_path": "C:\\real-mini-township\\queue_out\\desert_town_ep1\\desert_town_ep1.mp4",
+      "local_thumb_path": "C:\\real-mini-township\\queue_out\\desert_town_ep1\\desert_town_ep1_thumb.jpg",
+      "created_at": "2026-11-20T06:50:22.900Z",
+      "uploaded": false,
+      "uploaded_at": null,
+      "plan": {
+        "episode": 1,
+        "title": "Grading the Desert Route & Interlocking Pavements",
+        "subtitle_2word": "DESERT ROADS",
+        "problem": "Loose shifting red desert sand and dry tumbleweeds make travel impossible.",
+        "solution": "Clear shifting sand dunes, grade the clay base, and install interlocking desert adobe pavers.",
+        "is_multipart": false,
+        "multipart_info": null,
+        "updated_anchor_prompt": "Arid desert construction ground site, red sandstone dust, dense clay earth surface with desert scrub and rough gravel, golden hour directional natural sunlight. Virgin ground on building site. Completed addition: Interlocking terracotta stone desert road with sandstone drainage trenches.",
+        "structures_added": "Interlocking terracotta stone desert road with sandstone drainage trenches",
+        "stages": [
+          {
+            "stage_num": 1,
+            "title": "Stage 1: Brushing",
+            "action": "Brushing away dry red sand drifts and clearing brittle desert scrub with clearing rakes",
+            "tool": "sand broom and clearing rake",
+            "image_prompt": "Stage 1/5 of Grading the Desert Route & Interlocking Pavements: Authentic real-world construction process showing skilled adult craftsman worker hands actively using sand broom and clearing rake while brushing away dry red sand drifts and clearing brittle desert scrub with clearing rakes on the active building worksite. Crisp work-in-progress construction angle showing the structure under assembly: Brushing away dry red sand drifts and clearing brittle desert scrub with clearing rakes, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and workshop lighting, locked cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic construction craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Skilled craftsman hands steadily use sand broom and clearing rake while brushing away dry red sand drifts and clearing brittle desert scrub with clearing rakes, progressing cleanly toward carving neat sandstone drainage channels with a heavy triangular clay grading tool. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "grass_trimming",
+            "narration": "Deep in the arid desert, we brush back loose red dunes to expose the dense underlying clay hardpan."
+          },
+          {
+            "stage_num": 2,
+            "title": "Stage 2: Carving",
+            "action": "Carving neat sandstone drainage channels with a heavy triangular clay grading tool",
+            "tool": "grading scraper and trenching tool",
+            "image_prompt": "Stage 2/5 of Grading the Desert Route & Interlocking Pavements: Authentic real-world construction process showing skilled adult craftsman worker hands actively using grading scraper and trenching tool while carving neat sandstone drainage channels with a heavy triangular clay grading tool on the active building worksite. Crisp work-in-progress construction angle showing the structure under assembly: Carving neat sandstone drainage channels with a heavy triangular clay grading tool, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and workshop lighting, locked cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic construction craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Skilled craftsman hands steadily use grading scraper and trenching tool while carving neat sandstone drainage channels with a heavy triangular clay grading tool, progressing cleanly toward laying a stabilizing clay slip foundation using a broad wooden leveling board. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "dirt_scraping",
+            "narration": "Even in the desert, flash floods happen. We carve deep roadside drainage swales into the clay."
+          },
+          {
+            "stage_num": 3,
+            "title": "Stage 3: Laying",
+            "action": "Laying a stabilizing clay slip foundation using a broad wooden leveling board",
+            "tool": "leveling board and trowel",
+            "image_prompt": "Stage 3/5 of Grading the Desert Route & Interlocking Pavements: Authentic real-world construction process showing skilled adult craftsman worker hands actively using leveling board and trowel while laying a stabilizing clay slip foundation using a broad wooden leveling board on the active building worksite. Crisp work-in-progress construction angle showing the structure under assembly: Laying a stabilizing clay slip foundation using a broad wooden leveling board, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and workshop lighting, locked cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic construction craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Skilled craftsman hands steadily use leveling board and trowel while laying a stabilizing clay slip foundation using a broad wooden leveling board, progressing cleanly toward placing fired terracotta cobblestone pavers in an interlocking herringbone pattern with paver clamps. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "cement_troweling",
+            "narration": "A stabilizing clay slip is spread evenly across the roadbed to prevent sand seepage."
+          },
+          {
+            "stage_num": 4,
+            "title": "Stage 4: Placing",
+            "action": "Placing fired terracotta cobblestone pavers in an interlocking herringbone pattern with paver clamps",
+            "tool": "paver clamps and rubber mallet",
+            "image_prompt": "Stage 4/5 of Grading the Desert Route & Interlocking Pavements: Authentic real-world construction process showing skilled adult craftsman worker hands actively using paver clamps and rubber mallet while placing fired terracotta cobblestone pavers in an interlocking herringbone pattern with paver clamps on the active building worksite. Crisp work-in-progress construction angle showing the structure under assembly: Placing fired terracotta cobblestone pavers in an interlocking herringbone pattern with paver clamps, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and workshop lighting, locked cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic construction craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Skilled craftsman hands steadily use paver clamps and rubber mallet while placing fired terracotta cobblestone pavers in an interlocking herringbone pattern with paver clamps, progressing cleanly toward sweeping fine golden silica sand into the paver joints with a heavy joint-sand broom. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "brick_tapping",
+            "narration": "Fired terracotta pavers are laid in an interlocking herringbone pattern, designed to resist scorching desert heat."
+          },
+          {
+            "stage_num": 5,
+            "title": "Stage 5: Sweeping",
+            "action": "Sweeping fine golden silica sand into the paver joints with a heavy joint-sand broom",
+            "tool": "joint-sand broom",
+            "image_prompt": "Stage 5/5 of Grading the Desert Route & Interlocking Pavements: Authentic real-world construction process showing skilled adult craftsman worker hands actively using joint-sand broom while sweeping fine golden silica sand into the paver joints with a heavy joint-sand broom on the active building worksite. Crisp work-in-progress construction angle showing the structure under assembly: Sweeping fine golden silica sand into the paver joints with a heavy joint-sand broom, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and workshop lighting, locked cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic construction craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Skilled craftsman hands steadily use joint-sand broom while sweeping fine golden silica sand into the paver joints with a heavy joint-sand broom, progressing cleanly toward inspecting and finalizing the completed structure. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "dirt_scraping",
+            "narration": "Fine golden silica sand is swept between the joints, locking the pavers into a permanent desert highway."
+          }
+        ]
+      }
     }
   ],
-  "last_updated": "2026-11-20T06:24:13.423Z"
+  "last_updated": "2026-11-20T06:50:22.903Z"
 }
