@@ -506,23 +506,36 @@ async function ensureVerticalRatio(page) {
 
 /**
  * Watch for and automatically approve Google Flow credit confirmation dialogs:
- * e.g., "Would you like me to kick off this 1 video generation, costing 12 credits?"
- * Buttons: "Always approve in project" | "Approve" | "Reject"
+ * e.g., "Would you like me to kick off this 1 video generation, costing 15 credits?"
+ * Buttons: "Approve" | "Always approve in project" | "Reject"
  *
- * Prioritizes "Always approve in project" first, falling back to "Approve".
+ * Reliably clicks "Approve" (or "Always approve in project" if "Approve" isn't directly clickable)
+ * via DOM query/click + coordinate click so generation starts immediately without stalling.
  * Never clicks "Reject".
  */
 async function handleCreditConfirmationDialog(page) {
   if (!page) return false;
 
   try {
-    // 1. Check if credit confirmation dialog text is present in the DOM
+    // 1. Check if credit confirmation text is present anywhere in DOM or active cards
     const dialogPrompt = await page.evaluate(() => {
-      // Focus on dialogs, alertdialogs, popups, or concise alert containers
-      const candidates = Array.from(document.querySelectorAll('[role="dialog"], [role="alertdialog"], div[class*="modal" i], div[class*="dialog" i], div[class*="popup" i], div[class*="confirm" i], p, span, h2, h3'));
+      const body = document.body;
+      if (!body) return null;
+      const bodyText = (body.innerText || body.textContent || '');
+
+      const hasCreditKeywords = (
+        bodyText.includes('kick off this') ||
+        (bodyText.includes('costing') && bodyText.includes('credits')) ||
+        (bodyText.includes('credits') && (bodyText.includes('Approve') || bodyText.includes('Always approve')))
+      );
+
+      if (!hasCreditKeywords) return null;
+
+      const candidates = Array.from(document.querySelectorAll(
+        '[role="dialog"], [role="alertdialog"], div[class*="modal" i], div[class*="dialog" i], div[class*="popup" i], div[class*="confirm" i], div[class*="card" i], div[class*="panel" i], p, span, h2, h3'
+      ));
       for (const el of candidates) {
         const text = (el.innerText || el.textContent || '').trim();
-        // Dialog prompt must be a reasonably concise confirmation message (prevent matching whole-page wrappers)
         if (text.length > 5 && text.length < 350) {
           if (
             text.includes('kick off') ||
@@ -533,25 +546,80 @@ async function handleCreditConfirmationDialog(page) {
           }
         }
       }
-      return null;
+      return 'Credit confirmation prompt visible';
     }).catch(() => null);
 
-    if (dialogPrompt) {
-      console.log(`[LocalRunner] Credit confirmation dialog detected: "${dialogPrompt}"`);
+    if (!dialogPrompt) return false;
+
+    console.log(`[LocalRunner] Credit confirmation dialog detected: "${dialogPrompt}"`);
+
+    // Helper to click an element reliably via coordinate click + DOM click + locator click
+    const clickReliably = async (locator, label) => {
+      try {
+        const box = await locator.boundingBox().catch(() => null);
+        if (box && box.width > 0 && box.height > 0) {
+          const x = box.x + box.width / 2;
+          const y = box.y + box.height / 2;
+          console.log(`[LocalRunner] Coordinate clicking "${label}" at (${Math.round(x)}, ${Math.round(y)})...`);
+          await page.mouse.click(x, y).catch(() => {});
+        }
+
+        await locator.evaluate((el) => {
+          try {
+            el.scrollIntoView({ block: 'center', inline: 'center' });
+            el.focus();
+            el.click();
+            el.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window }));
+            el.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true, view: window }));
+            el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+          } catch (e) {}
+        }).catch(() => {});
+
+        await locator.click({ force: true }).catch(() => {});
+        await page.waitForTimeout(500);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    };
+
+    // 2. Primary target: "Approve" (single generation confirmation that kicks off video immediately)
+    const approveSelectors = [
+      'button:text-is("Approve")',
+      'button:text-matches("^\\s*Approve\\s*$", "i")',
+      'div[role="button"]:text-is("Approve")',
+      'div[role="button"]:text-matches("^\\s*Approve\\s*$", "i")',
+      'span[role="button"]:text-is("Approve")',
+      'span[role="button"]:text-matches("^\\s*Approve\\s*$", "i")',
+      '[aria-label="Approve" i]',
+      'button:has-text("Approve")',
+      'div[role="button"]:has-text("Approve")',
+      'span[role="button"]:has-text("Approve")',
+      'button:has-text("Confirm")',
+      'button:has-text("Continue")'
+    ];
+
+    for (const sel of approveSelectors) {
+      const loc = page.locator(sel);
+      const count = await loc.count().catch(() => 0);
+      for (let idx = 0; idx < count; idx++) {
+        const btn = loc.nth(idx);
+        if (await btn.isVisible().catch(() => false)) {
+          const btnText = (await btn.innerText().catch(() => '')).trim();
+          const btnAria = (await btn.getAttribute('aria-label').catch(() => '')).trim();
+          const lower = `${btnText} ${btnAria}`.toLowerCase();
+
+          // Skip "Reject" or "Always approve" in this primary "Approve" pass
+          if (lower.includes('reject') || lower.includes('always')) continue;
+
+          console.log(`[LocalRunner] Clicking primary "Approve" button via "${sel}" (label: "${btnText || btnAria}")...`);
+          const clicked = await clickReliably(btn, `Approve (${sel})`);
+          if (clicked) return true;
+        }
+      }
     }
 
-    // Check if an active dialog or confirmation container is visible on page
-    const hasActiveDialog = dialogPrompt || await page.evaluate(() => {
-      const dialogs = document.querySelectorAll('[role="dialog"], [role="alertdialog"], div[class*="modal" i]');
-      for (const d of dialogs) {
-        if (d.offsetParent !== null && d.innerText && (d.innerText.includes('credits') || d.innerText.includes('approve'))) return true;
-      }
-      return false;
-    }).catch(() => false);
-
-    if (!hasActiveDialog) return false;
-
-    // 2. Primary target: "Always approve in project" (prevents future prompts in this project)
+    // 3. Fallback target: "Always approve in project" (if "Approve" isn't directly clickable)
     const alwaysApproveSelectors = [
       'button:has-text("Always approve in project")',
       'button:has-text("Always approve for this project")',
@@ -559,73 +627,91 @@ async function handleCreditConfirmationDialog(page) {
       'div[role="button"]:has-text("Always approve in project")',
       'div[role="button"]:has-text("Always approve for this project")',
       'div[role="button"]:has-text("Always approve")',
+      'span[role="button"]:has-text("Always approve in project")',
+      'span[role="button"]:has-text("Always approve")',
       '[aria-label*="Always approve in project" i]',
       '[aria-label*="Always approve" i]',
       'button:text-matches("always approve", "i")'
     ];
 
     for (const sel of alwaysApproveSelectors) {
-      const btn = page.locator(sel).first();
-      if (await btn.isVisible().catch(() => false)) {
-        console.log(`[LocalRunner] Clicking "Always approve in project" button via "${sel}"...`);
-        await btn.click({ force: true }).catch(() => {});
-        await page.waitForTimeout(500);
-        return true;
+      const loc = page.locator(sel);
+      const count = await loc.count().catch(() => 0);
+      for (let idx = 0; idx < count; idx++) {
+        const btn = loc.nth(idx);
+        if (await btn.isVisible().catch(() => false)) {
+          const btnText = (await btn.innerText().catch(() => '')).trim();
+          const btnAria = (await btn.getAttribute('aria-label').catch(() => '')).trim();
+          const lower = `${btnText} ${btnAria}`.toLowerCase();
+
+          if (lower.includes('reject')) continue;
+
+          console.log(`[LocalRunner] Clicking fallback "Always approve in project" button via "${sel}" (label: "${btnText || btnAria}")...`);
+          const clicked = await clickReliably(btn, `Always approve (${sel})`);
+          if (clicked) return true;
+        }
       }
     }
 
-    // 3. Fallback target: "Approve" (single generation confirmation)
-    const approveSelectors = [
-      'button:text-is("Approve")',
-      'button:text-matches("^\\s*Approve\\s*$", "i")',
-      'div[role="button"]:text-is("Approve")',
-      'div[role="button"]:text-matches("^\\s*Approve\\s*$", "i")',
-      '[aria-label="Approve" i]',
-      'button:has-text("Approve")',
-      'div[role="button"]:has-text("Approve")',
-      'button:has-text("Confirm")',
-      'button:has-text("Continue")'
-    ];
+    // 4. In-depth DOM query + Coordinate Click fallback (scans shadow DOM/custom elements for bounding box)
+    const domTarget = await page.evaluate(() => {
+      try {
+        const clickables = Array.from(document.querySelectorAll('button, div[role="button"], span[role="button"], a[role="button"], span, div'));
 
-    for (const sel of approveSelectors) {
-      const btn = page.locator(sel).first();
-      if (await btn.isVisible().catch(() => false)) {
-        const btnText = (await btn.innerText().catch(() => '')).trim();
-        // Skip "Reject" or other unrelated buttons
-        if (btnText.toLowerCase().includes('reject')) continue;
-        console.log(`[LocalRunner] Clicking fallback "Approve" button via "${sel}" (label: "${btnText}")...`);
-        await btn.click({ force: true }).catch(() => {});
-        await page.waitForTimeout(500);
-        return true;
-      }
-    }
+        // First pass: look for "Approve"
+        for (const el of clickables) {
+          if (el.offsetParent === null && el.getClientRects().length === 0) continue;
+          const text = (el.innerText || el.textContent || '').trim();
+          const aria = (el.getAttribute('aria-label') || '').trim();
+          const t = text.toLowerCase();
+          const a = aria.toLowerCase();
 
-    // 4. In-depth DOM traversal fallback (in case elements are inside custom web components or shadow roots)
-    const domClicked = await page.evaluate(() => {
-      const clickables = Array.from(document.querySelectorAll('button, div[role="button"], span[role="button"], a[role="button"]'));
-
-      // Try "always approve" first
-      for (const el of clickables) {
-        const text = (el.innerText || el.textContent || '').trim().toLowerCase();
-        if (text.includes('always approve') && el.offsetParent !== null) {
-          el.click();
-          return 'Always approve in project (DOM)';
+          if (
+            (t === 'approve' || a === 'approve' || t.startsWith('approve') || a.startsWith('approve')) &&
+            !t.includes('reject') && !a.includes('reject') &&
+            !t.includes('always') && !a.includes('always')
+          ) {
+            const rect = el.getBoundingClientRect();
+            if (rect.width > 8 && rect.height > 8) {
+              el.scrollIntoView({ block: 'center', inline: 'center' });
+              el.click();
+              return {
+                label: 'Approve (DOM + Coordinates)',
+                x: rect.left + rect.width / 2,
+                y: rect.top + rect.height / 2
+              };
+            }
+          }
         }
-      }
 
-      // Try "approve" next
-      for (const el of clickables) {
-        const text = (el.innerText || el.textContent || '').trim().toLowerCase();
-        if ((text === 'approve' || text.startsWith('approve') || text === 'confirm') && !text.includes('reject') && el.offsetParent !== null) {
-          el.click();
-          return 'Approve (DOM)';
+        // Second pass: look for "Always approve in project"
+        for (const el of clickables) {
+          if (el.offsetParent === null && el.getClientRects().length === 0) continue;
+          const text = (el.innerText || el.textContent || '').trim().toLowerCase();
+          const aria = (el.getAttribute('aria-label') || '').trim().toLowerCase();
+          if ((text.includes('always approve') || aria.includes('always approve')) && !text.includes('reject')) {
+            const rect = el.getBoundingClientRect();
+            if (rect.width > 8 && rect.height > 8) {
+              el.scrollIntoView({ block: 'center', inline: 'center' });
+              el.click();
+              return {
+                label: 'Always approve in project (DOM + Coordinates)',
+                x: rect.left + rect.width / 2,
+                y: rect.top + rect.height / 2
+              };
+            }
+          }
         }
+
+        return null;
+      } catch (e) {
+        return null;
       }
-      return null;
     }).catch(() => null);
 
-    if (domClicked) {
-      console.log(`[LocalRunner] Auto-approved credit dialog via ${domClicked}.`);
+    if (domTarget) {
+      console.log(`[LocalRunner] Coordinate clicking ${domTarget.label} at (${Math.round(domTarget.x)}, ${Math.round(domTarget.y)})...`);
+      await page.mouse.click(domTarget.x, domTarget.y).catch(() => {});
       await page.waitForTimeout(500);
       return true;
     }
@@ -1179,6 +1265,15 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
                   return { started: false, reason: 'assistant asks to confirm 720p/duration', isResolutionPrompt: true };
                 }
 
+                // Check if credit confirmation dialog is currently waiting for user response
+                if (
+                  bodyText.includes('kick off this') ||
+                  (bodyText.includes('costing') && bodyText.includes('credits')) ||
+                  (bodyText.includes('credits') && (bodyText.includes('Always approve') || bodyText.includes('Approve')))
+                ) {
+                  return { started: false, reason: 'credit confirmation waiting for user approval', isCreditPrompt: true };
+                }
+
                 if (currentVal.length < 5) return { started: true, reason: 'prompt input cleared' };
 
                 if (
@@ -1187,8 +1282,7 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
                   bodyText.includes('Generating') ||
                   bodyText.includes('Rendering') ||
                   bodyText.includes('In queue') ||
-                  bodyText.includes('Queued') ||
-                  bodyText.includes('costing')
+                  bodyText.includes('Queued')
                 ) {
                   return { started: true, reason: 'generation status text present in DOM' };
                 }
@@ -1198,6 +1292,16 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
                 return { started: false, reason: e.message };
               }
             }, await promptInput.elementHandle().catch(() => null)).catch(() => ({ started: false, reason: 'evaluate error' }));
+
+            if (statusCheck.isCreditPrompt) {
+              console.log(`[LocalRunner] Credit confirmation detected in submission watchdog. Auto-approving...`);
+              if (await handleCreditConfirmationDialog(page)) {
+                console.log(`[LocalRunner] Credit confirmation auto-approved in submission watchdog.`);
+                generationStarted = true;
+                break;
+              }
+              continue;
+            }
 
             if (statusCheck.started) {
               generationStarted = true;

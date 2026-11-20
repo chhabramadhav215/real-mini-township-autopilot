@@ -17,7 +17,7 @@ echo [!DATE! !TIME!] Starting Real Mini Township Autopilot Queue Runner... >> %L
 echo ============================================================================== >> %LOG_FILE%
 
 echo ==============================================================================
-echo REAL MINI TOWNSHIP AUTOPILOT - LOCAL QUEUE & AUTO-CLEANUP RUNNER
+echo REAL MINI TOWNSHIP AUTOPILOT - LOCAL QUEUE ^& AUTO-CLEANUP RUNNER
 echo Workspace: %CD%
 echo Log File:  %LOG_FILE%
 echo ==============================================================================
