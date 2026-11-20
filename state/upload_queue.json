@@ -435,7 +435,7 @@
       "thumb_download_url": null,
       "local_video_path": "C:\\real-mini-township\\queue_out\\desert_town_ep2\\desert_town_ep2.mp4",
       "local_thumb_path": "C:\\real-mini-township\\queue_out\\desert_town_ep2\\desert_town_ep2_thumb.jpg",
-      "created_at": "2026-11-20T15:12:42.270Z",
+      "created_at": "2026-11-20T15:13:08.630Z",
       "uploaded": false,
       "uploaded_at": null,
       "plan": {
@@ -503,5 +503,5 @@
       }
     }
   ],
-  "last_updated": "2026-11-20T15:12:42.271Z"
+  "last_updated": "2026-11-20T15:13:08.630Z"
 }
