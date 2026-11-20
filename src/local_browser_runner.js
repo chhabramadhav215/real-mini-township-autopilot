@@ -268,11 +268,19 @@ async function handleCreditConfirmationDialog(page) {
   try {
     // 1. Check if credit confirmation dialog text is present in the DOM
     const dialogPrompt = await page.evaluate(() => {
-      const candidates = Array.from(document.querySelectorAll('p, span, div, h1, h2, h3, h4, [role="dialog"], [role="alertdialog"]'));
+      // Focus on dialogs, alertdialogs, popups, or concise alert containers
+      const candidates = Array.from(document.querySelectorAll('[role="dialog"], [role="alertdialog"], div[class*="modal" i], div[class*="dialog" i], div[class*="popup" i], div[class*="confirm" i], p, span, h2, h3'));
       for (const el of candidates) {
         const text = (el.innerText || el.textContent || '').trim();
-        if (text.includes('credits') && (text.includes('kick off') || text.includes('generation') || text.includes('costing') || text.includes('approve'))) {
-          return text.replace(/\s+/g, ' ').slice(0, 150);
+        // Dialog prompt must be a reasonably concise confirmation message (prevent matching whole-page wrappers)
+        if (text.length > 5 && text.length < 350) {
+          if (
+            text.includes('kick off') ||
+            text.includes('costing') ||
+            (text.includes('credits') && (text.includes('approve') || text.includes('video generation') || text.includes('like me to')))
+          ) {
+            return text.replace(/\s+/g, ' ').slice(0, 150);
+          }
         }
       }
       return null;
@@ -281,6 +289,17 @@ async function handleCreditConfirmationDialog(page) {
     if (dialogPrompt) {
       console.log(`[LocalRunner] Credit confirmation dialog detected: "${dialogPrompt}"`);
     }
+
+    // Check if an active dialog or confirmation container is visible on page
+    const hasActiveDialog = dialogPrompt || await page.evaluate(() => {
+      const dialogs = document.querySelectorAll('[role="dialog"], [role="alertdialog"], div[class*="modal" i]');
+      for (const d of dialogs) {
+        if (d.offsetParent !== null && d.innerText && (d.innerText.includes('credits') || d.innerText.includes('approve'))) return true;
+      }
+      return false;
+    }).catch(() => false);
+
+    if (!hasActiveDialog) return false;
 
     // 2. Primary target: "Always approve in project" (prevents future prompts in this project)
     const alwaysApproveSelectors = [
@@ -362,6 +381,126 @@ async function handleCreditConfirmationDialog(page) {
     }
   } catch (err) {
     // Non-blocking catch
+  }
+
+  return false;
+}
+
+/**
+ * Click the visible submit/send/generate button or the circular arrow button in/below the prompt composer
+ */
+async function clickPromptSubmitButton(page, promptInput) {
+  if (!page) return false;
+
+  // 1. Prioritize submit/arrow button inside or adjacent to prompt composer container
+  if (promptInput) {
+    const composerClicked = await page.evaluate((inputEl) => {
+      try {
+        let container = inputEl.closest('form, div[class*="composer" i], div[class*="prompt" i], div[class*="input" i], div[class*="footer" i], div[class*="bar" i]');
+        if (!container) container = inputEl.parentElement?.parentElement;
+        if (!container) container = inputEl.parentElement;
+
+        if (container) {
+          const buttons = Array.from(container.querySelectorAll('button, div[role="button"]'));
+          // A. Labeled submit buttons inside composer
+          for (const b of buttons) {
+            const aria = (b.getAttribute('aria-label') || '').toLowerCase();
+            const text = (b.innerText || '').toLowerCase();
+            if (
+              aria.includes('create') ||
+              aria.includes('send') ||
+              aria.includes('generate') ||
+              aria.includes('submit') ||
+              aria.includes('arrow') ||
+              text.includes('generate') ||
+              text.includes('create') ||
+              text.includes('send')
+            ) {
+              if (!b.disabled && b.offsetParent !== null) {
+                b.click();
+                return `composer button (${aria || text || 'submit'})`;
+              }
+            }
+          }
+
+          // B. Circular or SVG arrow button inside/below composer
+          for (const b of buttons) {
+            if (!b.disabled && b.offsetParent !== null && b.querySelector('svg')) {
+              b.click();
+              return 'composer circular arrow SVG button';
+            }
+          }
+        }
+        return null;
+      } catch (e) {
+        return null;
+      }
+    }, await promptInput.elementHandle().catch(() => null)).catch(() => null);
+
+    if (composerClicked) {
+      console.log(`[LocalRunner] Clicked submit button via ${composerClicked}.`);
+      return true;
+    }
+  }
+
+  // 2. Playwright locators for submit/create/send buttons, prioritizing lowest on the page
+  const buttonSelectors = [
+    'button[aria-label*="Create" i]',
+    'button[aria-label*="Send" i]',
+    'button[aria-label*="Generate" i]',
+    'button[aria-label*="Submit" i]',
+    'button[aria-label*="Arrow" i]',
+    'div[role="button"][aria-label*="Create" i]',
+    'div[role="button"][aria-label*="Send" i]',
+    'div[role="button"][aria-label*="Generate" i]',
+    'button:has-text("Generate")',
+    'button:has-text("Create")',
+    'button:has-text("Send")'
+  ];
+
+  for (const btnSel of buttonSelectors) {
+    const loc = page.locator(btnSel);
+    const count = await loc.count().catch(() => 0);
+    if (count > 0) {
+      // Pick the last visible one (closest to bottom prompt bar)
+      for (let idx = count - 1; idx >= 0; idx--) {
+        const btn = loc.nth(idx);
+        if (await btn.isVisible().catch(() => false) && await btn.isEnabled().catch(() => false)) {
+          console.log(`[LocalRunner] Clicking submit button via "${btnSel}" (index ${idx}/${count})...`);
+          await btn.click({ force: true }).catch(() => {});
+          return true;
+        }
+      }
+    }
+  }
+
+  // 3. Fallback: Search for bottom-right circular arrow button in lower viewport
+  const circularArrowClicked = await page.evaluate(() => {
+    try {
+      const clickables = Array.from(document.querySelectorAll('button, div[role="button"]'));
+      const windowH = window.innerHeight;
+      const bottomButtons = clickables.filter(el => {
+        if (el.disabled || el.offsetParent === null) return false;
+        const rect = el.getBoundingClientRect();
+        return rect.top > windowH * 0.5 && rect.width > 18 && rect.height > 18;
+      });
+
+      for (const b of bottomButtons) {
+        const aria = (b.getAttribute('aria-label') || '').toLowerCase();
+        if (aria.includes('create') || aria.includes('send') || aria.includes('generate') || aria.includes('arrow') || b.querySelector('svg')) {
+          b.click();
+          return `bottom-right circular arrow button (${aria || 'svg'})`;
+        }
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }).catch(() => null);
+
+  if (circularArrowClicked) {
+    console.log(`[LocalRunner] Clicked submit button via ${circularArrowClicked}.`);
+    return true;
   }
 
   return false;
@@ -488,6 +627,12 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
       try {
         // Find prompt input field (closing any lingering modals if necessary)
         const inputSelectors = [
+          'div[class*="composer" i] div[contenteditable="true"]',
+          'div[class*="composer" i] textarea',
+          'div[class*="prompt" i] div[contenteditable="true"]',
+          'div[class*="prompt" i] textarea',
+          'div[class*="footer" i] div[contenteditable="true"]',
+          'footer div[contenteditable="true"]',
           'textarea[placeholder*="describe" i]',
           'textarea[placeholder*="prompt" i]',
           'textarea[placeholder*="video" i]',
@@ -507,11 +652,20 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
           await handleCreditConfirmationDialog(page);
 
           for (const sel of inputSelectors) {
-            const el = page.locator(sel).first();
-            if (await el.isVisible().catch(() => false)) {
-              promptInput = el;
-              console.log(`[LocalRunner] Found prompt input using selector: "${sel}"`);
-              break;
+            const loc = page.locator(sel);
+            const count = await loc.count().catch(() => 0);
+            if (count > 0) {
+              // If multiple elements match (e.g. previous prompt chips/cards above or in side panel),
+              // inspect from last to first to select the active bottom prompt composer!
+              for (let idx = count - 1; idx >= 0; idx--) {
+                const candidate = loc.nth(idx);
+                if (await candidate.isVisible().catch(() => false)) {
+                  promptInput = candidate;
+                  console.log(`[LocalRunner] Found active prompt input using selector: "${sel}" (index ${idx}/${count})`);
+                  break;
+                }
+              }
+              if (promptInput) break;
             }
           }
           if (promptInput) break;
@@ -521,7 +675,8 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
         if (promptInput) {
           console.log(`[LocalRunner] Entering Veo prompt for Stage ${stage.stage_num}...`);
           await promptInput.scrollIntoViewIfNeeded().catch(() => {});
-          await promptInput.click().catch(() => {});
+          await promptInput.click({ force: true }).catch(() => {});
+          await promptInput.focus().catch(() => {});
           await page.waitForTimeout(200);
 
           let filled = false;
@@ -533,6 +688,7 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
 
           if (!filled) {
             await promptInput.evaluate((el, text) => {
+              el.focus();
               el.innerText = text;
               if ('value' in el) el.value = text;
               el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -542,30 +698,7 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
 
           await promptInput.dispatchEvent('input').catch(() => {});
           await promptInput.dispatchEvent('change').catch(() => {});
-          await page.waitForTimeout(300);
-
-          // Find and click submit/generate button
-          const buttonSelectors = [
-            'button:has-text("Generate")',
-            'button:has-text("Create")',
-            'button:has-text("Run")',
-            'button[aria-label*="Generate" i]',
-            'button[aria-label*="Submit" i]',
-            'button[aria-label*="Send" i]',
-            'button[aria-label*="Create" i]',
-            'button[type="submit"]',
-            'button:has(svg)'
-          ];
-
-          let generateBtn = null;
-          for (const btnSel of buttonSelectors) {
-            const btn = page.locator(btnSel).first();
-            if (await btn.isVisible().catch(() => false) && await btn.isEnabled().catch(() => false)) {
-              generateBtn = btn;
-              console.log(`[LocalRunner] Found submit button using selector: "${btnSel}"`);
-              break;
-            }
-          }
+          await page.waitForTimeout(200);
 
           // Setup video download listener for responses initiated after submission
           let interceptedUrl = null;
@@ -583,20 +716,70 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
           };
           page.on('response', responseHandler);
 
-          if (generateBtn) {
-            console.log(`[LocalRunner] Submitting generation request to Veo...`);
-            await generateBtn.click();
-          } else {
-            console.log(`[LocalRunner] Pressing Control+Enter / Enter to submit prompt...`);
-            await page.keyboard.press('Control+Enter');
-          }
+          // Submit step:
+          // 1. Explicitly focus the editable prompt box
+          // 2. Press Enter
+          // 3. Click the visible submit/send button (or circular arrow button)
+          // 4. Retry if submitting does not start generation within a few seconds
+          console.log(`[LocalRunner] Submitting prompt to Veo (Focus + Enter + Submit button)...`);
+          await promptInput.focus().catch(() => {});
+          await promptInput.press('Enter').catch(() => {});
+          await page.keyboard.press('Enter').catch(() => {});
+          await clickPromptSubmitButton(page, promptInput);
 
-          // Rapid credit approval watchdog (checks every 500ms for up to 3 seconds)
-          for (let cCheck = 0; cCheck < 6; cCheck++) {
-            await page.waitForTimeout(500);
-            if (await handleCreditConfirmationDialog(page)) {
-              console.log(`[LocalRunner] Credit confirmation auto-approved immediately after submission.`);
+          // Submission verification & retry watchdog
+          let generationStarted = false;
+          for (let verifyAttempt = 0; verifyAttempt < 3; verifyAttempt++) {
+            // Rapid credit approval watchdog (500ms intervals)
+            for (let cCheck = 0; cCheck < 4; cCheck++) {
+              await page.waitForTimeout(500);
+              if (await handleCreditConfirmationDialog(page)) {
+                console.log(`[LocalRunner] Credit confirmation auto-approved immediately after submission.`);
+                generationStarted = true;
+                break;
+              }
+            }
+
+            if (generationStarted) break;
+
+            // Check if prompt was cleared or generation status indicators appeared
+            const statusCheck = await page.evaluate((inputEl) => {
+              try {
+                const currentVal = (inputEl ? (inputEl.innerText || inputEl.value || '') : '').trim();
+                if (currentVal.length < 5) return { started: true, reason: 'prompt input cleared' };
+
+                const bodyText = document.body.innerText || '';
+                if (
+                  bodyText.includes('generation has started') ||
+                  bodyText.includes('Your video generation has started') ||
+                  bodyText.includes('Generating') ||
+                  bodyText.includes('Rendering') ||
+                  bodyText.includes('In queue') ||
+                  bodyText.includes('Queued') ||
+                  bodyText.includes('costing')
+                ) {
+                  return { started: true, reason: 'generation status text present in DOM' };
+                }
+
+                return { started: false, reason: 'prompt text still present in input' };
+              } catch (e) {
+                return { started: false, reason: e.message };
+              }
+            }, await promptInput.elementHandle().catch(() => null)).catch(() => ({ started: false, reason: 'evaluate error' }));
+
+            if (statusCheck.started) {
+              generationStarted = true;
+              console.log(`[LocalRunner] Generation initiation confirmed (${statusCheck.reason}).`);
               break;
+            }
+
+            // Retry submitting if prompt is still unsubmitted after ~2s
+            if (verifyAttempt < 2) {
+              console.warn(`[LocalRunner] Generation did not start yet (${statusCheck.reason}). Retrying submit button click and Enter...`);
+              await promptInput.focus().catch(() => {});
+              await promptInput.press('Enter').catch(() => {});
+              await page.keyboard.press('Enter').catch(() => {});
+              await clickPromptSubmitButton(page, promptInput);
             }
           }
 
@@ -949,6 +1132,7 @@ module.exports = {
   runLocalAutomation,
   generateClipsViaGoogleFlow,
   handleCreditConfirmationDialog,
+  clickPromptSubmitButton,
   standardizeClip,
   extractThumbnailFrame
 };
