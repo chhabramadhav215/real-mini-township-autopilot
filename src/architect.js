@@ -710,10 +710,10 @@ function generateProceduralPlan(townKey, townMemory, nextEpisode) {
     
     // Authentic real-world construction process prompt (zero diorama/toy/cutting mat framing)
     const actionDesc = stage.action.toLowerCase();
-    const imagePrompt = `Stage ${stage.stage_num}/5 of ${baseBlueprint.title}: Authentic real-world construction process showing skilled adult craftsman worker hands actively using ${stage.tool} while ${actionDesc} on the active building worksite. Crisp work-in-progress construction angle showing the structure under assembly: ${stage.action}, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and workshop lighting, locked cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic construction craftsmanship, 8k resolution, highly detailed realistic construction.`;
+    const imagePrompt = `Stage ${stage.stage_num}/5 of ${baseBlueprint.title}: Authentic real-world civil engineering worksite photography showing ${stage.action} with ${stage.tool}. Wide-to-medium documentary construction angle showing the structure under assembly: ${stage.action}, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and clean worksite lighting, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.`;
 
     const nextActionDesc = !isLast ? baseBlueprint.stages[idx + 1].action.toLowerCase() : "inspecting and finalizing the completed structure";
-    const motionPrompt = `Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Skilled craftsman hands steadily use ${stage.tool} while ${actionDesc}, progressing cleanly toward ${nextActionDesc}. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.`;
+    const motionPrompt = `Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Professional camera tracks ${stage.action} with ${stage.tool}, progressing cleanly toward ${nextActionDesc}. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.`;
 
     return {
       stage_num: stage.stage_num,

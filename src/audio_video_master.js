@@ -290,7 +290,7 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     console.log(`[AudioMaster] Rendering cinematic grand finale reveal for Stage 5...`);
     const finaleArgs = [
       '-loop', '1', '-t', '5.5', '-i', finalStagePath,
-      '-vf', 'scale=1160:2062:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-out_w)/2-16*(t/5.5):(in_h-out_h)/2+2.0*sin(t*1.2),format=yuv420p',
+      '-vf', "scale=w='2*trunc((1080*(1.18-0.12*(t/5.5)))/2)':h='2*trunc((1920*(1.18-0.12*(t/5.5)))/2)':eval=frame,crop=1080:1920:'(in_w-1080)*(0.65-0.35*(t/5.5))':'(in_h-1920)*(0.35+0.30*(t/5.5))',scale=1080:1920:out_range=tv,format=yuv420p,settb=AVTB,setpts=PTS-STARTPTS",
       '-r', '30',
       '-c:v', 'libx264',
       '-preset', 'veryfast',
