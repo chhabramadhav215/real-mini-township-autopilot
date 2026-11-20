@@ -10,6 +10,8 @@ queue_out/
 queue_out
 logs/
 logs
+.local_state
+.local_state/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

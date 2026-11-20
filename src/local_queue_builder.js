@@ -6,11 +6,18 @@ const { planEpisode } = require('./architect');
 const { assembleMasterVideo } = require('./audio_video_master');
 const { generateClipsViaGoogleFlow, extractThumbnailFrame } = require('./local_browser_runner');
 const {
+  loadCheckpoint,
+  saveCheckpoint,
+  updateStepProgress,
+  clearCheckpoint
+} = require('./checkpoint_manager');
+const {
   loadQueue,
   saveQueue,
   enqueueEpisode,
   measureTotalQueueBytes,
   cleanupUploadedLocalFiles,
+  checkStorageCapGate,
   MAX_QUEUE_STORAGE_BYTES,
   HARD_CAP_STORAGE_BYTES
 } = require('./queue_manager');
@@ -191,13 +198,12 @@ async function runLocalQueueBuilder() {
     return;
   }
 
-  // 4. STEP 2: Measure Current Storage Usage
-  let usage = measureTotalQueueBytes();
-  console.log(`[LocalQueue] Current local queue disk usage: ${usage.totalMB} MB (${usage.totalGB} GB)`);
-
-  if (!usage.isUnderWarningLimit) {
-    console.log(`\n[LocalQueue] STORAGE CAP REACHED: Local queue is currently at ${usage.totalMB} MB (>= 1.8 GB limit).`);
-    console.log(`[LocalQueue] Storage optimal. Waiting for GitHub Actions scheduled runs to publish queued episodes and free space.`);
+  // 4. STEP 2: Measure Current Storage Usage & Storage Cap Gate
+  const initialGate = checkStorageCapGate();
+  if (!initialGate.canProceed) {
+    console.log(`\n[LocalQueue] STORAGE CAP GATE: Local queue is currently at ${initialGate.usage?.totalMB} MB (>= 1.8 GB limit).`);
+    console.log(`[LocalQueue] Cleanly pausing batch generation for this session (exit code 0).`);
+    console.log(`[LocalQueue] Waiting for scheduled GitHub Actions runs to publish queued episodes and free space.`);
     return;
   }
 
@@ -206,21 +212,43 @@ async function runLocalQueueBuilder() {
 
   while (episodesGenerated < options.maxEpisodes) {
     // Check storage before starting next episode
-    usage = measureTotalQueueBytes();
-    if (!usage.isUnderWarningLimit) {
-      console.log(`\n[LocalQueue] Local queue storage limit reached (${usage.totalMB} MB >= 1800 MB). Stopping batch.`);
+    const episodeGate = checkStorageCapGate();
+    if (!episodeGate.canProceed) {
+      console.log(`\n[LocalQueue] Local queue storage limit reached (${episodeGate.usage?.totalMB} MB >= 1800 MB). Stopping batch cleanly (exit code 0).`);
       break;
     }
 
-    // Pick next balanced town and episode
-    const { townKey, nextEp } = selectNextTownAndEpisode(memory, queueData, options.town);
+    // Check if an in-progress checkpoint exists
+    let townKey;
+    let nextEp;
+    let plan = null;
+
+    const checkpoint = loadCheckpoint();
+    if (checkpoint && (!options.town || options.town === checkpoint.townKey)) {
+      townKey = checkpoint.townKey;
+      nextEp = checkpoint.episode;
+      plan = checkpoint.plan;
+      console.log(`\n======================================================`);
+      console.log(`[LocalQueue] RESUMING IN-PROGRESS CHECKPOINT`);
+      console.log(`Series:       ${memory[townKey]?.name || townKey} (${townKey})`);
+      console.log(`Episode:      Episode ${nextEp}`);
+      console.log(`Stages Done:  ${checkpoint.completedStages?.length || 0}/5 stages completed`);
+      console.log(`======================================================\n`);
+    } else {
+      // Pick next balanced town and episode
+      const nextTarget = selectNextTownAndEpisode(memory, queueData, options.town);
+      townKey = nextTarget.townKey;
+      nextEp = nextTarget.nextEp;
+    }
+
     const townMemory = memory[townKey];
+    const currentUsage = measureTotalQueueBytes();
 
     console.log(`\n======================================================`);
     console.log(`[LocalQueue] BATCH [${episodesGenerated + 1}/${options.maxEpisodes}] PRE-GENERATING EPISODE`);
     console.log(`Series:       ${townMemory.name} (${townKey})`);
     console.log(`Next Episode: Episode ${nextEp}`);
-    console.log(`Storage Left: ${( (MAX_QUEUE_STORAGE_BYTES - usage.totalBytes) / (1024 * 1024) ).toFixed(0)} MB until 1.8 GB limit`);
+    console.log(`Storage Left: ${( (MAX_QUEUE_STORAGE_BYTES - currentUsage.totalBytes) / (1024 * 1024) ).toFixed(0)} MB until 1.8 GB limit`);
     console.log(`======================================================\n`);
 
     // Setup output directory in queue_out/
@@ -231,8 +259,23 @@ async function runLocalQueueBuilder() {
 
     // Step A: Plan Episode
     console.log(`--- [1/4] ARCHITECT PLANNING ---`);
-    const plan = await planEpisode(townKey, townMemory, nextEp);
-    fs.writeFileSync(path.join(episodeOutputDir, 'episode_plan.json'), JSON.stringify(plan, null, 2), 'utf8');
+    if (!plan) {
+      plan = await planEpisode(townKey, townMemory, nextEp);
+      fs.writeFileSync(path.join(episodeOutputDir, 'episode_plan.json'), JSON.stringify(plan, null, 2), 'utf8');
+      saveCheckpoint({
+        active: true,
+        townKey,
+        episode: nextEp,
+        outputDir: episodeOutputDir,
+        clipsDir,
+        plan,
+        completedStages: [],
+        stageClips: {},
+        currentStep: 'video_generation'
+      });
+    } else {
+      console.log(`[LocalQueue] Reusing plan from checkpoint: "${plan.title}"`);
+    }
     console.log(`Episode Title:   "${plan.title}"`);
     console.log(`2-Word Focus:    "${plan.subtitle_2word}"`);
     console.log(`Civil Challenge: ${plan.problem}`);
@@ -257,6 +300,7 @@ async function runLocalQueueBuilder() {
     };
 
     const masterResult = await assembleMasterVideo(plan, townKey, townMemory, visualResult, episodeOutputDir);
+    updateStepProgress('audio_video_mastering', { clipsCount: clips.length });
     console.log(`Master Video Assembled: ${masterResult.finalVideoPath}`);
     console.log(`Thumbnail Created:      ${masterResult.finalThumbPath}\n`);
 
@@ -328,6 +372,10 @@ async function runLocalQueueBuilder() {
 
     // Step F: Commit & Push state to GitHub
     commitAndPushQueueState(`chore(queue): pre-generate real-motion episode for ${townKey} ep ${nextEp} [skip ci]`);
+
+    // Step G: Clear Mid-Run Checkpoint
+    clearCheckpoint();
+    console.log(`[LocalQueue] Checkpoint cleared for ${townKey} Ep ${nextEp}.`);
 
     episodesGenerated++;
   }

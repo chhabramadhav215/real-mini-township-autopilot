@@ -5,7 +5,7 @@ const { planEpisode } = require('./architect');
 const { generateEpisodeVisuals } = require('./visual_engine');
 const { assembleMasterVideo } = require('./audio_video_master');
 const { processUploadAndStateCommit } = require('./uploader');
-const { getNextQueuedEpisode, markEpisodeUploaded } = require('./queue_manager');
+const { getNextQueuedEpisode, markEpisodeUploaded, cleanupUploadedLocalFiles } = require('./queue_manager');
 const { downloadAsset, deleteReleaseAndTag } = require('./github_releases');
 
 /**
@@ -94,6 +94,9 @@ async function runTownshipAutopilot(targetTownKey = null) {
           youtube_upload: uploadResult?.youtube || null
         });
 
+        // Trigger post-publish local cleanup
+        cleanupUploadedLocalFiles();
+
         const durationSec = ((Date.now() - startTime) / 1000).toFixed(1);
         console.log(`\n======================================================`);
         console.log(`SCHEDULED QUEUE PUBLISH COMPLETE IN ${durationSec}s!`);
@@ -160,6 +163,9 @@ async function runTownshipAutopilot(targetTownKey = null) {
     masterResult.finalThumbPath,
     visualResult.finalStagePath
   );
+
+  // Trigger post-publish local cleanup
+  cleanupUploadedLocalFiles();
 
   const durationSec = ((Date.now() - startTime) / 1000).toFixed(1);
   console.log(`\n======================================================`);

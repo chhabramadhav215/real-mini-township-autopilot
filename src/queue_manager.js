@@ -3,12 +3,12 @@ const path = require('path');
 
 /**
  * Queue Manager & Local Storage Controller
- * Manages state/upload_queue.json and enforces the strict 1.8 GB / 2.0 GB local disk usage cap.
+ * Manages state/upload_queue.json and enforces the strict 1800 MB soft limit / 2048 MB hard cap.
  */
 
 const QUEUE_FILE_PATH = path.resolve('state', 'upload_queue.json');
-const MAX_QUEUE_STORAGE_BYTES = 1.8 * 1024 * 1024 * 1024; // 1.8 GB threshold
-const HARD_CAP_STORAGE_BYTES = 2.0 * 1024 * 1024 * 1024;  // 2.0 GB hard cap
+const MAX_QUEUE_STORAGE_BYTES = 1800 * 1024 * 1024; // 1800 MB soft threshold
+const HARD_CAP_STORAGE_BYTES = 2048 * 1024 * 1024;  // 2048 MB (2.0 GB) hard cap
 
 function loadQueue() {
   if (!fs.existsSync(QUEUE_FILE_PATH)) {
@@ -46,7 +46,85 @@ function getNextQueuedEpisode(townKey) {
 }
 
 /**
- * Mark a queued episode as uploaded
+ * Safely delete a single file, catching locks or missing file errors
+ */
+function safeDeleteFile(filePath) {
+  if (!filePath || !fs.existsSync(filePath)) return 0;
+  try {
+    const sz = fs.statSync(filePath).size;
+    fs.unlinkSync(filePath);
+    return sz;
+  } catch (err) {
+    console.warn(`[QueueManager] Notice deleting file ${path.basename(filePath)}: ${err.message}`);
+    return 0;
+  }
+}
+
+/**
+ * Safely and recursively delete a folder and all its contents without throwing on file locks
+ */
+function safeDeleteFolderRecursive(dirPath) {
+  if (!dirPath || !fs.existsSync(dirPath)) return 0;
+  let reclaimed = 0;
+
+  try {
+    const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dirPath, entry.name);
+      if (entry.isDirectory()) {
+        reclaimed += safeDeleteFolderRecursive(fullPath);
+      } else if (entry.isFile()) {
+        reclaimed += safeDeleteFile(fullPath);
+      }
+    }
+
+    try {
+      fs.rmdirSync(dirPath);
+    } catch (rmErr) {
+      try { fs.rmSync(dirPath, { recursive: true, force: true }); } catch (e) {}
+    }
+  } catch (err) {
+    console.warn(`[QueueManager] Notice deleting folder ${path.basename(dirPath)}: ${err.message}`);
+  }
+
+  return reclaimed;
+}
+
+/**
+ * Clean up local files for a single uploaded episode immediately
+ */
+function cleanupUploadedEpisodeFiles(townKey, episode) {
+  console.log(`[QueueManager] Cleaning up local assets for uploaded episode: ${townKey} Ep ${episode}...`);
+  let reclaimedBytes = 0;
+  const targetDirs = [path.resolve('output'), path.resolve('queue_out')];
+
+  for (const baseDir of targetDirs) {
+    if (!fs.existsSync(baseDir)) continue;
+
+    // 1. Check directory matching: <town>_ep<ep>
+    const epDir = path.join(baseDir, `${townKey}_ep${episode}`);
+    if (fs.existsSync(epDir)) {
+      reclaimedBytes += safeDeleteFolderRecursive(epDir);
+    }
+
+    // 2. Check loose video / thumbnail files matching: <town>_ep<ep>.*
+    try {
+      const files = fs.readdirSync(baseDir);
+      for (const file of files) {
+        if (file.startsWith(`${townKey}_ep${episode}.`) || file.startsWith(`${townKey}_ep${episode}_`)) {
+          reclaimedBytes += safeDeleteFile(path.join(baseDir, file));
+        }
+      }
+    } catch (e) {}
+  }
+
+  const reclaimedMB = (reclaimedBytes / (1024 * 1024)).toFixed(2);
+  console.log(`[QueueManager] Post-publish cleanup: Reclaimed ${reclaimedMB} MB for ${townKey} Ep ${episode}.`);
+  return reclaimedBytes;
+}
+
+/**
+ * Mark a queued episode as uploaded and immediately trigger post-publish cleanup
  */
 function markEpisodeUploaded(townKey, episode, uploadMetadata = {}) {
   const queueData = loadQueue();
@@ -57,6 +135,13 @@ function markEpisodeUploaded(townKey, episode, uploadMetadata = {}) {
     Object.assign(entry, uploadMetadata);
     saveQueue(queueData);
     console.log(`[QueueManager] Marked queue item as uploaded: ${entry.id} (${townKey} Ep ${episode})`);
+
+    // Clean up explicit local paths recorded in the queue item
+    if (entry.local_video_path) safeDeleteFile(entry.local_video_path);
+    if (entry.local_thumb_path) safeDeleteFile(entry.local_thumb_path);
+
+    // Clean up episode directory and loose artifacts
+    cleanupUploadedEpisodeFiles(townKey, episode);
     return entry;
   }
   return null;
@@ -120,33 +205,6 @@ function measureTotalQueueBytes() {
 }
 
 /**
- * Recursively delete folder and contents
- */
-function deleteFolderRecursive(dirPath) {
-  if (!fs.existsSync(dirPath)) return 0;
-  let reclaimed = 0;
-
-  try {
-    const entries = fs.readdirSync(dirPath, { withFileTypes: true });
-    for (const entry of entries) {
-      const fullPath = path.join(dirPath, entry.name);
-      if (entry.isDirectory()) {
-        reclaimed += deleteFolderRecursive(fullPath);
-      } else if (entry.isFile()) {
-        try {
-          const sz = fs.statSync(fullPath).size;
-          fs.unlinkSync(fullPath);
-          reclaimed += sz;
-        } catch (e) {}
-      }
-    }
-    fs.rmdirSync(dirPath);
-  } catch (e) {}
-
-  return reclaimed;
-}
-
-/**
  * Run automatic cleanup: delete local raw clips, temp audio, and rendered mp4/jpg
  * for episodes already marked uploaded: true in upload_queue.json or town_memory.json
  */
@@ -173,23 +231,27 @@ function cleanupUploadedLocalFiles(queueData = null, townMemory = null) {
     desert_town: new Set()
   };
 
-  // 1. From queue
+  // 1. From queue entries marked uploaded: true
   if (Array.isArray(queue.queue)) {
     for (const item of queue.queue) {
-      if (item.uploaded === true && item.townKey && uploadedSet[item.townKey]) {
+      if (item.uploaded === true && item.townKey) {
+        if (!uploadedSet[item.townKey]) uploadedSet[item.townKey] = new Set();
         uploadedSet[item.townKey].add(Number(item.episode));
+
+        // Clean up explicit local file paths if present
+        if (item.local_video_path) reclaimedBytes += safeDeleteFile(item.local_video_path);
+        if (item.local_thumb_path) reclaimedBytes += safeDeleteFile(item.local_thumb_path);
       }
     }
   }
 
   // 2. From town memory history
   if (memory) {
-    for (const townKey of Object.keys(uploadedSet)) {
-      if (memory[townKey]) {
-        const curEp = Number(memory[townKey].episode || 0);
-        for (let ep = 1; ep <= curEp; ep++) {
-          uploadedSet[townKey].add(ep);
-        }
+    for (const townKey of Object.keys(memory)) {
+      if (!uploadedSet[townKey]) uploadedSet[townKey] = new Set();
+      const curEp = Number(memory[townKey].episode || 0);
+      for (let ep = 1; ep <= curEp; ep++) {
+        uploadedSet[townKey].add(ep);
       }
     }
   }
@@ -200,28 +262,30 @@ function cleanupUploadedLocalFiles(queueData = null, townMemory = null) {
   for (const baseDir of targetDirs) {
     if (!fs.existsSync(baseDir)) continue;
 
-    const entries = fs.readdirSync(baseDir, { withFileTypes: true });
-    for (const entry of entries) {
-      const fullPath = path.join(baseDir, entry.name);
-      
-      // Match directory names like "smart_city_ep1", "smart_city_ep2"
-      const match = entry.name.match(/^([a-z_]+)_ep(\d+)/i);
-      if (match) {
-        const town = match[1].toLowerCase();
-        const ep = Number(match[2]);
+    try {
+      const entries = fs.readdirSync(baseDir, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = path.join(baseDir, entry.name);
 
-        if (uploadedSet[town] && uploadedSet[town].has(ep)) {
-          console.log(`[QueueManager] Reclaiming disk space for uploaded episode: ${entry.name}`);
-          if (entry.isDirectory()) {
-            reclaimedBytes += deleteFolderRecursive(fullPath);
-            deletedFoldersCount++;
-          } else if (entry.isFile()) {
-            const sz = fs.statSync(fullPath).size;
-            fs.unlinkSync(fullPath);
-            reclaimedBytes += sz;
+        // Match directory names or file names like "smart_city_ep1", "smart_city_ep2.mp4"
+        const match = entry.name.match(/^([a-z_]+)_ep(\d+)/i);
+        if (match) {
+          const town = match[1].toLowerCase();
+          const ep = Number(match[2]);
+
+          if (uploadedSet[town] && uploadedSet[town].has(ep)) {
+            console.log(`[QueueManager] Reclaiming disk space for uploaded episode: ${entry.name}`);
+            if (entry.isDirectory()) {
+              reclaimedBytes += safeDeleteFolderRecursive(fullPath);
+              deletedFoldersCount++;
+            } else if (entry.isFile()) {
+              reclaimedBytes += safeDeleteFile(fullPath);
+            }
           }
         }
       }
+    } catch (err) {
+      console.warn(`[QueueManager] Notice scanning ${path.basename(baseDir)}: ${err.message}`);
     }
   }
 
@@ -230,7 +294,7 @@ function cleanupUploadedLocalFiles(queueData = null, townMemory = null) {
 
   console.log(`[QueueManager] Storage Cleanup complete!`);
   console.log(`[QueueManager] Reclaimed:  ${reclaimedMB} MB (${deletedFoldersCount} episode directories removed)`);
-  console.log(`[QueueManager] Remaining:  ${currentUsage.totalMB} MB / 1800 MB limit (Cap: 2048 MB)\n`);
+  console.log(`[QueueManager] Remaining:  ${currentUsage.totalMB} MB / 1800 MB soft limit (Hard Cap: 2048 MB)\n`);
 
   return {
     reclaimedBytes,
@@ -238,6 +302,36 @@ function cleanupUploadedLocalFiles(queueData = null, townMemory = null) {
     deletedFoldersCount,
     currentUsage
   };
+}
+
+/**
+ * Storage Cap Gate:
+ * Evaluates current local disk usage against the 1800 MB soft threshold / 2048 MB hard cap.
+ * If over the cap, runs cleanup. If still over the cap, cleanly signals to pause generation (exit code 0).
+ */
+function checkStorageCapGate() {
+  let usage = measureTotalQueueBytes();
+
+  // If over or at soft threshold (1800 MB)
+  if (!usage.isUnderWarningLimit) {
+    console.log(`[StorageGate] Disk usage at ${usage.totalMB} MB (>= 1800 MB threshold). Attempting cleanup...`);
+    const cleanRes = cleanupUploadedLocalFiles();
+    usage = measureTotalQueueBytes();
+
+    if (!usage.isUnderWarningLimit) {
+      console.log(`\n======================================================`);
+      console.log(`[StorageGate] STORAGE CAP REACHED: ${usage.totalMB} MB / 1800 MB limit (Hard Cap: 2048 MB)`);
+      console.log(`[StorageGate] No space was freed by cleanup because queued episodes are pending publication.`);
+      console.log(`[StorageGate] Cleanly pausing generation for this session (exit code 0).`);
+      console.log(`[StorageGate] Once scheduled GitHub Actions publish queued episodes, local cleanup will free space and generation will automatically resume.`);
+      console.log(`======================================================\n`);
+      return { canProceed: false, usage, reclaimedMB: cleanRes.reclaimedMB, reason: 'STORAGE_CAPPED' };
+    } else {
+      console.log(`[StorageGate] Cleanup freed ${cleanRes.reclaimedMB} MB! Storage now at ${usage.totalMB} MB (< 1800 MB). Proceeding with generation.`);
+    }
+  }
+
+  return { canProceed: true, usage };
 }
 
 module.exports = {
@@ -250,5 +344,9 @@ module.exports = {
   markEpisodeUploaded,
   enqueueEpisode,
   measureTotalQueueBytes,
-  cleanupUploadedLocalFiles
+  cleanupUploadedLocalFiles,
+  cleanupUploadedEpisodeFiles,
+  checkStorageCapGate,
+  safeDeleteFile,
+  safeDeleteFolderRecursive
 };

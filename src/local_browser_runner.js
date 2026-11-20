@@ -8,6 +8,17 @@ const { planEpisode } = require('./architect');
 const { generateKeyframe, createContinuousWorkingMotionVideo, runFFmpeg } = require('./visual_engine');
 const { assembleMasterVideo } = require('./audio_video_master');
 const { processUploadAndStateCommit } = require('./uploader');
+const {
+  loadCheckpoint,
+  saveCheckpoint,
+  updateStageProgress,
+  updateStepProgress,
+  clearCheckpoint
+} = require('./checkpoint_manager');
+const {
+  checkStorageCapGate,
+  cleanupUploadedLocalFiles
+} = require('./queue_manager');
 
 /**
  * Local Windows Browser Automation Runner (Google Flow / Veo AI Video Clips)
@@ -597,6 +608,13 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
           console.log(`[LocalRunner] Verified unique existing clip for Stage ${stage.stage_num}: ${finalClipPath}`);
           downloadedHashes.add(existingHash);
           clips.push(finalClipPath);
+          updateStageProgress(stage.stage_num, finalClipPath, {
+            townKey,
+            episode: plan.episode,
+            outputDir: path.dirname(clipsDir),
+            clipsDir,
+            plan
+          });
           continue;
         }
       }
@@ -937,6 +955,13 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
               await standardizeClip(rawClipPath, finalClipPath);
               clips.push(finalClipPath);
               generated = true;
+              updateStageProgress(stage.stage_num, finalClipPath, {
+                townKey,
+                episode: plan.episode,
+                outputDir: path.dirname(clipsDir),
+                clipsDir,
+                plan
+              });
             }
           }
         } else {
@@ -969,6 +994,13 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
         const fallbackHash = crypto.createHash('sha256').update(fs.readFileSync(finalClipPath)).digest('hex');
         downloadedHashes.add(fallbackHash);
         clips.push(finalClipPath);
+        updateStageProgress(stage.stage_num, finalClipPath, {
+          townKey,
+          episode: plan.episode,
+          outputDir: path.dirname(clipsDir),
+          clipsDir,
+          plan
+        });
       }
     }
   } finally {
@@ -996,23 +1028,40 @@ async function runLocalAutomation() {
   console.log(`Browser Mode:      ${options.headless ? 'Headless' : 'Visible Chrome Window'}`);
   console.log(`======================================================\n`);
 
+  // Storage Cap Gate & Automatic Resume check
+  const gate = checkStorageCapGate();
+  if (!gate.canProceed) {
+    console.log(`[LocalRunner] Storage cap reached (${gate.usage?.totalMB} MB >= 1800 MB). Cleanly pausing automation for this session.`);
+    return { status: 'paused', reason: gate.reason, usage: gate.usage };
+  }
+
   const memoryPath = path.resolve('state', 'town_memory.json');
   if (!fs.existsSync(memoryPath)) {
     throw new Error(`Town memory file not found at ${memoryPath}`);
   }
 
   const memory = JSON.parse(fs.readFileSync(memoryPath, 'utf8'));
-  if (!memory[options.town]) {
-    console.error(`Invalid town key "${options.town}". Available: ${Object.keys(memory).join(', ')}`);
-    process.exit(1);
+  let townKey = options.town;
+  let nextEpisode = null;
+  let plan = null;
+
+  const checkpoint = loadCheckpoint();
+  if (checkpoint && (!options.town || options.town === checkpoint.townKey)) {
+    townKey = checkpoint.townKey;
+    nextEpisode = checkpoint.episode;
+    plan = checkpoint.plan;
+    console.log(`[LocalRunner] RESUMING FROM MID-RUN CHECKPOINT: ${townKey} Ep ${nextEpisode} (${checkpoint.completedStages?.length || 0}/5 stages completed)`);
+  } else {
+    if (!memory[townKey]) {
+      console.error(`Invalid town key "${townKey}". Available: ${Object.keys(memory).join(', ')}`);
+      process.exit(1);
+    }
+    nextEpisode = (memory[townKey].episode || 0) + 1;
   }
 
-  const townKey = options.town;
   const townMemory = memory[townKey];
-  const nextEpisode = (townMemory.episode || 0) + 1;
-
   console.log(`Series Name:       "${townMemory.name}"`);
-  console.log(`Current Episode:   ${townMemory.episode} -> Next: Episode ${nextEpisode}\n`);
+  console.log(`Current Episode:   ${townMemory.episode} -> Target: Episode ${nextEpisode}\n`);
 
   const outputDir = path.resolve('output', `${townKey}_ep${nextEpisode}`);
   const clipsDir = path.join(outputDir, 'clips');
@@ -1021,8 +1070,23 @@ async function runLocalAutomation() {
 
   // 1. Plan Episode
   console.log(`--- [1/4] ARCHITECT PLANNING ---`);
-  const plan = await planEpisode(townKey, townMemory, nextEpisode);
-  fs.writeFileSync(path.join(outputDir, 'episode_plan.json'), JSON.stringify(plan, null, 2), 'utf8');
+  if (!plan) {
+    plan = await planEpisode(townKey, townMemory, nextEpisode);
+    fs.writeFileSync(path.join(outputDir, 'episode_plan.json'), JSON.stringify(plan, null, 2), 'utf8');
+    saveCheckpoint({
+      active: true,
+      townKey,
+      episode: nextEpisode,
+      outputDir,
+      clipsDir,
+      plan,
+      completedStages: [],
+      stageClips: {},
+      currentStep: 'video_generation'
+    });
+  } else {
+    console.log(`[LocalRunner] Reusing plan from active checkpoint: "${plan.title}"`);
+  }
   console.log(`Episode Title:     "${plan.title}"`);
   console.log(`2-Word Focus:      "${plan.subtitle_2word}"`);
   console.log(`Civil Challenge:   ${plan.problem}`);
@@ -1045,6 +1109,7 @@ async function runLocalAutomation() {
   }
 
   console.log(`\nCollected ${clips.length} standardized video clips for assembly.`);
+  updateStepProgress('audio_video_mastering', { clipsCount: clips.length });
 
   // Extract high-res thumbnail frame from stage 5 clip
   const lastClip = clips[clips.length - 1];
@@ -1076,11 +1141,16 @@ async function runLocalAutomation() {
       masterResult.finalThumbPath,
       thumbFramePath
     );
+    // Post-publish cleanup of local files
+    cleanupUploadedLocalFiles();
   } else {
     console.log(`[LocalRunner] DRY RUN mode active. Video and thumbnail are ready in:`);
     console.log(`  Video: ${masterResult.finalVideoPath}`);
     console.log(`  Thumb: ${masterResult.finalThumbPath}`);
   }
+
+  // Clear mid-run checkpoint upon full episode completion
+  clearCheckpoint();
 
   // Inspect generated video stream properties via ffprobe
   let probeOutput = 'Unknown';
