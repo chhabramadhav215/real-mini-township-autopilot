@@ -352,7 +352,7 @@
       "thumb_download_url": null,
       "local_video_path": "C:\\real-mini-township\\queue_out\\smart_city_ep6\\smart_city_ep6.mp4",
       "local_thumb_path": "C:\\real-mini-township\\queue_out\\smart_city_ep6\\smart_city_ep6_thumb.jpg",
-      "created_at": "2026-11-20T14:27:05.706Z",
+      "created_at": "2026-11-20T14:27:41.407Z",
       "uploaded": false,
       "uploaded_at": null,
       "plan": {
@@ -420,5 +420,5 @@
       }
     }
   ],
-  "last_updated": "2026-11-20T14:27:05.708Z"
+  "last_updated": "2026-11-20T14:27:41.408Z"
 }
