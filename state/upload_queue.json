@@ -1,4 +1,88 @@
 {
-  "queue": [],
-  "last_updated": "2026-11-19T17:55:00.000Z"
+  "queue": [
+    {
+      "id": "queue_mountain_village_ep1",
+      "townKey": "mountain_village",
+      "episode": 1,
+      "title": "Clearing the Alpine Route and Grading Road Base",
+      "subtitle_2word": "GROUND CLEARING",
+      "problem": "Dense wild roots, rocky outcrops, and unstable slope loam prevent building any access route.",
+      "solution": "Clear brush, grade the mountain dirt, and lay a compacted crushed granite roadbed.",
+      "tag_name": "queue-mountain_village-ep1",
+      "release_id": null,
+      "video_asset_name": "mountain_village_ep1.mp4",
+      "thumb_asset_name": "mountain_village_ep1_thumb.jpg",
+      "video_download_url": null,
+      "thumb_download_url": null,
+      "local_video_path": "C:\\real-mini-township\\queue_out\\mountain_village_ep1\\mountain_village_ep1.mp4",
+      "local_thumb_path": "C:\\real-mini-township\\queue_out\\mountain_village_ep1\\mountain_village_ep1_thumb.jpg",
+      "created_at": "2026-11-20T05:43:45.776Z",
+      "uploaded": false,
+      "uploaded_at": null,
+      "plan": {
+        "episode": 1,
+        "title": "Clearing the Alpine Route and Grading Road Base",
+        "subtitle_2word": "GROUND CLEARING",
+        "problem": "Dense wild roots, rocky outcrops, and unstable slope loam prevent building any access route.",
+        "solution": "Clear brush, grade the mountain dirt, and lay a compacted crushed granite roadbed.",
+        "is_multipart": false,
+        "multipart_info": null,
+        "updated_anchor_prompt": "Rugged alpine mountain terrain site, natural rock grain texture, surrounded by raw granite rock fragments, wild moss, mountain loam soil, warm morning natural daylight. Virgin ground on building site. Completed addition: Crushed granite mountain road base, compacted earth foundation.",
+        "structures_added": "Crushed granite mountain road base, compacted earth foundation",
+        "stages": [
+          {
+            "stage_num": 1,
+            "title": "Stage 1: Clearing",
+            "action": "Clearing brush and dense roots from the mountain trail using heavy hand shears and clearing hooks",
+            "tool": "hand shears and clearing hook",
+            "image_prompt": "Stage 1/5 of Clearing the Alpine Route and Grading Road Base: Authentic real-world construction process showing skilled adult craftsman worker hands actively using hand shears and clearing hook while clearing brush and dense roots from the mountain trail using heavy hand shears and clearing hooks on the active building worksite. Crisp work-in-progress construction angle showing the structure under assembly: Clearing brush and dense roots from the mountain trail using heavy hand shears and clearing hooks, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and workshop lighting, locked cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic construction craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Skilled craftsman hands steadily use hand shears and clearing hook while clearing brush and dense roots from the mountain trail using heavy hand shears and clearing hooks, progressing cleanly toward scraping and leveling uneven mountain dirt with a steel grading rake and heavy tamper. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "grass_trimming",
+            "narration": "We begin on the untouched mountain slope, clearing away wild brush and roots to uncover the solid ground."
+          },
+          {
+            "stage_num": 2,
+            "title": "Stage 2: Scraping",
+            "action": "Scraping and leveling uneven mountain dirt with a steel grading rake and heavy tamper",
+            "tool": "grading rake and tamper",
+            "image_prompt": "Stage 2/5 of Clearing the Alpine Route and Grading Road Base: Authentic real-world construction process showing skilled adult craftsman worker hands actively using grading rake and tamper while scraping and leveling uneven mountain dirt with a steel grading rake and heavy tamper on the active building worksite. Crisp work-in-progress construction angle showing the structure under assembly: Scraping and leveling uneven mountain dirt with a steel grading rake and heavy tamper, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and workshop lighting, locked cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic construction craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Skilled craftsman hands steadily use grading rake and tamper while scraping and leveling uneven mountain dirt with a steel grading rake and heavy tamper, progressing cleanly toward spreading coarse grey crushed granite stone along the cleared route with a steel spreader. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "dirt_scraping",
+            "narration": "Every section of alpine dirt is leveled and compacted, preparing a rock-solid foundation for the village trail."
+          },
+          {
+            "stage_num": 3,
+            "title": "Stage 3: Spreading",
+            "action": "Spreading coarse grey crushed granite stone along the cleared route with a steel spreader",
+            "tool": "steel trowel and spreader",
+            "image_prompt": "Stage 3/5 of Clearing the Alpine Route and Grading Road Base: Authentic real-world construction process showing skilled adult craftsman worker hands actively using steel trowel and spreader while spreading coarse grey crushed granite stone along the cleared route with a steel spreader on the active building worksite. Crisp work-in-progress construction angle showing the structure under assembly: Spreading coarse grey crushed granite stone along the cleared route with a steel spreader, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and workshop lighting, locked cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic construction craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Skilled craftsman hands steadily use steel trowel and spreader while spreading coarse grey crushed granite stone along the cleared route with a steel spreader, progressing cleanly toward compacting and rolling the granite gravel firmly using a heavy steel compaction roller. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "gravel_rolling",
+            "narration": "A layer of crushed granite creates an all-weather road that won't wash away in mountain storms."
+          },
+          {
+            "stage_num": 4,
+            "title": "Stage 4: Compacting",
+            "action": "Compacting and rolling the granite gravel firmly using a heavy steel compaction roller",
+            "tool": "heavy compaction roller",
+            "image_prompt": "Stage 4/5 of Clearing the Alpine Route and Grading Road Base: Authentic real-world construction process showing skilled adult craftsman worker hands actively using heavy compaction roller while compacting and rolling the granite gravel firmly using a heavy steel compaction roller on the active building worksite. Crisp work-in-progress construction angle showing the structure under assembly: Compacting and rolling the granite gravel firmly using a heavy steel compaction roller, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and workshop lighting, locked cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic construction craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Skilled craftsman hands steadily use heavy compaction roller while compacting and rolling the granite gravel firmly using a heavy steel compaction roller, progressing cleanly toward setting heavy granite curbstones along the finished trail using stone setting clamps and a mallet. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "gravel_rolling",
+            "narration": "Using a heavy compaction roller, we compress the gravel until it forms a dense, durable roadbed."
+          },
+          {
+            "stage_num": 5,
+            "title": "Stage 5: Setting",
+            "action": "Setting heavy granite curbstones along the finished trail using stone setting clamps and a mallet",
+            "tool": "stone setting clamps and mallet",
+            "image_prompt": "Stage 5/5 of Clearing the Alpine Route and Grading Road Base: Authentic real-world construction process showing skilled adult craftsman worker hands actively using stone setting clamps and mallet while setting heavy granite curbstones along the finished trail using stone setting clamps and a mallet on the active building worksite. Crisp work-in-progress construction angle showing the structure under assembly: Setting heavy granite curbstones along the finished trail using stone setting clamps and a mallet, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and workshop lighting, locked cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic construction craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Skilled craftsman hands steadily use stone setting clamps and mallet while setting heavy granite curbstones along the finished trail using stone setting clamps and a mallet, progressing cleanly toward inspecting and finalizing the completed structure. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "brick_tapping",
+            "narration": "Finally, heavy granite curbstones lock the roadbed in place, completing the alpine access route."
+          }
+        ]
+      }
+    }
+  ],
+  "last_updated": "2026-11-20T05:43:45.777Z"
 }
