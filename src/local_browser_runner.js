@@ -268,10 +268,10 @@ async function handleCreditConfirmationDialog(page) {
   try {
     // 1. Check if credit confirmation dialog text is present in the DOM
     const dialogPrompt = await page.evaluate(() => {
-      const candidates = Array.from(document.querySelectorAll('p, span, div, h1, h2, h3, h4'));
+      const candidates = Array.from(document.querySelectorAll('p, span, div, h1, h2, h3, h4, [role="dialog"], [role="alertdialog"]'));
       for (const el of candidates) {
         const text = (el.innerText || el.textContent || '').trim();
-        if (text.includes('credits') && (text.includes('kick off') || text.includes('generation') || text.includes('costing'))) {
+        if (text.includes('credits') && (text.includes('kick off') || text.includes('generation') || text.includes('costing') || text.includes('approve'))) {
           return text.replace(/\s+/g, ' ').slice(0, 150);
         }
       }
@@ -285,8 +285,10 @@ async function handleCreditConfirmationDialog(page) {
     // 2. Primary target: "Always approve in project" (prevents future prompts in this project)
     const alwaysApproveSelectors = [
       'button:has-text("Always approve in project")',
+      'button:has-text("Always approve for this project")',
       'button:has-text("Always approve")',
       'div[role="button"]:has-text("Always approve in project")',
+      'div[role="button"]:has-text("Always approve for this project")',
       'div[role="button"]:has-text("Always approve")',
       '[aria-label*="Always approve in project" i]',
       '[aria-label*="Always approve" i]',
@@ -298,7 +300,7 @@ async function handleCreditConfirmationDialog(page) {
       if (await btn.isVisible().catch(() => false)) {
         console.log(`[LocalRunner] Clicking "Always approve in project" button via "${sel}"...`);
         await btn.click({ force: true }).catch(() => {});
-        await page.waitForTimeout(1000);
+        await page.waitForTimeout(500);
         return true;
       }
     }
@@ -311,7 +313,9 @@ async function handleCreditConfirmationDialog(page) {
       'div[role="button"]:text-matches("^\\s*Approve\\s*$", "i")',
       '[aria-label="Approve" i]',
       'button:has-text("Approve")',
-      'div[role="button"]:has-text("Approve")'
+      'div[role="button"]:has-text("Approve")',
+      'button:has-text("Confirm")',
+      'button:has-text("Continue")'
     ];
 
     for (const sel of approveSelectors) {
@@ -322,7 +326,7 @@ async function handleCreditConfirmationDialog(page) {
         if (btnText.toLowerCase().includes('reject')) continue;
         console.log(`[LocalRunner] Clicking fallback "Approve" button via "${sel}" (label: "${btnText}")...`);
         await btn.click({ force: true }).catch(() => {});
-        await page.waitForTimeout(1000);
+        await page.waitForTimeout(500);
         return true;
       }
     }
@@ -343,7 +347,7 @@ async function handleCreditConfirmationDialog(page) {
       // Try "approve" next
       for (const el of clickables) {
         const text = (el.innerText || el.textContent || '').trim().toLowerCase();
-        if ((text === 'approve' || text.startsWith('approve')) && !text.includes('reject') && el.offsetParent !== null) {
+        if ((text === 'approve' || text.startsWith('approve') || text === 'confirm') && !text.includes('reject') && el.offsetParent !== null) {
           el.click();
           return 'Approve (DOM)';
         }
@@ -353,7 +357,7 @@ async function handleCreditConfirmationDialog(page) {
 
     if (domClicked) {
       console.log(`[LocalRunner] Auto-approved credit dialog via ${domClicked}.`);
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(500);
       return true;
     }
   } catch (err) {
@@ -429,6 +433,7 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
     await handleCreditConfirmationDialog(page);
 
     const downloadedHashes = new Set();
+    const collectedVideoUrls = new Set();
 
     // Process each stage
     for (let i = 0; i < plan.stages.length; i++) {
@@ -457,16 +462,21 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
         }
       }
 
-      // Check workspace state before prompt input
+      // Ensure any floating preview modal or inspector panel is closed
+      await page.keyboard.press('Escape').catch(() => {});
       await ensureGoogleFlowWorkspace(page);
       await ensureVideoMode(page);
       await handleCreditConfirmationDialog(page);
 
       // Snapshot all video sources currently in the DOM before submitting new prompt
       const priorVideoSrcs = new Set(
-        await page.locator('video').evaluateAll(vids =>
-          vids.map(v => v.src || v.currentSrc).filter(Boolean)
-        ).catch(() => [])
+        await page.evaluate(() => {
+          const vids = Array.from(document.querySelectorAll('video'));
+          return vids.map(v => {
+            const sourceEl = v.querySelector('source');
+            return v.src || v.currentSrc || (sourceEl ? sourceEl.src : '');
+          }).filter(Boolean);
+        }).catch(() => [])
       );
       console.log(`[LocalRunner] Prior video elements detected on page before Stage ${stage.stage_num}: ${priorVideoSrcs.size}`);
 
@@ -476,7 +486,7 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
       let generated = false;
 
       try {
-        // Find prompt input field
+        // Find prompt input field (closing any lingering modals if necessary)
         const inputSelectors = [
           'textarea[placeholder*="describe" i]',
           'textarea[placeholder*="prompt" i]',
@@ -492,7 +502,10 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
         ];
 
         let promptInput = null;
-        for (let attempt = 0; attempt < 3; attempt++) {
+        for (let attempt = 0; attempt < 4; attempt++) {
+          await page.keyboard.press('Escape').catch(() => {});
+          await handleCreditConfirmationDialog(page);
+
           for (const sel of inputSelectors) {
             const el = page.locator(sel).first();
             if (await el.isVisible().catch(() => false)) {
@@ -502,24 +515,34 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
             }
           }
           if (promptInput) break;
-          await page.waitForTimeout(2000);
+          await page.waitForTimeout(1000);
         }
 
         if (promptInput) {
           console.log(`[LocalRunner] Entering Veo prompt for Stage ${stage.stage_num}...`);
+          await promptInput.scrollIntoViewIfNeeded().catch(() => {});
           await promptInput.click().catch(() => {});
-          const tagName = await promptInput.evaluate(el => el.tagName.toLowerCase()).catch(() => 'textarea');
+          await page.waitForTimeout(200);
 
-          if (tagName === 'textarea' || tagName === 'input') {
+          let filled = false;
+          try {
             await promptInput.fill('');
             await promptInput.fill(veoPrompt);
-          } else {
-            // Contenteditable div
-            await page.keyboard.press('Control+A');
-            await page.keyboard.press('Backspace');
-            await page.keyboard.type(veoPrompt, { delay: 10 });
+            filled = true;
+          } catch (e) {}
+
+          if (!filled) {
+            await promptInput.evaluate((el, text) => {
+              el.innerText = text;
+              if ('value' in el) el.value = text;
+              el.dispatchEvent(new Event('input', { bubbles: true }));
+              el.dispatchEvent(new Event('change', { bubbles: true }));
+            }, veoPrompt).catch(() => {});
           }
-          await page.waitForTimeout(1000);
+
+          await promptInput.dispatchEvent('input').catch(() => {});
+          await promptInput.dispatchEvent('change').catch(() => {});
+          await page.waitForTimeout(300);
 
           // Find and click submit/generate button
           const buttonSelectors = [
@@ -529,6 +552,7 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
             'button[aria-label*="Generate" i]',
             'button[aria-label*="Submit" i]',
             'button[aria-label*="Send" i]',
+            'button[aria-label*="Create" i]',
             'button[type="submit"]',
             'button:has(svg)'
           ];
@@ -548,9 +572,10 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
           const responseHandler = async (response) => {
             try {
               const url = response.url();
+              const status = response.status();
               const contentType = response.headers()['content-type'] || '';
-              if ((contentType.includes('video/mp4') || url.endsWith('.mp4') || (url.includes('googlevideo') && contentType.includes('video'))) && response.status() === 200) {
-                if (!priorVideoSrcs.has(url)) {
+              if ((status === 200 || status === 206) && (contentType.includes('video/') || url.endsWith('.mp4') || (url.includes('googlevideo') && contentType.includes('video')))) {
+                if (!priorVideoSrcs.has(url) && !collectedVideoUrls.has(url)) {
                   interceptedUrl = url;
                 }
               }
@@ -566,92 +591,153 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
             await page.keyboard.press('Control+Enter');
           }
 
-          // Credit confirmation dialog check right after prompt submission
-          await page.waitForTimeout(1500);
-          await handleCreditConfirmationDialog(page);
-          await page.waitForTimeout(1000);
-          await handleCreditConfirmationDialog(page);
+          // Rapid credit approval watchdog (checks every 500ms for up to 3 seconds)
+          for (let cCheck = 0; cCheck < 6; cCheck++) {
+            await page.waitForTimeout(500);
+            if (await handleCreditConfirmationDialog(page)) {
+              console.log(`[LocalRunner] Credit confirmation auto-approved immediately after submission.`);
+              break;
+            }
+          }
 
           console.log(`[LocalRunner] Waiting for Veo generation to complete (up to ${options.timeoutMs / 1000}s)...`);
           const startTime = Date.now();
           let videoFound = false;
 
           while (Date.now() - startTime < options.timeoutMs) {
-            await page.waitForTimeout(4000);
+            await page.waitForTimeout(1800);
 
-            // Periodically check and auto-approve credit confirmation dialog if it popped up during queuing
+            // 1. Periodically check and auto-approve credit confirmation dialog if it popped up during queuing
             await handleCreditConfirmationDialog(page);
 
-            // 1. Inspect DOM video elements for a NEW video src not present before submission
-            const currentVideos = await page.locator('video').evaluateAll(vids => {
-              return vids.map(v => ({
-                src: v.src || v.currentSrc,
-                readyState: v.readyState,
-                duration: v.duration
-              })).filter(v => v.src && v.src.length > 5);
+            // 2. Inspect all DOM video elements (both direct src and nested <source src="...">)
+            const domVideos = await page.evaluate(() => {
+              const elements = Array.from(document.querySelectorAll('video'));
+              return elements.map(v => {
+                const sourceEl = v.querySelector('source');
+                const effectiveSrc = v.src || v.currentSrc || (sourceEl ? sourceEl.src : '');
+                return {
+                  src: effectiveSrc,
+                  readyState: v.readyState,
+                  duration: v.duration,
+                  videoWidth: v.videoWidth,
+                  videoHeight: v.videoHeight
+                };
+              }).filter(v => v.src && v.src.length > 5);
             }).catch(() => []);
 
-            const newVideo = currentVideos.find(v => !priorVideoSrcs.has(v.src) && v.readyState >= 1 && (v.duration > 0 || isNaN(v.duration)));
+            // Check from newest (last) to oldest (first)
+            const newVideo = domVideos.reverse().find(v => !priorVideoSrcs.has(v.src) && !collectedVideoUrls.has(v.src));
 
             if (newVideo) {
-              console.log(`[LocalRunner] Detected NEW video element for Stage ${stage.stage_num} (src: ${newVideo.src.slice(0, 80)}... readyState: ${newVideo.readyState}, duration: ${newVideo.duration})...`);
+              console.log(`[LocalRunner] Detected completed video source for Stage ${stage.stage_num}: ${newVideo.src.slice(0, 80)}...`);
 
-              if (newVideo.src.startsWith('blob:')) {
-                const videoBase64 = await page.evaluate(async (videoSrc) => {
-                  try {
-                    const res = await fetch(videoSrc);
-                    const blob = await res.blob();
-                    return new Promise((resolve) => {
-                      const reader = new FileReader();
-                      reader.onloadend = () => resolve(reader.result.split(',')[1]);
-                      reader.readAsDataURL(blob);
-                    });
-                  } catch (e) {
-                    return null;
-                  }
-                }, newVideo.src);
-
-                if (videoBase64 && videoBase64.length > 50000) {
-                  fs.writeFileSync(rawClipPath, Buffer.from(videoBase64, 'base64'));
-                  videoFound = true;
-                  priorVideoSrcs.add(newVideo.src);
-                  break;
+              // Fast in-browser extraction via fetch (works for both blob: and authenticated http: URLs)
+              const videoBase64 = await page.evaluate(async (srcUrl) => {
+                try {
+                  const res = await fetch(srcUrl);
+                  if (!res.ok && res.status !== 0) return null;
+                  const blob = await res.blob();
+                  if (blob.size < 50000) return null;
+                  return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      const res = reader.result;
+                      resolve(typeof res === 'string' ? res.split(',')[1] : null);
+                    };
+                    reader.readAsDataURL(blob);
+                  });
+                } catch (e) {
+                  return null;
                 }
+              }, newVideo.src).catch(() => null);
+
+              if (videoBase64 && videoBase64.length > 50000) {
+                fs.writeFileSync(rawClipPath, Buffer.from(videoBase64, 'base64'));
+                console.log(`[LocalRunner] Successfully captured video clip (${Math.round(fs.statSync(rawClipPath).size / 1024)} KB)`);
+                videoFound = true;
+                priorVideoSrcs.add(newVideo.src);
+                collectedVideoUrls.add(newVideo.src);
+                break;
               } else if (newVideo.src.startsWith('http')) {
+                // Secondary fallback via page.request.get
                 const videoBuffer = await page.request.get(newVideo.src).then(r => r.body()).catch(() => null);
                 if (videoBuffer && videoBuffer.length > 50000) {
                   fs.writeFileSync(rawClipPath, videoBuffer);
+                  console.log(`[LocalRunner] Successfully downloaded HTTP video clip (${Math.round(videoBuffer.length / 1024)} KB)`);
                   videoFound = true;
                   priorVideoSrcs.add(newVideo.src);
+                  collectedVideoUrls.add(newVideo.src);
                   break;
                 }
               }
             }
 
-            // 2. Check intercepted video response initiated AFTER submission
-            if (interceptedUrl && !priorVideoSrcs.has(interceptedUrl)) {
-              console.log(`[LocalRunner] Intercepted new video media response: ${interceptedUrl.slice(0, 80)}...`);
-              const videoBuffer = await page.request.get(interceptedUrl).then(r => r.body()).catch(() => null);
-              if (videoBuffer && videoBuffer.length > 50000) {
-                fs.writeFileSync(rawClipPath, videoBuffer);
+            // 3. Inspect intercepted network responses (status 200 or 206)
+            if (interceptedUrl && !priorVideoSrcs.has(interceptedUrl) && !collectedVideoUrls.has(interceptedUrl)) {
+              console.log(`[LocalRunner] Intercepted new video response: ${interceptedUrl.slice(0, 80)}...`);
+              const videoBase64 = await page.evaluate(async (url) => {
+                try {
+                  const res = await fetch(url);
+                  const blob = await res.blob();
+                  if (blob.size < 50000) return null;
+                  return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      const res = reader.result;
+                      resolve(typeof res === 'string' ? res.split(',')[1] : null);
+                    };
+                    reader.readAsDataURL(blob);
+                  });
+                } catch (e) {
+                  return null;
+                }
+              }, interceptedUrl).catch(() => null);
+
+              if (videoBase64 && videoBase64.length > 50000) {
+                fs.writeFileSync(rawClipPath, Buffer.from(videoBase64, 'base64'));
                 videoFound = true;
                 priorVideoSrcs.add(interceptedUrl);
+                collectedVideoUrls.add(interceptedUrl);
                 break;
+              } else {
+                const videoBuffer = await page.request.get(interceptedUrl).then(r => r.body()).catch(() => null);
+                if (videoBuffer && videoBuffer.length > 50000) {
+                  fs.writeFileSync(rawClipPath, videoBuffer);
+                  videoFound = true;
+                  priorVideoSrcs.add(interceptedUrl);
+                  collectedVideoUrls.add(interceptedUrl);
+                  break;
+                }
               }
             }
 
-            // 3. Check for Download button
-            const downloadBtn = page.locator('button:has-text("Download"), a[download], [aria-label*="Download" i]').first();
-            if (await downloadBtn.isVisible().catch(() => false)) {
-              try {
-                const [download] = await Promise.all([
-                  page.waitForEvent('download', { timeout: 15000 }),
-                  downloadBtn.click()
-                ]);
-                await download.saveAs(rawClipPath);
-                videoFound = true;
-                break;
-              } catch (e) {}
+            // 4. Hover over latest completed media card/tile to reveal Download button
+            const mediaCards = page.locator('[role="listitem"], [role="article"], div[data-testid*="card" i], div[data-testid*="media" i], div[class*="tile" i], div[class*="media" i]');
+            const cardCount = await mediaCards.count().catch(() => 0);
+            if (cardCount > 0) {
+              await mediaCards.last().hover().catch(() => {});
+            }
+
+            // 5. Check for Download button on completed video card
+            const downloadBtns = page.locator('button:has-text("Download"), button[aria-label*="Download" i], a[download], [data-testid*="download" i]');
+            const dlCount = await downloadBtns.count().catch(() => 0);
+            if (dlCount > 0) {
+              const dlBtn = downloadBtns.last();
+              if (await dlBtn.isVisible().catch(() => false)) {
+                try {
+                  console.log(`[LocalRunner] Found Download button on latest video item. Clicking...`);
+                  const [download] = await Promise.all([
+                    page.waitForEvent('download', { timeout: 10000 }),
+                    dlBtn.click({ force: true })
+                  ]);
+                  await download.saveAs(rawClipPath);
+                  if (fs.existsSync(rawClipPath) && fs.statSync(rawClipPath).size > 50000) {
+                    videoFound = true;
+                    break;
+                  }
+                } catch (e) {}
+              }
             }
           }
 
