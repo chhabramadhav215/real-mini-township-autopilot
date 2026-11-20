@@ -501,7 +501,90 @@
           }
         ]
       }
+    },
+    {
+      "id": "queue_mountain_village_ep3",
+      "townKey": "mountain_village",
+      "episode": 3,
+      "title": "Constructing the Heavy Timber Trestle Ravine Bridge",
+      "subtitle_2word": "TIMBER BRIDGE",
+      "problem": "A deep mountain ravine divides the village road from the upper timber stands.",
+      "solution": "Construct a hand-hewn rustic pine timber trestle bridge across the ravine gap.",
+      "tag_name": "queue-mountain_village-ep3",
+      "release_id": null,
+      "video_asset_name": "mountain_village_ep3.mp4",
+      "thumb_asset_name": "mountain_village_ep3_thumb.jpg",
+      "video_download_url": null,
+      "thumb_download_url": null,
+      "local_video_path": "C:\\real-mini-township\\queue_out\\mountain_village_ep3\\mountain_village_ep3.mp4",
+      "local_thumb_path": "C:\\real-mini-township\\queue_out\\mountain_village_ep3\\mountain_village_ep3_thumb.jpg",
+      "created_at": "2026-11-20T15:26:55.425Z",
+      "uploaded": false,
+      "uploaded_at": null,
+      "plan": {
+        "episode": 3,
+        "title": "Constructing the Heavy Timber Trestle Ravine Bridge",
+        "subtitle_2word": "TIMBER BRIDGE",
+        "problem": "A deep mountain ravine divides the village road from the upper timber stands.",
+        "solution": "Construct a hand-hewn rustic pine timber trestle bridge across the ravine gap.",
+        "is_multipart": false,
+        "multipart_info": null,
+        "updated_anchor_prompt": "Rugged alpine mountain terrain site, natural rock grain texture, surrounded by raw granite rock fragments, wild moss, mountain loam soil, warm morning natural daylight. Virgin ground on building site. Completed addition: Rustic heavy pine timber trestle road bridge with safety log railings.",
+        "structures_added": "Rustic heavy pine timber trestle road bridge with safety log railings",
+        "stages": [
+          {
+            "stage_num": 1,
+            "title": "Stage 1: Chiseling",
+            "action": "Chiseling bridge abutment seats into the rocky ravine cliffs with a heavy cold chisel",
+            "tool": "carpentry chisel and mallet",
+            "image_prompt": "Stage 1/5 of Constructing the Heavy Timber Trestle Ravine Bridge: Authentic real-world civil engineering worksite photography showing Chiseling bridge abutment seats into the rocky ravine cliffs with a heavy cold chisel with carpentry chisel and mallet. Wide establishing construction angle showing the full raw site challenge showing the structure under assembly: Chiseling bridge abutment seats into the rocky ravine cliffs with a heavy cold chisel, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. crisp morning directional sunlight with rich long shadows, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Dramatic establishing push-in and upward tilt across the active construction site. Professional camera tracks Chiseling bridge abutment seats into the rocky ravine cliffs with a heavy cold chisel with carpentry chisel and mallet, progressing cleanly toward assembling a-frame timber bent supports using hand-notched pine beams and framing clamps. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "brick_tapping",
+            "narration": "A 50-foot gorge cut off the village from the forest. Watch us build a bridge across it."
+          },
+          {
+            "stage_num": 2,
+            "title": "Stage 2: Assembling",
+            "action": "Assembling A-frame timber bent supports using hand-notched pine beams and framing clamps",
+            "tool": "heavy timber clamps and framing square",
+            "image_prompt": "Stage 2/5 of Constructing the Heavy Timber Trestle Ravine Bridge: Authentic real-world civil engineering worksite photography showing Assembling A-frame timber bent supports using hand-notched pine beams and framing clamps with heavy timber clamps and framing square. Dynamic low-angle motorized tracking shot capturing rapid subsoil progress showing the structure under assembly: Assembling A-frame timber bent supports using hand-notched pine beams and framing clamps, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. bright clear daytime construction lighting, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth low-angle lateral tracking dolly glide across the active construction site. Professional camera tracks Assembling A-frame timber bent supports using hand-notched pine beams and framing clamps with heavy timber clamps and framing square, progressing cleanly toward spanning heavy pine log stringers across the ravine gap onto the abutments with timber tongs. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "wood_cutting",
+            "narration": "Level masonry abutment seats are carved directly into the opposing cliff faces."
+          },
+          {
+            "stage_num": 3,
+            "title": "Stage 3: Spanning",
+            "action": "Spanning heavy pine log stringers across the ravine gap onto the abutments with timber tongs",
+            "tool": "timber tongs and drift pin hammer",
+            "image_prompt": "Stage 3/5 of Constructing the Heavy Timber Trestle Ravine Bridge: Authentic real-world civil engineering worksite photography showing Spanning heavy pine log stringers across the ravine gap onto the abutments with timber tongs with timber tongs and drift pin hammer. Razor-sharp macro close-up detail angle with shallow cinematic depth of field focusing on material bonding showing the structure under assembly: Spanning heavy pine log stringers across the ravine gap onto the abutments with timber tongs, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. high-contrast directional architectural lighting highlighting physical textures, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Precise macro push-in and diagonal tracking glide across the active construction site. Professional camera tracks Spanning heavy pine log stringers across the ravine gap onto the abutments with timber tongs with timber tongs and drift pin hammer, progressing cleanly toward laying individual rough-sawn timber road decking planks one by one across the stringers. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "wood_cutting",
+            "narration": "Hand-notched pine A-frames and massive log stringers span the divide."
+          },
+          {
+            "stage_num": 4,
+            "title": "Stage 4: Laying",
+            "action": "Laying individual rough-sawn timber road decking planks one by one across the stringers",
+            "tool": "framing hammer and timber fasteners",
+            "image_prompt": "Stage 4/5 of Constructing the Heavy Timber Trestle Ravine Bridge: Authentic real-world civil engineering worksite photography showing Laying individual rough-sawn timber road decking planks one by one across the stringers with framing hammer and timber fasteners. Medium fast-action construction perspective showing structural components converging into place showing the structure under assembly: Laying individual rough-sawn timber road decking planks one by one across the stringers, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. natural afternoon documentary worksite lighting, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Dynamic lateral sweep tracking active assembly across the active construction site. Professional camera tracks Laying individual rough-sawn timber road decking planks one by one across the stringers with framing hammer and timber fasteners, progressing cleanly toward installing weathered split-rail cedar guardrails along both sides of the bridge span. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "brick_tapping",
+            "narration": "Rough-sawn timber decking planks are hammered crosswise across the frame."
+          },
+          {
+            "stage_num": 5,
+            "title": "Stage 5: Installing",
+            "action": "Installing weathered split-rail cedar guardrails along both sides of the bridge span",
+            "tool": "fastener driver and brackets",
+            "image_prompt": "Stage 5/5 of Constructing the Heavy Timber Trestle Ravine Bridge: Authentic real-world civil engineering worksite photography showing Installing weathered split-rail cedar guardrails along both sides of the bridge span with fastener driver and brackets. Grand cinematic wide pull-back reveal showcasing the complete, pristine transformed structure showing the structure under assembly: Installing weathered split-rail cedar guardrails along both sides of the bridge span, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. dramatic warm golden-hour glow casting rich highlights across the finished build, cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic engineering craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Majestic sweeping pull-back and elevation reveal across the active construction site. Professional camera tracks Installing weathered split-rail cedar guardrails along both sides of the bridge span with fastener driver and brackets, progressing cleanly toward inspecting and celebrating the completed transformation. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "wood_cutting",
+            "narration": "Split-rail cedar guardrails secured. The gorge is conquered!"
+          }
+        ]
+      }
     }
   ],
-  "last_updated": "2026-11-20T15:13:34.855Z"
+  "last_updated": "2026-11-20T15:26:55.426Z"
 }
