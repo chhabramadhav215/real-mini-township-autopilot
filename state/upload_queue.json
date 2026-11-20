@@ -82,7 +82,94 @@
           }
         ]
       }
+    },
+    {
+      "id": "queue_smart_city_ep5",
+      "townKey": "smart_city",
+      "episode": 5,
+      "title": "Building the Twin-Pump Petrol Station & Canopy (Part 2 of 2)",
+      "subtitle_2word": "PETROL STATION",
+      "problem": "The underground fuel vault is secured, and now the site requires a dedicated concrete fueling island, commercial dispensers, and an overhead protective canopy.",
+      "solution": "Pour the reinforced concrete island apron directly above the fuel tanks, install two commercial fuel dispensers, erect the structural canopy columns, and mount the overhead roof shelter.",
+      "tag_name": "queue-smart_city-ep5",
+      "release_id": null,
+      "video_asset_name": "smart_city_ep5.mp4",
+      "thumb_asset_name": "smart_city_ep5_thumb.jpg",
+      "video_download_url": null,
+      "thumb_download_url": null,
+      "local_video_path": "C:\\real-mini-township\\queue_out\\smart_city_ep5\\smart_city_ep5.mp4",
+      "local_thumb_path": "C:\\real-mini-township\\queue_out\\smart_city_ep5\\smart_city_ep5_thumb.jpg",
+      "created_at": "2026-11-20T06:22:52.679Z",
+      "uploaded": false,
+      "uploaded_at": null,
+      "plan": {
+        "episode": 5,
+        "title": "Building the Twin-Pump Petrol Station & Canopy (Part 2 of 2)",
+        "subtitle_2word": "PETROL STATION",
+        "problem": "The underground fuel vault is secured, and now the site requires a dedicated concrete fueling island, commercial dispensers, and an overhead protective canopy.",
+        "solution": "Pour the reinforced concrete island apron directly above the fuel tanks, install two commercial fuel dispensers, erect the structural canopy columns, and mount the overhead roof shelter.",
+        "is_multipart": true,
+        "multipart_info": {
+          "part": 2,
+          "total_parts": 2,
+          "title": "Metropolis Fuel Depot & Charging Hub"
+        },
+        "updated_anchor_prompt": "Urban civil construction worksite, compacted dual-lane asphalt boulevard with concrete curbs and painted lane markers, subterranean concrete stormwater drainage culverts, repaved asphalt patch, and reinforced concrete underground fuel containment vault with twin cylinders. Visible on site: Compacted dual-lane asphalt boulevard with concrete curbs and painted lane markers; Subterranean concrete stormwater drainage culverts and cast-iron style catch basins; Repaved asphalt patch with tar-sealed perimeter seams and high-visibility road work cones; Deep reinforced concrete underground fuel containment vault with twin brass fuel cylinders. Completed addition: Modern street-level fuel station with overhead canopy, twin commercial fuel dispensers, and safety bollards.",
+        "structures_added": "Modern street-level fuel station with overhead canopy, twin commercial fuel dispensers, and safety bollards",
+        "stages": [
+          {
+            "stage_num": 1,
+            "title": "Stage 1: Forming",
+            "action": "Forming and troweling the raised reinforced concrete fueling island apron directly above the underground vault",
+            "tool": "stainless steel concrete trowel and edge tool",
+            "image_prompt": "Stage 1/5 of Building the Twin-Pump Petrol Station & Canopy (Part 2 of 2): Authentic real-world construction process showing skilled adult craftsman worker hands actively using stainless steel concrete trowel and edge tool while forming and troweling the raised reinforced concrete fueling island apron directly above the underground vault on the active building worksite. Crisp work-in-progress construction angle showing the structure under assembly: Forming and troweling the raised reinforced concrete fueling island apron directly above the underground vault, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and workshop lighting, locked cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic construction craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Skilled craftsman hands steadily use stainless steel concrete trowel and edge tool while forming and troweling the raised reinforced concrete fueling island apron directly above the underground vault, progressing cleanly toward mounting and bolting two commercial fuel dispenser pump units onto the cured concrete island. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "cement_troweling",
+            "narration": "Building the fuel station starts with forming and finishing the raised concrete island apron directly over the fuel vault."
+          },
+          {
+            "stage_num": 2,
+            "title": "Stage 2: Mounting",
+            "action": "Mounting and bolting two commercial fuel dispenser pump units onto the cured concrete island",
+            "tool": "socket wrench and alignment level",
+            "image_prompt": "Stage 2/5 of Building the Twin-Pump Petrol Station & Canopy (Part 2 of 2): Authentic real-world construction process showing skilled adult craftsman worker hands actively using socket wrench and alignment level while mounting and bolting two commercial fuel dispenser pump units onto the cured concrete island on the active building worksite. Crisp work-in-progress construction angle showing the structure under assembly: Mounting and bolting two commercial fuel dispenser pump units onto the cured concrete island, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and workshop lighting, locked cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic construction craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Skilled craftsman hands steadily use socket wrench and alignment level while mounting and bolting two commercial fuel dispenser pump units onto the cured concrete island, progressing cleanly toward erecting structural steel cantilever canopy columns and cross-beams directly over the concrete fueling island. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "brick_tapping",
+            "narration": "Two commercial fuel dispensers are anchored onto the island pad, with heavy rubber delivery hoses connected."
+          },
+          {
+            "stage_num": 3,
+            "title": "Stage 3: Erecting",
+            "action": "Erecting structural steel cantilever canopy columns and cross-beams directly over the concrete fueling island",
+            "tool": "steel erection wrench and torque tool",
+            "image_prompt": "Stage 3/5 of Building the Twin-Pump Petrol Station & Canopy (Part 2 of 2): Authentic real-world construction process showing skilled adult craftsman worker hands actively using steel erection wrench and torque tool while erecting structural steel cantilever canopy columns and cross-beams directly over the concrete fueling island on the active building worksite. Crisp work-in-progress construction angle showing the structure under assembly: Erecting structural steel cantilever canopy columns and cross-beams directly over the concrete fueling island, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and workshop lighting, locked cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic construction craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Skilled craftsman hands steadily use steel erection wrench and torque tool while erecting structural steel cantilever canopy columns and cross-beams directly over the concrete fueling island, progressing cleanly toward installing the protective weather canopy deck and fascia panels directly across the steel canopy frame over the dispensers. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "brick_tapping",
+            "narration": "Heavy structural steel canopy columns are bolted onto anchor plates directly above the island to support the overhead roof."
+          },
+          {
+            "stage_num": 4,
+            "title": "Stage 4: Installing",
+            "action": "Installing the protective weather canopy deck and fascia panels directly across the steel canopy frame over the dispensers",
+            "tool": "fastener driver and alignment clamps",
+            "image_prompt": "Stage 4/5 of Building the Twin-Pump Petrol Station & Canopy (Part 2 of 2): Authentic real-world construction process showing skilled adult craftsman worker hands actively using fastener driver and alignment clamps while installing the protective weather canopy deck and fascia panels directly across the steel canopy frame over the dispensers on the active building worksite. Crisp work-in-progress construction angle showing the structure under assembly: Installing the protective weather canopy deck and fascia panels directly across the steel canopy frame over the dispensers, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and workshop lighting, locked cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic construction craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Skilled craftsman hands steadily use fastener driver and alignment clamps while installing the protective weather canopy deck and fascia panels directly across the steel canopy frame over the dispensers, progressing cleanly toward bolting yellow steel impact protection bollards and painting safety chevron bay markings around the fueling island. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "wood_cutting",
+            "narration": "The protective overhead canopy deck is hoisted and fastened directly over the fuel dispensers, shielding the pumps from the elements."
+          },
+          {
+            "stage_num": 5,
+            "title": "Stage 5: Bolting",
+            "action": "Bolting yellow steel impact protection bollards and painting safety chevron bay markings around the fueling island",
+            "tool": "line-marking sprayer and stencil",
+            "image_prompt": "Stage 5/5 of Building the Twin-Pump Petrol Station & Canopy (Part 2 of 2): Authentic real-world construction process showing skilled adult craftsman worker hands actively using line-marking sprayer and stencil while bolting yellow steel impact protection bollards and painting safety chevron bay markings around the fueling island on the active building worksite. Crisp work-in-progress construction angle showing the structure under assembly: Bolting yellow steel impact protection bollards and painting safety chevron bay markings around the fueling island, surrounded by authentic building materials, leveled ground foundation, and genuine structural elements of the site. Natural daylight and workshop lighting, locked cinema camera angle on a Sony FX6, razor-sharp focus on the physical build and materials, authentic construction craftsmanship, 8k resolution, highly detailed realistic construction.",
+            "motion_prompt": "Cinematic real-world construction process video: Smooth, steady motorized camera glide across the active construction site. Skilled craftsman hands steadily use line-marking sprayer and stencil while bolting yellow steel impact protection bollards and painting safety chevron bay markings around the fueling island, progressing cleanly toward inspecting and finalizing the completed structure. Continuous physical construction motion, authentic building craftsmanship, steady cinema tracking, zero jitter, 30fps.",
+            "asmr_type": "spray_painting",
+            "narration": "With steel impact bollards anchored at the island corners and yellow safety bay lines applied, the fueling station is fully operational."
+          }
+        ]
+      }
     }
   ],
-  "last_updated": "2026-11-20T05:44:58.037Z"
+  "last_updated": "2026-11-20T06:22:52.683Z"
 }
