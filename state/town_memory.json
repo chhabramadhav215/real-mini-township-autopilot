@@ -128,13 +128,22 @@
     "cron_utc": "17:00 UTC",
     "cron_ist": "10:30 PM IST",
     "cron_schedule": "0 17 * * *",
-    "episode": 4,
+    "episode": 5,
     "camera_seed": 618492,
     "diorama_anchor_prompt": "Hands-on miniature desert architecture worksite on reddish desert sand base with natural studio sandstone rocks and consistent backdrop. Thin wood shuttering, metal pins, white grid mesh, smooth poured concrete.",
     "built_structures": [
-      "Mini Desert Oasis Villa Part 4: Complete Desert Oasis Villa with roof slab, stripped formwork, filled turquoise oasis pool, and natural landscaping"
+      "Mini Desert Oasis Villa Part 4: Complete Desert Oasis Villa with roof slab, stripped formwork, filled turquoise oasis pool, and natural landscaping",
+      "Mini Desert Watchtower & Rampart Part 1: Smooth concrete foundation slab and entrance stairs on dense orange desert sand base with sandstone studio boulders"
     ],
-    "active_multipart": null,
+    "active_multipart": {
+      "structure_name": "Desert Watchtower & Rampart",
+      "structure_index": 1,
+      "series_label": "Mini Desert Watchtower & Rampart Part 2",
+      "part": 2,
+      "total_parts": 4,
+      "milestone": "Part 2 construction",
+      "prior_state": "Smooth concrete foundation slab and entrance stairs on dense orange desert sand base with sandstone studio boulders"
+    },
     "last_frame_path": "state/last_frame_desert_town.jpg",
     "history": [
       {
@@ -146,6 +155,16 @@
         "total_parts": 4,
         "subtitle_2word": "OASIS REVEAL",
         "completed_at": "2026-11-21T21:49:57.474Z"
+      },
+      {
+        "episode": 5,
+        "title": "Mini Desert Watchtower & Rampart Part 1: Desert Watchtower & Rampart - Foundation & Earthworks",
+        "structure_name": "Desert Watchtower & Rampart",
+        "series_label": "Mini Desert Watchtower & Rampart Part 1",
+        "part": 1,
+        "total_parts": 4,
+        "subtitle_2word": "TOWER PLINTH",
+        "completed_at": "2026-11-21T22:22:21.857Z"
       }
     ],
     "completed_series": [

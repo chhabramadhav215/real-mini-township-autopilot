@@ -1399,7 +1399,107 @@
           }
         ]
       }
+    },
+    {
+      "id": "queue_desert_town_ep5",
+      "townKey": "desert_town",
+      "episode": 5,
+      "title": "Mini Desert Watchtower & Rampart Part 1: Desert Watchtower & Rampart - Foundation & Earthworks",
+      "structure_name": "Desert Watchtower & Rampart",
+      "series_label": "Mini Desert Watchtower & Rampart Part 1",
+      "part": 1,
+      "total_parts": 4,
+      "subtitle_2word": "TOWER PLINTH",
+      "problem": "The virgin ground base requires precise shuttering formwork and reinforced cement foundation footings for the Desert Watchtower & Rampart.",
+      "solution": "Assemble curved circular timber shuttering forms, secure with radial metal pins, position curved white wire mesh, pour warm terracotta-tinted cement slurry, and strip formwork to reveal smooth stairs and slab.",
+      "tag_name": "queue-desert_town-ep5",
+      "release_id": null,
+      "video_asset_name": "desert_town_ep5.mp4",
+      "thumb_asset_name": "desert_town_ep5_thumb.jpg",
+      "video_download_url": null,
+      "thumb_download_url": null,
+      "local_video_path": "C:\\real-mini-township\\queue_out\\desert_town_ep5\\desert_town_ep5.mp4",
+      "local_thumb_path": "C:\\real-mini-township\\queue_out\\desert_town_ep5\\desert_town_ep5_thumb.jpg",
+      "created_at": "2026-11-21T22:22:21.852Z",
+      "uploaded": false,
+      "uploaded_at": null,
+      "plan": {
+        "episode": 5,
+        "title": "Mini Desert Watchtower & Rampart Part 1: Desert Watchtower & Rampart - Foundation & Earthworks",
+        "structure_name": "Desert Watchtower & Rampart",
+        "structure_index": 1,
+        "series_label": "Mini Desert Watchtower & Rampart Part 1",
+        "part": 1,
+        "total_parts": 4,
+        "subtitle_2word": "TOWER PLINTH",
+        "problem": "The virgin ground base requires precise shuttering formwork and reinforced cement foundation footings for the Desert Watchtower & Rampart.",
+        "solution": "Assemble curved circular timber shuttering forms, secure with radial metal pins, position curved white wire mesh, pour warm terracotta-tinted cement slurry, and strip formwork to reveal smooth stairs and slab.",
+        "is_multipart": true,
+        "multipart_info": {
+          "structure_name": "Desert Watchtower & Rampart",
+          "structure_index": 1,
+          "series_label": "Mini Desert Watchtower & Rampart Part 1",
+          "part": 1,
+          "total_parts": 4,
+          "milestone": "Foundation / Stairs",
+          "prior_state": "Raw leveled dense orange desert sand base with sandstone studio boulders."
+        },
+        "updated_anchor_prompt": "Hands-on miniature construction worksite on sand and soil base with studio rocks. Prior state: Raw leveled dense orange desert sand base with sandstone studio boulders. Completed on site: Mini Desert Oasis Villa Part 4: Complete Desert Oasis Villa with roof slab, stripped formwork, filled turquoise oasis pool, and natural landscaping. Current milestone: Smooth concrete foundation slab and entrance stairs on dense orange desert sand base with sandstone studio boulders. Consistent studio backdrop with warm directional lighting.",
+        "structures_added": "Smooth concrete foundation slab and entrance stairs on dense orange desert sand base with sandstone studio boulders",
+        "stages": [
+          {
+            "stage_num": 1,
+            "title": "Sand Leveling",
+            "action": "Leveling dense orange desert sand base with sandstone studio boulders and placing natural studio rocks around the perimeter",
+            "tool": "miniature sand rake and brass level",
+            "image_prompt": "Stage 1/5 of Mini Desert Watchtower & Rampart Part 1: Hands-on miniature construction photography (9:16 vertical). Wide macro establishing angle showing craftsman hands preparing formwork on the sand base. Craftsman hands actively performing: Leveling dense orange desert sand base with sandstone studio boulders and placing natural studio rocks around the perimeter using miniature sand rake and brass level. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Smooth macro push-in tracking the formwork setup. Craftsman hands perform Leveling dense orange desert sand base with sandstone studio boulders and placing natural studio rocks around the perimeter using miniature sand rake and brass level, progressing cleanly toward assembling curved circular timber shuttering forms and securing with radial metal pins. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "sand_level",
+            "narration": "Leveling the sand base and studio rocks."
+          },
+          {
+            "stage_num": 2,
+            "title": "Formwork & Pins",
+            "action": "Assembling curved circular timber shuttering forms and securing with radial metal pins",
+            "tool": "curved circular timber shuttering forms and radial metal pins",
+            "image_prompt": "Stage 2/5 of Mini Desert Watchtower & Rampart Part 1: Hands-on miniature construction photography (9:16 vertical). Eye-level close-up showing metal pins and grid mesh placement. Craftsman hands actively performing: Assembling curved circular timber shuttering forms and securing with radial metal pins using curved circular timber shuttering forms and radial metal pins. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Low-angle lateral macro glide tracking pin alignment. Craftsman hands perform Assembling curved circular timber shuttering forms and securing with radial metal pins using curved circular timber shuttering forms and radial metal pins, progressing cleanly toward positioning curved white wire mesh flat inside the foundation formwork. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "pin_placement",
+            "narration": "Formwork pinned firmly in place."
+          },
+          {
+            "stage_num": 3,
+            "title": "Grid Mesh",
+            "action": "Positioning curved white wire mesh flat inside the foundation formwork",
+            "tool": "curved white wire mesh and tweezers",
+            "image_prompt": "Stage 3/5 of Mini Desert Watchtower & Rampart Part 1: Hands-on miniature construction photography (9:16 vertical). Dynamic macro action angle capturing wet cement slurry pouring. Craftsman hands actively performing: Positioning curved white wire mesh flat inside the foundation formwork using curved white wire mesh and tweezers. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Top-down macro tilt tracking wet cement flow. Craftsman hands perform Positioning curved white wire mesh flat inside the foundation formwork using curved white wire mesh and tweezers, progressing cleanly toward pouring warm terracotta-tinted cement slurry into the formwork and smoothing with a mini trowel. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "pin_placement",
+            "narration": "Reinforcing mesh laid inside the frame."
+          },
+          {
+            "stage_num": 4,
+            "title": "Slurry Pour & Screed",
+            "action": "Pouring warm terracotta-tinted cement slurry into the formwork and smoothing with a mini trowel",
+            "tool": "cement pouring vessel and mini stainless trowel",
+            "image_prompt": "Stage 4/5 of Mini Desert Watchtower & Rampart Part 1: Hands-on miniature construction photography (9:16 vertical). Razor-sharp macro detail of mini trowel smoothing and leveling. Craftsman hands actively performing: Pouring warm terracotta-tinted cement slurry into the formwork and smoothing with a mini trowel using cement pouring vessel and mini stainless trowel. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Precise diagonal glide following the mini trowel blade. Craftsman hands perform Pouring warm terracotta-tinted cement slurry into the formwork and smoothing with a mini trowel using cement pouring vessel and mini stainless trowel, progressing cleanly toward stripping the curved circular timber shuttering forms to reveal razor-smooth cured concrete foundation and stairs. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "cement_pour",
+            "narration": "Pouring the wet cement slurry."
+          },
+          {
+            "stage_num": 5,
+            "title": "Formwork Strip Reveal",
+            "action": "Stripping the curved circular timber shuttering forms to reveal razor-smooth cured concrete foundation and stairs",
+            "tool": "pin puller and gentle hand strip",
+            "image_prompt": "Stage 5/5 of Mini Desert Watchtower & Rampart Part 1: Hands-on miniature construction photography (9:16 vertical). Grand macro reveal angle stripping the wood formwork to reveal razor-smooth cured concrete. Craftsman hands actively performing: Stripping the curved circular timber shuttering forms to reveal razor-smooth cured concrete foundation and stairs using pin puller and gentle hand strip. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Majestic slow pull-back and elevation reveal of the demolded structure. Craftsman hands perform Stripping the curved circular timber shuttering forms to reveal razor-smooth cured concrete foundation and stairs using pin puller and gentle hand strip, progressing cleanly toward celebrating the smooth demolded concrete reveal. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "formwork_strip",
+            "narration": "Stripping the formwork. Look at this finish!"
+          }
+        ]
+      }
     }
   ],
-  "last_updated": "2026-11-21T22:13:44.930Z"
+  "last_updated": "2026-11-21T22:22:21.853Z"
 }
