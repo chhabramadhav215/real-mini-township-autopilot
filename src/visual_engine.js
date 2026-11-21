@@ -95,65 +95,38 @@ function verifyImageFile(imagePath) {
 }
 
 /**
- * Sanitize and format a photorealistic civil engineering worksite prompt.
- * Strictly eliminates deformed human limb/hand close-ups, miniature/diorama terms,
- * clay/doll/statue figurines, and surreal morphing objects.
- * Enforces dynamic visual variety across cuts (wide establishing -> tracking -> macro -> assembly -> grand reveal).
+ * Sanitize and format a photorealistic hands-on miniature construction prompt (9:16 vertical).
+ * Features sand/soil base, studio rocks, thin wood shuttering formwork, metal pins,
+ * white grid mesh, pouring grey cement slurry, leveling with mini trowel, and formwork stripping reveal.
  */
 function buildSanitizedEngineeringPrompt(stage, townKey) {
-  const cleanTool = (stage.tool || 'construction equipment').trim()
-    .replace(/hedge wall|pruning shears|gardening shears|hand shears/gi, 'heavy excavation equipment')
-    .replace(/\b4k\b/gi, '720p, 5s duration');
-  const cleanAction = (stage.action || 'assembling structure').trim()
-    .replace(/hedge wall|pruning shears|gardening shears/gi, 'excavation trench')
-    .replace(/clearing wild brush|trimming hedge/gi, 'excavating ground foundation')
-    .replace(/\b4k\b/gi, '720p, 5s duration');
+  const cleanTool = (stage.tool || 'miniature construction tools').trim().replace(/\b4k\b/gi, '720p, 5s duration');
+  const cleanAction = (stage.action || 'assembling miniature structure').trim().replace(/\b4k\b/gi, '720p, 5s duration');
   const stageNum = stage.stage_num || 1;
 
   let basePrompt = stage.image_prompt || '';
 
-  // Dynamic camera angle & lighting per stage
-  let stageFraming = 'Medium-to-wide architectural construction angle';
+  // Dynamic macro studio camera angles per stage
+  let stageFraming = 'Macro 45-degree angle focusing on hands-on miniature construction';
   if (stageNum === 1) {
-    stageFraming = 'Wide establishing cinematic angle, dramatic morning sunlight across raw worksite';
+    stageFraming = 'Wide establishing macro angle showing craftsman hands preparing the sand base and thin plywood shuttering formwork';
   } else if (stageNum === 2) {
-    stageFraming = 'Dynamic low-angle motorized tracking shot following subsoil excavation and foundation grading';
+    stageFraming = 'Crisp eye-level close-up showing steel pins securing wood formwork and white grid mesh placement';
   } else if (stageNum === 3) {
-    stageFraming = 'Razor-sharp macro close-up detail shot with shallow depth of field focusing on material bonding and tool precision';
+    stageFraming = 'Dynamic macro action shot of pouring viscous grey cement slurry into the formwork';
   } else if (stageNum === 4) {
-    stageFraming = 'Medium fast-action construction view showing structural components converging into place';
+    stageFraming = 'Razor-sharp macro detail of mini stainless steel trowel screeding wet cement dead-flat';
   } else {
-    stageFraming = 'Grand cinematic wide pull-back reveal under warm golden-hour glow showcasing the complete transformed structure';
+    stageFraming = 'Grand cinematic reveal shot stripping away the wood formwork to reveal razor-smooth cured concrete and stairs';
   }
-
-  // Strip human close-up triggers that produce distorted/weird hands or surreal mannequins
-  basePrompt = basePrompt
-    .replace(/skilled adult craftsman worker hands actively using/gi, 'professional construction crew worksite showing')
-    .replace(/craftsman worker hands actively using/gi, 'active worksite showing')
-    .replace(/skilled adult craftsman hands actively using/gi, 'construction worksite showing')
-    .replace(/craftsman hands actively using/gi, 'construction worksite showing')
-    .replace(/skilled adult craftsman worker hands/gi, 'professional worksite equipment')
-    .replace(/craftsman worker hands/gi, 'worksite equipment')
-    .replace(/worker hands/gi, 'worksite tools')
-    .replace(/craftsman hands/gi, 'worksite tools')
-    .replace(/hands actively using/gi, 'heavy-duty tools aligned on')
-    .replace(/hands actively/gi, 'equipment in position')
-    .replace(/hands using/gi, 'equipment applying')
-    .replace(/close-up construction angle/gi, stageFraming)
-    .replace(/extreme close-up/gi, 'macro worksite perspective')
-    .replace(/macro lens/gi, '35mm cinema lens')
-    .replace(/miniature|diorama|ho-scale|1:87|cutting mat|tweezers|scale model/gi, 'real-world construction')
-    .replace(/hedge wall|pruning shears|gardening shears/gi, 'heavy excavation equipment')
-    .replace(/clearing wild brush|trimming hedge/gi, 'excavating ground foundation')
-    .replace(/\b4k\b/gi, '720p, 5s duration');
 
   // If no base prompt was available or it was too short, build a fresh crisp prompt
   if (!basePrompt || basePrompt.length < 50) {
-    basePrompt = `Stage ${stageNum}/5: Authentic real-world civil engineering worksite photography. ${stageFraming} showing ${cleanAction}. Heavy-duty ${cleanTool} actively placed on the physical build surface. Ground-level view showing authentic building materials, compacted sub-base, and genuine structural elements under assembly. Shot on Sony FX6 cinema camera, natural daylight, razor-sharp focus on materials and structural alignment, 8k resolution, highly detailed realistic engineering.`;
+    basePrompt = `Stage ${stageNum}/5: Authentic hands-on miniature construction photography (9:16 vertical). ${stageFraming}. Craftsman hands performing: ${cleanAction} using ${cleanTool}. Real miniature building materials on a fine sand and soil base with studio rocks: thin plywood shuttering formwork, metal pins, white grid mesh, wet grey cement slurry, and miniature bricks. Warm directional studio lighting casting crisp shadows, macro lens with shallow depth of field, Sony FX6 cinema camera, 8k resolution physical craftsmanship.`;
   }
 
   // Append explicit negative guidance / realism enforcement
-  const cleanPrompt = `${basePrompt.trim()} Clean civil engineering scene, ${stageFraming}, sharp focus on physical structural materials. Zero human limb distortions, no disembodied hands, no surreal clay or wooden figures, no toy people, no figurines. Zero gardening themes, no green hedges, no hedge walls, no pruning shears, no axes, no household tools, no diorama, no miniature models. Crisp photorealistic 8k documentary cinematography.`;
+  const cleanPrompt = `${basePrompt.trim()} Consistent studio background, sand and soil base with studio rocks. Zero full-size construction machinery, no giant human limbs, no CGI cartoons, no low resolution, no deformed fingers, no blurry morphing. Crisp photorealistic macro studio cinematography.`;
 
   return cleanPrompt.replace(/\b4k\b/gi, '720p, 5s duration');
 }

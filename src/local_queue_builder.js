@@ -346,11 +346,20 @@ async function runLocalQueueBuilder() {
     }
 
     // Step E: Enqueue in state/upload_queue.json
+    const structureName = plan.multipart_info?.structure_name || plan.structure_name || plan.title;
+    const partNum = plan.multipart_info?.part || plan.part || (((nextEp - 1) % 4) + 1);
+    const totalParts = plan.multipart_info?.total_parts || plan.total_parts || 4;
+    const seriesLabel = plan.multipart_info?.series_label || plan.series_label || `Mini ${structureName} Part ${partNum}`;
+
     const queueEntry = {
       id: `queue_${townKey}_ep${nextEp}`,
       townKey,
       episode: nextEp,
       title: plan.title,
+      structure_name: structureName,
+      series_label: seriesLabel,
+      part: partNum,
+      total_parts: totalParts,
       subtitle_2word: plan.subtitle_2word,
       problem: plan.problem,
       solution: plan.solution,
@@ -370,8 +379,37 @@ async function runLocalQueueBuilder() {
 
     enqueueEpisode(queueEntry);
 
+    // Update town memory for multi-part continuity
+    if (!townMemory.built_structures) townMemory.built_structures = [];
+    townMemory.built_structures.push(`${seriesLabel}: ${plan.structures_added}`);
+    if (!townMemory.history) townMemory.history = [];
+    townMemory.history.push({
+      episode: nextEp,
+      title: plan.title,
+      structure_name: structureName,
+      series_label: seriesLabel,
+      part: partNum,
+      total_parts: totalParts,
+      subtitle_2word: plan.subtitle_2word,
+      completed_at: new Date().toISOString()
+    });
+
+    if (partNum < totalParts) {
+      townMemory.active_multipart = {
+        structure_name: structureName,
+        part: partNum + 1,
+        total_parts: totalParts,
+        milestone: `Part ${partNum + 1} construction`
+      };
+    } else {
+      townMemory.active_multipart = null; // Completed structure! Next advances to next miniature structure Part 1
+    }
+    townMemory.episode = nextEp;
+
+    fs.writeFileSync(memoryPath, JSON.stringify(memory, null, 2), 'utf8');
+
     // Step F: Commit & Push state to GitHub
-    commitAndPushQueueState(`chore(queue): pre-generate real-motion episode for ${townKey} ep ${nextEp} [skip ci]`);
+    commitAndPushQueueState(`chore(queue): pre-generate miniature build for ${townKey} ep ${nextEp} (${seriesLabel}) [skip ci]`);
 
     // Step G: Clear Mid-Run Checkpoint
     clearCheckpoint();

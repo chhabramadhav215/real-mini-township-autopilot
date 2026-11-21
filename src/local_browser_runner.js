@@ -1109,12 +1109,13 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
         lightingMood = 'Dramatic warm golden-hour glow casting rich highlights across the finished build';
       }
 
-      const projectTitle = plan.title || 'Civil Engineering Construction';
-      const structureFocus = plan.structures_added || 'active civil infrastructure';
-      const cleanTool = (stage.tool || 'construction equipment').trim();
-      const cleanAction = (stage.action || 'assembling structure').trim();
+      const structureName = plan.multipart_info?.structure_name || plan.structure_name || plan.title || 'Structure';
+      const partNum = plan.multipart_info?.part || plan.part || (((plan.episode - 1) % 4) + 1);
+      const partLabel = `Mini ${structureName} Part ${partNum}`;
+      const cleanTool = (stage.tool || 'miniature tools').trim();
+      const cleanAction = (stage.action || 'assembling miniature structure').trim();
 
-      const veoPrompt = `Cinematic 720p, 5s duration real-world construction process video: ${shotAngle}. Project: "${projectTitle}". Continuous construction of ${structureFocus}. Skilled adult craftsman male hands with visible skin texture and rolled dark denim work sleeves use ${cleanTool} to ${cleanAction}. Authentic civil construction site: concrete foundations, structural framing, building materials, clean ground worksite, and natural construction environment. ${lightingMood}, real physical construction craftsmanship, genuine working motion, steady camera angle, razor-sharp focus on the active build, 30fps. Zero gardening, no hedge walls, no pruning, no miniature diorama toys.`;
+      const veoPrompt = `Cinematic 720p, 5s duration miniature construction video (9:16 vertical): ${shotAngle}. Hands-on build of ${partLabel}. Craftsman hands working on a fine sand and soil base with studio rocks and consistent backdrop. Step: ${cleanAction} using ${cleanTool}. Thin plywood shuttering formwork held with metal pins, white grid mesh, pouring grey cement slurry, mini trowel screed, stripping formwork to reveal smooth cured concrete. ${lightingMood}, macro lens with authentic shallow depth of field, real physical craftsmanship, 30fps.`;
 
       let generated = false;
 

@@ -118,31 +118,36 @@ async function generateNarration(plan, outputDir) {
 }
 
 /**
- * Procedural ASMR Construction Foley synthesis
- * Soft, natural acoustic workbench textures that complement voiceover without harsh digital noise
+ * Procedural ASMR Miniature Construction Foley synthesis
+ * Crisp acoustic placement, pour, scrape, tap, and peel textures
  */
 async function generateASMRFoley(asmrType, durationSeconds, destPath) {
   const d = Math.max(durationSeconds, 2.0);
 
-  // Soft, warm, acoustic workbench textures with zero harsh high-frequency noise
   const foleyPresets = {
-    dirt_scraping: `anoisesrc=c=brown:r=44100:a=0.06,bandpass=f=450:w=300,lowpass=f=1200,tremolo=f=1.5:d=0.7,volume=0.05`,
-    grass_trimming: `aevalsrc='0.08*sin(650*2*PI*t)*exp(-45*mod(t,1.4))+0.04*sin(1100*2*PI*t)*exp(-55*mod(t,1.4))':s=44100,lowpass=f=1800,volume=0.05`,
-    cement_troweling: `anoisesrc=c=brown:r=44100:a=0.06,bandpass=f=350:w=250,lowpass=f=1000,tremolo=f=1.2:d=0.6,volume=0.04`,
-    brick_tapping: `aevalsrc='0.12*sin(420*2*PI*t)*exp(-35*mod(t,1.1))+0.05*sin(840*2*PI*t)*exp(-45*mod(t,1.1))':s=44100,lowpass=f=1500,volume=0.06`,
-    spray_painting: `anoisesrc=c=pink:r=44100:a=0.03,bandpass=f=800:w=500,lowpass=f=1300,volume=0.03`,
-    gravel_rolling: `anoisesrc=c=brown:r=44100:a=0.06,bandpass=f=450:w=300,lowpass=f=1100,tremolo=f=2:d=0.6,volume=0.04`,
-    wood_cutting: `anoisesrc=c=brown:r=44100:a=0.06,bandpass=f=380:w=260,lowpass=f=1000,tremolo=f=2:d=0.5,volume=0.04`,
-    wire_tweezing: `aevalsrc='0.10*sin(750*2*PI*t)*exp(-40*mod(t,1.2))+0.03*sin(1200*2*PI*t)*exp(-50*mod(t,1.2))':s=44100,lowpass=f=1500,volume=0.05`
+    cement_pour: `anoisesrc=c=brown:r=44100:a=0.15,bandpass=f=280:w=220,lowpass=f=800,tremolo=f=3.5:d=0.85,volume=0.28`,
+    trowel_scrape: `anoisesrc=c=pink:r=44100:a=0.10,bandpass=f=1600:w=800,lowpass=f=3200,tremolo=f=1.8:d=0.7,volume=0.22`,
+    formwork_strip: `aevalsrc='0.22*sin(180*2*PI*t)*exp(-30*mod(t,0.9)) + 0.14*sin(650*2*PI*t)*exp(-50*mod(t,0.9)) + 0.08*(2*random(0)-1)*exp(-35*mod(t,0.9))':s=44100,lowpass=f=2200,volume=0.26`,
+    brick_tap: `aevalsrc='0.25*sin(380*2*PI*t)*exp(-45*mod(t,0.75)) + 0.12*sin(920*2*PI*t)*exp(-60*mod(t,0.75))':s=44100,lowpass=f=1800,volume=0.26`,
+    pin_placement: `aevalsrc='0.18*sin(1450*2*PI*t)*exp(-70*mod(t,0.6)) + 0.08*sin(2800*2*PI*t)*exp(-80*mod(t,0.6))':s=44100,lowpass=f=3600,volume=0.20`,
+    sand_level: `anoisesrc=c=brown:r=44100:a=0.12,bandpass=f=550:w=350,lowpass=f=1400,tremolo=f=2.2:d=0.75,volume=0.22`,
+    // Backward compatibility aliases
+    dirt_scraping: `anoisesrc=c=brown:r=44100:a=0.12,bandpass=f=550:w=350,lowpass=f=1400,tremolo=f=2.2:d=0.75,volume=0.22`,
+    cement_troweling: `anoisesrc=c=pink:r=44100:a=0.10,bandpass=f=1600:w=800,lowpass=f=3200,tremolo=f=1.8:d=0.7,volume=0.22`,
+    brick_tapping: `aevalsrc='0.25*sin(380*2*PI*t)*exp(-45*mod(t,0.75)) + 0.12*sin(920*2*PI*t)*exp(-60*mod(t,0.75))':s=44100,lowpass=f=1800,volume=0.26`,
+    spray_painting: `anoisesrc=c=pink:r=44100:a=0.08,bandpass=f=800:w=500,lowpass=f=1300,volume=0.15`,
+    gravel_rolling: `anoisesrc=c=brown:r=44100:a=0.12,bandpass=f=450:w=300,lowpass=f=1100,tremolo=f=2:d=0.6,volume=0.20`,
+    wood_cutting: `anoisesrc=c=brown:r=44100:a=0.12,bandpass=f=380:w=260,lowpass=f=1000,tremolo=f=2:d=0.5,volume=0.20`,
+    wire_tweezing: `aevalsrc='0.18*sin(1450*2*PI*t)*exp(-70*mod(t,0.6)) + 0.08*sin(2800*2*PI*t)*exp(-80*mod(t,0.6))':s=44100,lowpass=f=3600,volume=0.20`
   };
 
-  const filter = foleyPresets[asmrType] || foleyPresets.dirt_scraping;
+  const filter = foleyPresets[asmrType] || foleyPresets.sand_level;
 
   const args = [
     '-f', 'lavfi',
     '-i', filter,
     '-t', `${d.toFixed(2)}`,
-    '-af', `lowpass=f=1800,afade=t=in:st=0:d=0.4,afade=t=out:st=${(d - 0.4).toFixed(2)}:d=0.4`,
+    '-af', `lowpass=f=4500,afade=t=in:st=0:d=0.2,afade=t=out:st=${(d - 0.2).toFixed(2)}:d=0.2`,
     '-y',
     destPath
   ];
@@ -173,6 +178,43 @@ async function generateBackgroundMusic(durationSeconds, destPath) {
 
   await runFFmpeg(args);
   return destPath;
+}
+
+/**
+ * Create clean top-left part/series label badge SVG (e.g., Mini Modern Villa • Part 1)
+ */
+function createPartLabelOverlay(partLabel, destSvgPath) {
+  const cleanLabel = (partLabel || 'Mini Build • Part 1')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .trim();
+
+  const labelLength = cleanLabel.length;
+  const pillWidth = Math.min(860, Math.max(380, labelLength * 18 + 80));
+  const pillX = 60;
+
+  const svg = `<svg width="1080" height="180" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="pillShadow" x="-10%" y="-10%" width="130%" height="130%">
+        <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.85"/>
+      </filter>
+      <linearGradient id="dotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#10b981"/>
+        <stop offset="100%" stop-color="#059669"/>
+      </linearGradient>
+    </defs>
+    <!-- Frosted Dark Pill Backing -->
+    <rect x="${pillX}" y="60" width="${pillWidth}" height="68" rx="22" fill="#030712" fill-opacity="0.80" stroke="rgba(255,255,255,0.22)" stroke-width="2" filter="url(#pillShadow)"/>
+    <!-- Glowing Accent Dot -->
+    <circle cx="${pillX + 32}" cy="94" r="8" fill="url(#dotGrad)"/>
+    <!-- Clean Part / Series Label Typography -->
+    <text x="${pillX + 54}" y="103" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="28" font-weight="900" fill="#ffffff" letter-spacing="1.2">${cleanLabel}</text>
+  </svg>`;
+
+  fs.writeFileSync(destSvgPath, svg, 'utf8');
+  return destSvgPath;
 }
 
 /**
@@ -298,7 +340,7 @@ async function generateThumbnail(stage5Path, townKey, townMemory, episodeNum, su
     <text x="100" y="1635" font-family="Arial, Helvetica, sans-serif" font-size="68" font-weight="900" fill="url(#gradSub)" filter="url(#heavy3d)" letter-spacing="2">${subText}</text>
     
     <!-- Subtitle Footnote -->
-    <text x="100" y="1725" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" fill="#94a3b8" letter-spacing="2">REAL-WORLD CONSTRUCTION PROCESS</text>
+    <text x="100" y="1725" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" fill="#94a3b8" letter-spacing="2">MINIATURE FORMWORK &amp; ASMR REVEAL</text>
   </svg>`;
 
   fs.writeFileSync(thumbSvgPath, svg, 'utf8');
@@ -359,7 +401,7 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     : [...transitionPaths, finaleVideoPath];
 
   // 3. Generate ASMR Foley Tracks for all 5 stages based on exact narration duration
-  console.log(`[AudioMaster] Synthesizing acoustic ASMR construction foley audio...`);
+  console.log(`[AudioMaster] Synthesizing acoustic ASMR miniature construction foley audio...`);
   const foleyDir = path.join(outputDir, 'foley');
   if (!fs.existsSync(foleyDir)) fs.mkdirSync(foleyDir, { recursive: true });
 
@@ -370,10 +412,10 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     const stage = plan.stages[i];
     const narrAudio = narrationPaths[i] || narrationPaths[0];
     const narrDuration = getMediaDuration(narrAudio);
-    // Dynamic speech fit: 0.25s pre-roll delay + voiceover + 0.45s breathing room (never truncated)
+    // Fast step-by-step cuts (~0.8s–2.2s rhythm across ~14–20s vertical reels)
     const isClimax = (i === plan.stages.length - 1);
-    const minDur = isClimax ? 3.6 : 2.8;
-    const requiredDuration = narrDuration + 0.25 + 0.45;
+    const minDur = isClimax ? 3.0 : 2.2;
+    const requiredDuration = narrDuration + 0.15 + 0.35;
     const segDuration = Math.max(requiredDuration, minDur);
     segDurations.push(segDuration);
 
@@ -382,10 +424,18 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     foleyPaths.push(foleyPath);
   }
 
-  // 4. Combine each segment: Video Track + Sync Narration & Foley + Clean Subtitle (Zero Badges)
-  const segmentPaths = [];
+  // 4. Generate clean part/series label badge (e.g., Mini Modern Villa • Part 1)
   const segmentsDir = path.join(outputDir, 'segments');
   if (!fs.existsSync(segmentsDir)) fs.mkdirSync(segmentsDir, { recursive: true });
+
+  const structureName = plan.multipart_info?.structure_name || plan.structure_name || plan.title || 'Structure';
+  const partNum = plan.multipart_info?.part || plan.part || (((plan.episode - 1) % 4) + 1);
+  const partLabel = `Mini ${structureName} • Part ${partNum}`;
+  const partBadgeSvgPath = path.join(segmentsDir, 'part_badge.svg');
+  createPartLabelOverlay(partLabel, partBadgeSvgPath);
+
+  // Combine each segment: Video Track + Sync Narration & Foley + Clean Subtitle + Clean Part Label
+  const segmentPaths = [];
 
   for (let i = 0; i < plan.stages.length; i++) {
     const stage = plan.stages[i];
@@ -412,10 +462,10 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     }
 
     const filterComplex = [
-      `${vFilter}[3:v]overlay=50:1380[vout]`,
-      `[1:a]adelay=250|250,volume=1.0,highpass=f=100,lowpass=f=7500,equalizer=f=3500:t=q:w=1.2:g=-3[anarr]`,
-      `[2:a]volume=0.035,highpass=f=120,lowpass=f=1500,afade=t=in:st=0:d=0.3,afade=t=out:st=${(segDuration - 0.4).toFixed(2)}:d=0.4[afoley]`,
-      `[anarr][afoley]amix=inputs=2:duration=longest:dropout_transition=0,volume=1.0,alimiter=limit=0.92[aout]`
+      `${vFilter}[4:v]overlay=0:0[vbadge];[vbadge][3:v]overlay=50:1440[vout]`,
+      `[1:a]adelay=150|150,volume=1.0,highpass=f=100,lowpass=f=7500[anarr]`,
+      `[2:a]volume=0.25,highpass=f=120,lowpass=f=6500,afade=t=in:st=0:d=0.2,afade=t=out:st=${(segDuration - 0.3).toFixed(2)}:d=0.3[afoley]`,
+      `[anarr][afoley]amix=inputs=2:duration=longest:dropout_transition=0,volume=1.0,alimiter=limit=0.94[aout]`
     ].join(';');
 
     const segmentArgs = [
@@ -423,6 +473,7 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
       '-i', narrAudio,
       '-i', foleyAudio,
       '-i', subSvgPath,
+      '-i', partBadgeSvgPath,
       '-filter_complex', filterComplex,
       '-map', '[vout]',
       '-map', '[aout]',
@@ -441,6 +492,8 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     if (fs.existsSync(subSvgPath)) fs.unlinkSync(subSvgPath);
     segmentPaths.push(segmentDest);
   }
+
+  if (fs.existsSync(partBadgeSvgPath)) fs.unlinkSync(partBadgeSvgPath);
 
   // 5. Generate Continuous Energetic Background Music Bed with Smooth Ducking
   const totalMasterDuration = segDurations.reduce((a, b) => a + b, 0);
@@ -464,7 +517,7 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
   concatInputs.push('-i', bgmPath);
 
   concatFilter.push(`concat=n=${segmentPaths.length}:v=1:a=1[vmaster][aspeech];`);
-  concatFilter.push(`[${bgmInputIndex}:a]volume='if(gte(t,${climaxStartTime.toFixed(2)}), 0.20, 0.08)':eval=frame[abgm_ducked];`);
+  concatFilter.push(`[${bgmInputIndex}:a]volume='if(gte(t,${climaxStartTime.toFixed(2)}), 0.16, 0.06)':eval=frame[abgm_ducked];`);
   concatFilter.push(`[aspeech][abgm_ducked]amix=inputs=2:duration=first:dropout_transition=0,volume=1.0,alimiter=limit=0.94[amaster]`);
 
   const concatArgs = [
@@ -500,6 +553,7 @@ module.exports = {
   generateASMRFoley,
   generateBackgroundMusic,
   createBadgeOverlay,
+  createPartLabelOverlay,
   createSubtitleOverlay,
   generateThumbnail,
   assembleMasterVideo,
