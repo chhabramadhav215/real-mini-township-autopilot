@@ -1099,7 +1099,107 @@
       "series_label": "Mini Glass Terrace House Part 4",
       "part": 4,
       "total_parts": 4
+    },
+    {
+      "id": "queue_desert_town_ep4",
+      "townKey": "desert_town",
+      "episode": 4,
+      "title": "Mini Desert Oasis Villa Part 4: Desert Oasis Villa - Roof Slab & Grand Transformation",
+      "structure_name": "Desert Oasis Villa",
+      "series_label": "Mini Desert Oasis Villa Part 4",
+      "part": 4,
+      "total_parts": 4,
+      "subtitle_2word": "OASIS REVEAL",
+      "problem": "The structure requires a cantilever roof slab, formwork stripping, and finished water landscaping.",
+      "solution": "Pour and cure upper concrete roof, strip all formwork, and fill the turquoise oasis pool for the grand payoff.",
+      "tag_name": "queue-desert_town-ep4",
+      "release_id": null,
+      "video_asset_name": "desert_town_ep4.mp4",
+      "thumb_asset_name": "desert_town_ep4_thumb.jpg",
+      "video_download_url": null,
+      "thumb_download_url": null,
+      "local_video_path": "C:\\real-mini-township\\queue_out\\desert_town_ep4\\desert_town_ep4.mp4",
+      "local_thumb_path": "C:\\real-mini-township\\queue_out\\desert_town_ep4\\desert_town_ep4_thumb.jpg",
+      "created_at": "2026-11-21T21:49:57.470Z",
+      "uploaded": false,
+      "uploaded_at": null,
+      "plan": {
+        "episode": 4,
+        "title": "Mini Desert Oasis Villa Part 4: Desert Oasis Villa - Roof Slab & Grand Transformation",
+        "structure_name": "Desert Oasis Villa",
+        "structure_index": 0,
+        "series_label": "Mini Desert Oasis Villa Part 4",
+        "part": 4,
+        "total_parts": 4,
+        "subtitle_2word": "OASIS REVEAL",
+        "problem": "The structure requires a cantilever roof slab, formwork stripping, and finished water landscaping.",
+        "solution": "Pour and cure upper concrete roof, strip all formwork, and fill the turquoise oasis pool for the grand payoff.",
+        "is_multipart": true,
+        "multipart_info": {
+          "structure_name": "Desert Oasis Villa",
+          "structure_index": 0,
+          "series_label": "Mini Desert Oasis Villa Part 4",
+          "part": 4,
+          "total_parts": 4,
+          "milestone": "Upper / Roof / Reveal",
+          "prior_state": "Complete masonry walls, concrete columns, lintels, and foundation slab on reddish desert sand base with natural desert studio rocks."
+        },
+        "updated_anchor_prompt": "Hands-on miniature construction worksite on sand and soil base with studio rocks. Prior state: Complete masonry walls, concrete columns, lintels, and foundation slab on reddish desert sand base with natural desert studio rocks. Fresh sand and soil base with studio rocks. Current milestone: Complete Desert Oasis Villa with roof slab, stripped formwork, filled turquoise oasis pool, and natural landscaping. Consistent studio backdrop with warm directional lighting.",
+        "structures_added": "Complete Desert Oasis Villa with roof slab, stripped formwork, filled turquoise oasis pool, and natural landscaping",
+        "stages": [
+          {
+            "stage_num": 1,
+            "title": "Roof Formwork",
+            "action": "Fitting wide thin wood formwork strips for pool basin and colonnade roof shuttering across top of walls",
+            "tool": "thin wood formwork strips for pool basin and colonnade and metal pins",
+            "image_prompt": "Stage 1/5 of Mini Desert Oasis Villa Part 4: Hands-on miniature construction photography (9:16 vertical). Wide macro establishing angle showing craftsman hands preparing formwork on the sand base. Craftsman hands actively performing: Fitting wide thin wood formwork strips for pool basin and colonnade roof shuttering across top of walls using thin wood formwork strips for pool basin and colonnade and metal pins. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Smooth macro push-in tracking the formwork setup. Craftsman hands perform Fitting wide thin wood formwork strips for pool basin and colonnade roof shuttering across top of walls using thin wood formwork strips for pool basin and colonnade and metal pins, progressing cleanly toward laying double-layer white grid rebar mesh across the entire roof shuttering. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "pin_placement",
+            "narration": "Fitting wide roof shuttering boards."
+          },
+          {
+            "stage_num": 2,
+            "title": "Roof Mesh Placement",
+            "action": "Laying double-layer white grid rebar mesh across the entire roof shuttering",
+            "tool": "white grid rebar mesh sheets",
+            "image_prompt": "Stage 2/5 of Mini Desert Oasis Villa Part 4: Hands-on miniature construction photography (9:16 vertical). Eye-level close-up showing metal pins and grid mesh placement. Craftsman hands actively performing: Laying double-layer white grid rebar mesh across the entire roof shuttering using white grid rebar mesh sheets. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Low-angle lateral macro glide tracking pin alignment. Craftsman hands perform Laying double-layer white grid rebar mesh across the entire roof shuttering using white grid rebar mesh sheets, progressing cleanly toward pouring a rich layer of grey cement slurry across the roof formwork. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "pin_placement",
+            "narration": "Reinforcing mesh spanning the entire roof."
+          },
+          {
+            "stage_num": 3,
+            "title": "Roof Slurry Pour",
+            "action": "Pouring a rich layer of grey cement slurry across the roof formwork",
+            "tool": "cement pouring vessel and mini screed",
+            "image_prompt": "Stage 3/5 of Mini Desert Oasis Villa Part 4: Hands-on miniature construction photography (9:16 vertical). Dynamic macro action angle capturing wet cement slurry pouring. Craftsman hands actively performing: Pouring a rich layer of grey cement slurry across the roof formwork using cement pouring vessel and mini screed. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Top-down macro tilt tracking wet cement flow. Craftsman hands perform Pouring a rich layer of grey cement slurry across the roof formwork using cement pouring vessel and mini screed, progressing cleanly toward burnishing wet cement slab to a mirror-smooth finish with a flexible mini trowel. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "cement_pour",
+            "narration": "Pouring the smooth roof slab."
+          },
+          {
+            "stage_num": 4,
+            "title": "Burnish Finishing",
+            "action": "Burnishing wet cement slab to a mirror-smooth finish with a flexible mini trowel",
+            "tool": "mini stainless finishing trowel",
+            "image_prompt": "Stage 4/5 of Mini Desert Oasis Villa Part 4: Hands-on miniature construction photography (9:16 vertical). Razor-sharp macro detail of mini trowel smoothing and leveling. Craftsman hands actively performing: Burnishing wet cement slab to a mirror-smooth finish with a flexible mini trowel using mini stainless finishing trowel. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Precise diagonal glide following the mini trowel blade. Craftsman hands perform Burnishing wet cement slab to a mirror-smooth finish with a flexible mini trowel using mini stainless finishing trowel, progressing cleanly toward stripping all formwork to reveal the finished architectural build and filling turquoise oasis pool. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "trowel_scrape",
+            "narration": "Burnishing the surface to a silky polish."
+          },
+          {
+            "stage_num": 5,
+            "title": "Grand Demolding Reveal",
+            "action": "Stripping all formwork to reveal the finished architectural build and filling turquoise oasis pool",
+            "tool": "demolding spatula and water pipette",
+            "image_prompt": "Stage 5/5 of Mini Desert Oasis Villa Part 4: Hands-on miniature construction photography (9:16 vertical). Grand macro reveal angle stripping the wood formwork to reveal razor-smooth cured concrete. Craftsman hands actively performing: Stripping all formwork to reveal the finished architectural build and filling turquoise oasis pool using demolding spatula and water pipette. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Majestic slow pull-back and elevation reveal of the demolded structure. Craftsman hands perform Stripping all formwork to reveal the finished architectural build and filling turquoise oasis pool using demolding spatula and water pipette, progressing cleanly toward celebrating the smooth demolded concrete reveal. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "formwork_strip",
+            "narration": "Stripping formwork for the grand reveal. Complete!"
+          }
+        ]
+      }
     }
   ],
-  "last_updated": "2026-11-21T21:27:39.549Z"
+  "last_updated": "2026-11-21T21:49:57.472Z"
 }
