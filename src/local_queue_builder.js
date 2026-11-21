@@ -137,10 +137,12 @@ function selectNextTownAndEpisode(memory, queueData, forcedTown = null) {
       throw new Error(`Invalid town key: "${forcedTown}". Choose from: ${allTowns.join(', ')}`);
     }
     const currentBaseEp = Number(memory[forcedTown].episode || 0);
-    const queuedEps = (queueData.queue || [])
-      .filter(item => item.townKey === forcedTown && item.uploaded !== true)
+    const allQueuedEps = (queueData.queue || [])
+      .filter(item => item.townKey === forcedTown)
       .map(item => Number(item.episode));
-    const highestEp = Math.max(currentBaseEp, ...queuedEps, 0);
+    const historyEps = (memory[forcedTown]?.history || [])
+      .map(item => Number(item.episode));
+    const highestEp = Math.max(currentBaseEp, ...allQueuedEps, ...historyEps, 0);
     return { townKey: forcedTown, nextEp: highestEp + 1 };
   }
 
@@ -148,8 +150,9 @@ function selectNextTownAndEpisode(memory, queueData, forcedTown = null) {
   const townStats = allTowns.map(townKey => {
     const currentBaseEp = Number(memory[townKey]?.episode || 0);
     const queuedItems = (queueData.queue || []).filter(item => item.townKey === townKey && item.uploaded !== true);
-    const queuedEps = queuedItems.map(item => Number(item.episode));
-    const highestEp = Math.max(currentBaseEp, ...queuedEps, 0);
+    const allQueuedEps = (queueData.queue || []).filter(item => item.townKey === townKey).map(item => Number(item.episode));
+    const historyEps = (memory[townKey]?.history || []).map(item => Number(item.episode));
+    const highestEp = Math.max(currentBaseEp, ...allQueuedEps, ...historyEps, 0);
 
     return {
       townKey,
@@ -188,7 +191,7 @@ async function runLocalQueueBuilder() {
     throw new Error(`Town memory not found at ${memoryPath}`);
   }
   const memory = JSON.parse(fs.readFileSync(memoryPath, 'utf8'));
-  const queueData = loadQueue();
+  let queueData = loadQueue();
 
   // 3. STEP 1: Run Storage Cleanup (Delete uploaded local files)
   const cleanupResult = cleanupUploadedLocalFiles(queueData, memory);
@@ -379,6 +382,9 @@ async function runLocalQueueBuilder() {
 
     enqueueEpisode(queueEntry);
 
+    // Refresh queueData in-memory so subsequent batch iterations accurately see the newly enqueued episode
+    queueData = loadQueue();
+
     // Update town memory for multi-part continuity
     if (!townMemory.built_structures) townMemory.built_structures = [];
     townMemory.built_structures.push(`${seriesLabel}: ${plan.structures_added}`);
@@ -397,12 +403,18 @@ async function runLocalQueueBuilder() {
     if (partNum < totalParts) {
       townMemory.active_multipart = {
         structure_name: structureName,
+        structure_index: plan.multipart_info?.structure_index ?? Math.floor((nextEp - 1) / totalParts),
+        series_label: `Mini ${structureName} Part ${partNum + 1}`,
         part: partNum + 1,
         total_parts: totalParts,
-        milestone: `Part ${partNum + 1} construction`
+        milestone: `Part ${partNum + 1} construction`,
+        prior_state: plan.structures_added
       };
     } else {
-      townMemory.active_multipart = null; // Completed structure! Next advances to next miniature structure Part 1
+      // Completed structure! Append to completed_series and reset active_multipart
+      townMemory.active_multipart = null;
+      if (!townMemory.completed_series) townMemory.completed_series = [];
+      townMemory.completed_series.push(`Mini ${structureName} (Parts 1-${totalParts} Complete)`);
     }
     townMemory.episode = nextEp;
 

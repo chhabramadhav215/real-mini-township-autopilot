@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 /**
- * Town Architect Engine (Gemini 2.5 Flash Free API + Multi-Part Miniature Construction Series)
+ * Town Architect Engine (Gemini 2.5 Flash Free API + Infinite Multi-Part Miniature Construction Series)
  * Follows the viral hands-on miniature formwork, ASMR & reveal model (9:16 Vertical).
  * Builds on a sand/soil base with studio rocks and consistent backdrop across shots:
  * - thin wood/plywood shuttering/formwork
@@ -13,6 +13,11 @@ const path = require('path');
  * - stripping formwork to reveal smooth concrete/stairs/slabs
  * - stacking miniature blocks/bricks
  * Fast step-by-step cuts (~0.8s–2.2s rhythm across ~14–20s vertical reels) with clean part labels.
+ *
+ * INFINITE PROGRESSION GUARANTEE:
+ * Daily and queued scripts NEVER run out ("end") and NEVER repeat identical parts or micro-steps.
+ * For any episode N >= 1, structure index S = Math.floor((N - 1) / 4) and part P = ((N - 1) % 4) + 1.
+ * When Part 4 completes, the structure is recorded as complete and the series advances to the next structure at Part 1.
  */
 
 const CRAFTSMAN_HANDS_DESCRIPTION = 
@@ -21,449 +26,614 @@ const CRAFTSMAN_HANDS_DESCRIPTION =
 const CAMERA_BASE_PROMPT = 
   "Cinematic 720p, 5s duration miniature construction cinematography (9:16 vertical): macro lens with authentic shallow depth of field, steady eye-level and 45-degree angle focusing on hands-on building on a sand base with studio rocks and consistent backdrop, warm directional studio lighting, Sony FX6 cinema camera, authentic physical craftsmanship";
 
-// Comprehensive multi-part miniature construction series catalog
-// Milestone progression: Part 1 Foundation/Stairs -> Part 2 Deck/Columns -> Part 3 Walls/Blocks -> Part 4 Upper/Roof/Reveal
-const MINIATURE_STRUCTURE_SERIES = {
+// Comprehensive catalog of 10 architectural archetypes per town
+const ARCHETYPE_BLUEPRINTS = {
   smart_city: [
     {
-      structure_name: "Modern Villa",
-      parts: [
-        {
-          part: 1,
-          title: "Foundation & Pool Excavation",
-          subtitle_2word: "VILLA FOUNDATION",
-          milestone: "Foundation / Stairs",
-          prior_state: "Raw leveled fine sand and soil base surrounded by natural studio rocks.",
-          problem: "The sand base requires precise wood shuttering formwork and reinforced cement foundation slabs for the villa.",
-          solution: "Pin thin plywood formwork, lay white grid mesh, pour grey cement slurry, and strip formwork to reveal smooth stairs and slab.",
-          structures_added: "Smooth concrete foundation slab and entrance stairs on leveled sand base with studio rocks",
-          stages: [
-            {
-              stage_num: 1,
-              title: "Sand Leveling",
-              action: "Leveling fine sand and soil base and placing natural studio rocks around the perimeter",
-              tool: "miniature sand rake and brass level",
-              asmr_type: "sand_level",
-              narration: "Leveling the sand base and studio rocks."
-            },
-            {
-              stage_num: 2,
-              title: "Formwork & Pins",
-              action: "Assembling thin plywood shuttering formwork and securing with slim metal pins",
-              tool: "thin plywood shuttering boards and metal pins",
-              asmr_type: "pin_placement",
-              narration: "Thin plywood formwork pinned in place."
-            },
-            {
-              stage_num: 3,
-              title: "White Grid Mesh",
-              action: "Positioning miniature white grid reinforcing mesh flat inside the formwork",
-              tool: "white grid mesh and tweezers",
-              asmr_type: "pin_placement",
-              narration: "White grid mesh laid inside the frame."
-            },
-            {
-              stage_num: 4,
-              title: "Slurry Pour & Screed",
-              action: "Pouring viscous grey cement slurry into the formwork and smoothing with a mini trowel",
-              tool: "cement pouring vessel and mini stainless trowel",
-              asmr_type: "cement_pour",
-              narration: "Pouring the wet grey cement slurry."
-            },
-            {
-              stage_num: 5,
-              title: "Formwork Strip Reveal",
-              action: "Stripping the plywood shuttering to reveal razor-smooth cured concrete foundation and stairs",
-              tool: "pin puller and gentle hand strip",
-              asmr_type: "formwork_strip",
-              narration: "Stripping the formwork. Look at this finish!"
-            }
-          ]
-        },
-        {
-          part: 2,
-          title: "Pool Formwork & Ground Columns",
-          subtitle_2word: "CONCRETE COLUMNS",
-          milestone: "Deck / Columns",
-          prior_state: "Cured smooth concrete foundation slab and entrance stairs on leveled sand base.",
-          problem: "The villa foundation slab needs structural load-bearing columns and a ground terrace deck.",
-          solution: "Set vertical plywood column formwork with metal pins, pour grey cement slurry, and demold sleek concrete pillars.",
-          structures_added: "Erected smooth concrete structural columns and ground patio deck slab",
-          stages: [
-            {
-              stage_num: 1,
-              title: "Column Formwork",
-              action: "Erecting vertical plywood column formwork boxes over foundation anchor pins",
-              tool: "vertical timber shuttering boxes and pins",
-              asmr_type: "pin_placement",
-              narration: "Setting column formwork over anchor pins."
-            },
-            {
-              stage_num: 2,
-              title: "Column Cement Pour",
-              action: "Pouring grey cement slurry into each column box and tamping with a metal pin",
-              tool: "funnel and miniature tamp rod",
-              asmr_type: "cement_pour",
-              narration: "Pouring cement slurry into each column."
-            },
-            {
-              stage_num: 3,
-              title: "Deck Shuttering & Mesh",
-              action: "Laying horizontal plywood deck shuttering and placing white grid mesh between columns",
-              tool: "plywood decking sheets and white mesh",
-              asmr_type: "pin_placement",
-              narration: "Deck shuttering and white mesh in position."
-            },
-            {
-              stage_num: 4,
-              title: "Deck Troweling",
-              action: "Pouring grey cement slurry across the deck formwork and leveling with an aluminum screed bar",
-              tool: "mini aluminum screed bar and trowel",
-              asmr_type: "trowel_scrape",
-              narration: "Screeding the deck slab dead-flat."
-            },
-            {
-              stage_num: 5,
-              title: "Column Demolding Reveal",
-              action: "Peeling off the column and deck wood shuttering to reveal sleek concrete columns and terrace slab",
-              tool: "demolding spatula and gentle peel",
-              asmr_type: "formwork_strip",
-              narration: "Stripping formwork. Sleek concrete pillars revealed."
-            }
-          ]
-        },
-        {
-          part: 3,
-          title: "Lower Floor Walls & Brickwork",
-          subtitle_2word: "BRICK WALLS",
-          milestone: "Walls / Blocks",
-          prior_state: "Cured concrete columns, terrace deck, and foundation slab on sand base.",
-          problem: "The concrete columns require structural miniature brick perimeter walls and reinforced lintels.",
-          solution: "Stack miniature bricks with troweled cement mortar, place timber lintel boxes, and cast solid concrete headers.",
-          structures_added: "Stacked miniature brick perimeter walls with cast concrete window and door lintels",
-          stages: [
-            {
-              stage_num: 1,
-              title: "Mortar Bedding",
-              action: "Spreading a thin bed of grey cement mortar onto the concrete deck using a mini pointed trowel",
-              tool: "mini pointed stainless steel trowel",
-              asmr_type: "trowel_scrape",
-              narration: "Spreading fresh mortar on the concrete deck."
-            },
-            {
-              stage_num: 2,
-              title: "Brick Stacking",
-              action: "Stacking individual miniature red bricks in staggered courses and tapping level with trowel handle",
-              tool: "miniature bricks and trowel handle",
-              asmr_type: "brick_tap",
-              narration: "Stacking miniature bricks course by course."
-            },
-            {
-              stage_num: 3,
-              title: "Lintel Formwork",
-              action: "Installing small timber lintel formwork boxes across window and door openings",
-              tool: "timber lintel boxes and metal clips",
-              asmr_type: "pin_placement",
-              narration: "Wood lintel formwork over door frames."
-            },
-            {
-              stage_num: 4,
-              title: "Lintel Cement Pour",
-              action: "Pouring grey cement slurry into the lintel formwork and scraping joints flush",
-              tool: "cement ladle and joint scraper",
-              asmr_type: "cement_pour",
-              narration: "Pouring concrete lintels and scraping flush."
-            },
-            {
-              stage_num: 5,
-              title: "Lintel Demolding Reveal",
-              action: "Stripping the timber lintel formwork to reveal neat brick walls and solid concrete headers",
-              tool: "formwork release wedge",
-              asmr_type: "formwork_strip",
-              narration: "Stripping lintels. The walls are locked solid."
-            }
-          ]
-        },
-        {
-          part: 4,
-          title: "Upper Cantilever Roof & Pool Reveal",
-          subtitle_2word: "VILLA REVEAL",
-          milestone: "Upper / Roof / Reveal",
-          prior_state: "Complete brick walls, concrete columns, lintels, and foundation slab on sand base.",
-          problem: "The villa structure requires a modern cantilever roof slab, formwork stripping, and finished pool detailing.",
-          solution: "Pour and cure the upper concrete roof, strip all formwork, and fill the pool for the grand transformation payoff.",
-          structures_added: "Complete Modern Villa with cantilever roof, stripped formwork, filled pool, and studio rock landscaping",
-          stages: [
-            {
-              stage_num: 1,
-              title: "Cantilever Formwork",
-              action: "Fitting wide plywood cantilever roof formwork across the top of the brick walls",
-              tool: "thin plywood roof shuttering and metal pins",
-              asmr_type: "pin_placement",
-              narration: "Fitting the wide cantilever roof shuttering."
-            },
-            {
-              stage_num: 2,
-              title: "Roof Mesh Placement",
-              action: "Laying double-layer white grid reinforcing mesh across the entire roof shuttering",
-              tool: "white grid mesh sheets",
-              asmr_type: "pin_placement",
-              narration: "White grid mesh spanning the entire roof."
-            },
-            {
-              stage_num: 3,
-              title: "Roof Slurry Pour",
-              action: "Pouring a rich layer of grey cement slurry across the roof formwork",
-              tool: "cement pouring vessel and mini screed",
-              asmr_type: "cement_pour",
-              narration: "Pouring the smooth grey roof slab."
-            },
-            {
-              stage_num: 4,
-              title: "Burnish Finishing",
-              action: "Burnishing the wet cement slab to a mirror-smooth finish with a flexible mini trowel",
-              tool: "mini stainless finishing trowel",
-              asmr_type: "trowel_scrape",
-              narration: "Burnishing the surface to a silky polish."
-            },
-            {
-              stage_num: 5,
-              title: "Grand Demolding Reveal",
-              action: "Stripping all roof formwork to reveal the finished architectural villa and filling the pool with crystal water",
-              tool: "demolding spatula and water pipette",
-              asmr_type: "formwork_strip",
-              narration: "Stripping formwork for the grand reveal. Complete!"
-            }
-          ]
-        }
-      ]
+      name: "Modern Villa",
+      baseSand: "fine white quartz sand base with natural granite studio rocks",
+      formwork: "thin birch plywood shuttering",
+      pins: "slim stainless steel pins",
+      mesh: "white grid reinforcing mesh",
+      slurry: "viscous grey Portland cement slurry",
+      blocks: "miniature red clay bricks",
+      water: "crystal-clear infinity pool",
+      subtitles: ["VILLA FOUNDATION", "CONCRETE COLUMNS", "BRICK WALLS", "VILLA REVEAL"]
     },
     {
-      structure_name: "Glass Terrace House",
-      parts: [
-        {
-          part: 1,
-          title: "Retaining Formwork & Step Footings",
-          subtitle_2word: "STEP FOOTINGS",
-          milestone: "Foundation / Stairs",
-          prior_state: "Raw terraced sand base surrounded by studio rocks.",
-          problem: "The multi-tier terrace requires curved plywood shuttering and poured concrete footing steps.",
-          solution: "Assemble curved shuttering with pins, lay white grid mesh, pour grey cement slurry, and reveal smooth steps.",
-          structures_added: "Curved concrete foundation terrace and step footings",
-          stages: [
-            { stage_num: 1, title: "Base Prep", action: "Grading stepped sand terraces and bedding studio slate rocks", tool: "mini sand trowel", asmr_type: "sand_level", narration: "Grading stepped terraces on the sand base." },
-            { stage_num: 2, title: "Curved Formwork", action: "Bending thin plywood shuttering strips and locking with metal pins", tool: "curved plywood strips and pins", asmr_type: "pin_placement", narration: "Curved plywood shuttering pinned tight." },
-            { stage_num: 3, title: "Grid Mesh", action: "Clipping white grid rebar mesh into the stepped foundation channels", tool: "mesh snips and tweezers", asmr_type: "pin_placement", narration: "White reinforcing mesh laid in channels." },
-            { stage_num: 4, title: "Slurry Pour", action: "Pouring grey cement slurry into the curved steps and smoothing", tool: "cement pouring spout and mini trowel", asmr_type: "cement_pour", narration: "Pouring grey cement slurry into the steps." },
-            { stage_num: 5, title: "Strip Reveal", action: "Stripping wood shuttering to reveal crisp curved concrete terrace steps", tool: "pin puller and strip knife", asmr_type: "formwork_strip", narration: "Stripping formwork. Curved steps revealed!" }
-          ]
-        },
-        {
-          part: 2,
-          title: "Cantilever Columns & Floor Deck",
-          subtitle_2word: "CANTILEVER DECK",
-          milestone: "Deck / Columns",
-          prior_state: "Curved concrete foundation terrace and step footings.",
-          problem: "The second floor needs cantilever column supports and a suspended terrace deck.",
-          solution: "Cast twin concrete pillars with rebar pins, lay deck shuttering, and screed the floor slab.",
-          structures_added: "Reinforced cantilever concrete pillars and suspended floor deck",
-          stages: [
-            { stage_num: 1, title: "Column Shuttering", action: "Clamping vertical column boxes over anchor pins", tool: "column shuttering boxes", asmr_type: "pin_placement", narration: "Clamping column boxes over the pins." },
-            { stage_num: 2, title: "Pillar Pour", action: "Pouring grey cement slurry into the pillars", tool: "mini cement funnel", asmr_type: "cement_pour", narration: "Pouring cement slurry into the pillars." },
-            { stage_num: 3, title: "Cantilever Shuttering", action: "Extending cantilever plywood deck shuttering with white mesh", tool: "cantilever deck forms and mesh", asmr_type: "pin_placement", narration: "Cantilever deck shuttering in position." },
-            { stage_num: 4, title: "Deck Screeding", action: "Pouring and screeding the terrace slab with aluminum bar", tool: "mini aluminum screed", asmr_type: "trowel_scrape", narration: "Screeding the suspended terrace slab." },
-            { stage_num: 5, title: "Pillar Strip", action: "Stripping column boxes to reveal silky smooth concrete pillars", tool: "formwork release lever", asmr_type: "formwork_strip", narration: "Demolding sleek concrete cantilever pillars." }
-          ]
-        },
-        {
-          part: 3,
-          title: "Miniature Blockwork & Frame Lintels",
-          subtitle_2word: "BLOCKWORK WALLS",
-          milestone: "Walls / Blocks",
-          prior_state: "Reinforced cantilever concrete pillars and suspended floor deck.",
-          problem: "The floor deck requires miniature perimeter walls, glass opening frames, and solid lintels.",
-          solution: "Stack miniature grey blocks with mortar, position lintel formwork boxes, and cast headers.",
-          structures_added: "Precision miniature blockwork walls with cast concrete window lintels",
-          stages: [
-            { stage_num: 1, title: "Mortar Line", action: "Troweling grey mortar along the perimeter deck line", tool: "mini pointer trowel", asmr_type: "trowel_scrape", narration: "Laying mortar along the terrace perimeter." },
-            { stage_num: 2, title: "Block Stacking", action: "Setting miniature concrete blocks in level courses", tool: "miniature blocks and mallet", asmr_type: "brick_tap", narration: "Setting miniature concrete blocks in line." },
-            { stage_num: 3, title: "Lintel Framing", action: "Placing wood lintel boxes across panoramic window spans", tool: "wood lintels and pins", asmr_type: "pin_placement", narration: "Formwork boxes over window openings." },
-            { stage_num: 4, title: "Lintel Pour", action: "Filling lintel boxes with dense grey cement mix", tool: "pouring spoon and tamper", asmr_type: "cement_pour", narration: "Filling the window lintels with cement." },
-            { stage_num: 5, title: "Lintel Strip", action: "Stripping lintel shuttering to reveal clean window headers", tool: "release wedge", asmr_type: "formwork_strip", narration: "Stripping formwork. Window frames locked." }
-          ]
-        },
-        {
-          part: 4,
-          title: "Rooftop Slab & Terrace Pool Reveal",
-          subtitle_2word: "TERRACE REVEAL",
-          milestone: "Upper / Roof / Reveal",
-          prior_state: "Miniature blockwork walls with cast concrete window lintels.",
-          problem: "The structure requires a flat roof slab, formwork strip, and infinity edge water fill.",
-          solution: "Cast the flat roof slab with white mesh, strip all forms, and fill the rooftop terrace pool.",
-          structures_added: "Complete Glass Terrace House with roof deck, filled terrace pool, and studio rock landscaping",
-          stages: [
-            { stage_num: 1, title: "Roof Formwork", action: "Laying thin plywood roof sheets across the walls", tool: "roof plywood sheets", asmr_type: "pin_placement", narration: "Placing thin plywood roof sheets." },
-            { stage_num: 2, title: "Roof Mesh", action: "Spreading white grid mesh over the entire roof area", tool: "white grid mesh", asmr_type: "pin_placement", narration: "Spreading white reinforcing mesh." },
-            { stage_num: 3, title: "Roof Pour", action: "Pouring grey cement slurry for the flat roof deck", tool: "cement pouring vessel", asmr_type: "cement_pour", narration: "Pouring the smooth flat roof deck." },
-            { stage_num: 4, title: "Trowel Burnish", action: "Burnishing roof edges to an ultra-clean chamfer", tool: "chamfer trowel", asmr_type: "trowel_scrape", narration: "Burnishing the roof edges smooth." },
-            { stage_num: 5, title: "Final Reveal", action: "Stripping all formwork and filling terrace pool with clear water", tool: "hand strip and water filler", asmr_type: "formwork_strip", narration: "Stripping formwork. Grand reveal complete!" }
-          ]
-        }
-      ]
+      name: "Glass Terrace House",
+      baseSand: "stepped quartz sand terraces with studio slate slabs",
+      formwork: "curved thin plywood shuttering strips",
+      pins: "precision metal pins",
+      mesh: "white grid rebar mesh",
+      slurry: "smooth grey cement slurry",
+      blocks: "miniature grey concrete blocks",
+      water: "rooftop terrace plunge pool",
+      subtitles: ["STEP FOOTINGS", "CANTILEVER DECK", "BLOCKWORK WALLS", "TERRACE REVEAL"]
+    },
+    {
+      name: "Minimalist Pavilion & Pool",
+      baseSand: "compacted sand base with polished studio river stones",
+      formwork: "balsa wood shuttering forms",
+      pins: "brass anchor pins",
+      mesh: "fine white wire grid mesh",
+      slurry: "light grey architectural cement slurry",
+      blocks: "dark slate miniature blocks",
+      water: "perimeter reflecting pool",
+      subtitles: ["PAVILION BASE", "PILLAR COLONNADE", "SLATE WALLS", "PAVILION REVEAL"]
+    },
+    {
+      name: "Cantilever Studio & Sunken Deck",
+      baseSand: "fine silica sand bed with dark granite studio outcrops",
+      formwork: "birch shuttering boards",
+      pins: "machined steel pins",
+      mesh: "high-tensile white grid mesh",
+      slurry: "dense grey cement slurry",
+      blocks: "miniature split-face masonry blocks",
+      water: "sunken courtyard water basin",
+      subtitles: ["STUDIO FOOTING", "SUSPENDED DECK", "MASONRY WALLS", "STUDIO REVEAL"]
+    },
+    {
+      name: "Dual-Wing Horizon Villa",
+      baseSand: "graded white sand base with twin granite anchor rocks",
+      formwork: "dual-channel plywood formwork",
+      pins: "heavy steel pins",
+      mesh: "double-layer white grid mesh",
+      slurry: "liquid grey Portland cement slurry",
+      blocks: "miniature white limestone bricks",
+      water: "central horizon lap pool",
+      subtitles: ["TWIN FOOTINGS", "BRIDGE DECK", "LIMESTONE WALLS", "HORIZON REVEAL"]
+    },
+    {
+      name: "Sunken Atrium Courtyard",
+      baseSand: "tiered sand base with dark studio basalt boulders",
+      formwork: "stepped timber formwork boxes",
+      pins: "locking steel pins",
+      mesh: "square white reinforcing mesh",
+      slurry: "viscous grey cement mix",
+      blocks: "miniature terracotta face bricks",
+      water: "central bubbling fountain pool",
+      subtitles: ["ATRIUM BASIN", "MEZZANINE DECK", "TERRACOTTA WALLS", "ATRIUM REVEAL"]
+    },
+    {
+      name: "Monolithic Concrete Residence",
+      baseSand: "coarse sand and gravel base with raw studio granite",
+      formwork: "board-formed timber shuttering panels",
+      pins: "heavy structural pins",
+      mesh: "heavy-duty white rebar mesh",
+      slurry: "rich grey architectural cement slurry",
+      blocks: "miniature fluted concrete blocks",
+      water: "interior courtyard reflecting pond",
+      subtitles: ["MONOLITH BASE", "SHEAR COLUMNS", "BOARD CONCRETE", "MONOLITH REVEAL"]
+    },
+    {
+      name: "Waterfront Infinity Villa",
+      baseSand: "fine beach sand base with studio shoreline rocks",
+      formwork: "curved plywood shoreline formwork",
+      pins: "marine brass pins",
+      mesh: "interlocking white grid mesh",
+      slurry: "hydrophobic grey cement slurry",
+      blocks: "miniature travertine stone bricks",
+      water: "infinity edge ocean-facing pool",
+      subtitles: ["WATERFRONT BASE", "CANTILEVER PIERS", "TRAVERTINE WALLS", "INFINITY REVEAL"]
+    },
+    {
+      name: "Modular Geometric Loft",
+      baseSand: "level silica sand bed with angular studio stones",
+      formwork: "modular cubic plywood form boxes",
+      pins: "modular steel corner pins",
+      mesh: "precision white grid mesh",
+      slurry: "rapid-cure grey cement slurry",
+      blocks: "modular grey concrete mini bricks",
+      water: "geometric sunken spa pool",
+      subtitles: ["CUBIC FOOTINGS", "MODULAR PILLARS", "GEOMETRIC WALLS", "LOFT REVEAL"]
+    },
+    {
+      name: "Biophilic Courtyard Studio",
+      baseSand: "loam and sand base with mossy studio rock clusters",
+      formwork: "curved planter shuttering strips",
+      pins: "bamboo and metal pins",
+      mesh: "flexible white wire mesh",
+      slurry: "fine grey mortar slurry",
+      blocks: "miniature earthen clay pavers",
+      water: "bio-filtration lotus pond",
+      subtitles: ["PLANTER BASE", "GARDEN COLUMNS", "EARTHEN WALLS", "BIOPHILIC REVEAL"]
     }
   ],
 
   mountain_village: [
     {
-      structure_name: "Stone Arch Bridge",
-      parts: [
-        {
-          part: 1,
-          title: "Riverbed Abutments & Footings",
-          subtitle_2word: "BRIDGE FOOTING",
-          milestone: "Foundation / Stairs",
-          prior_state: "Raw sand riverbed flanked by natural mountain studio rocks.",
-          problem: "The mountain ravine needs solid concrete abutment footings pinned into the sand base.",
-          solution: "Erect timber box shuttering, secure with metal pins, place white mesh, pour cement slurry, and reveal smooth abutments.",
-          structures_added: "Dual concrete riverbed abutment footing slabs on sand and rock base",
-          stages: [
-            { stage_num: 1, title: "Sand Bedding", action: "Grading sand riverbed and placing studio slate boulders along banks", tool: "mini gravel rake and level", asmr_type: "sand_level", narration: "Grading riverbed sand and studio rocks." },
-            { stage_num: 2, title: "Abutment Formwork", action: "Pinning thin plywood abutment boxes on both riverbanks", tool: "plywood box shuttering and pins", asmr_type: "pin_placement", narration: "Pinning abutment formwork on both banks." },
-            { stage_num: 3, title: "Rebar Mesh", action: "Inserting white grid mesh down into the abutment footings", tool: "grid mesh and tweezers", asmr_type: "pin_placement", narration: "Inserting white grid reinforcing mesh." },
-            { stage_num: 4, title: "Cement Pour", action: "Pouring viscous grey cement slurry into the footing boxes", tool: "cement pourer and mini spatula", asmr_type: "cement_pour", narration: "Pouring viscous grey cement slurry." },
-            { stage_num: 5, title: "Strip Reveal", action: "Stripping wood shuttering to reveal massive smooth concrete abutments", tool: "pin puller and strip wedge", asmr_type: "formwork_strip", narration: "Stripping formwork. Rock-solid footings revealed!" }
-          ]
-        },
-        {
-          part: 2,
-          title: "Timber Arch Falsework & Stone Vaulting",
-          subtitle_2word: "ARCH VAULTING",
-          milestone: "Deck / Columns",
-          prior_state: "Dual concrete riverbed abutment footing slabs on sand and rock base.",
-          problem: "The ravine gap requires a semicircular arch vault spanned by curved timber centering falsework.",
-          solution: "Erect curved timber arch falsework with pins, stack wedge-shaped miniature stones, and lock with keystone.",
-          structures_added: "Self-supporting curved stone arch vault with locked center keystone",
-          stages: [
-            { stage_num: 1, title: "Arch Falsework", action: "Positioning curved plywood arch centering falsework across abutments", tool: "curved timber falsework and pins", asmr_type: "pin_placement", narration: "Positioning curved timber arch falsework." },
-            { stage_num: 2, title: "Mortar Bed", action: "Applying grey cement mortar along the curved timber centering", tool: "mini pointed trowel", asmr_type: "trowel_scrape", narration: "Applying mortar along the arch centering." },
-            { stage_num: 3, title: "Stone Arch", action: "Stacking miniature natural stone voussoirs symmetrically up both sides", tool: "cut stone blocks and tweezers", asmr_type: "brick_tap", narration: "Stacking stone blocks up both sides." },
-            { stage_num: 4, title: "Keystone Lock", action: "Tapping the center keystone stone firmly into the arch crown", tool: "mini setting mallet", asmr_type: "brick_tap", narration: "Tapping the keystone into the crown." },
-            { stage_num: 5, title: "Falsework Drop", action: "Striking the timber centering pins to reveal the freestanding stone arch", tool: "pin knock tool", asmr_type: "formwork_strip", narration: "Dropping falsework. The stone arch stands!" }
-          ]
-        },
-        {
-          part: 3,
-          title: "Spandrel Blockwork & Deck Formwork",
-          subtitle_2word: "ROADBED DECK",
-          milestone: "Walls / Blocks",
-          prior_state: "Self-supporting curved stone arch vault with locked center keystone.",
-          problem: "The arch requires vertical spandrel retaining walls and a level roadbed deck formwork.",
-          solution: "Build stone spandrel walls, lay deck wood shuttering with white mesh, and pour roadbed cement.",
-          structures_added: "Stone spandrel walls with reinforced concrete roadbed deck slab",
-          stages: [
-            { stage_num: 1, title: "Spandrel Walls", action: "Mortaring miniature stone blocks to build vertical spandrel walls", tool: "mini trowel and stone blocks", asmr_type: "brick_tap", narration: "Building vertical stone spandrel walls." },
-            { stage_num: 2, title: "Deck Shuttering", action: "Fitting thin plywood road deck shuttering along the bridge span", tool: "deck shuttering and pins", asmr_type: "pin_placement", narration: "Fitting thin plywood deck shuttering." },
-            { stage_num: 3, title: "Deck Mesh", action: "Laying white grid mesh across the bridge roadbed channel", tool: "white grid mesh", asmr_type: "pin_placement", narration: "White grid mesh laid along the deck." },
-            { stage_num: 4, title: "Roadbed Pour", action: "Pouring grey cement slurry and screeding road surface dead-flat", tool: "cement pouring spout and mini screed", asmr_type: "cement_pour", narration: "Pouring and screeding the roadbed slurry." },
-            { stage_num: 5, title: "Deck Strip", action: "Stripping deck shuttering to reveal a flat, seamless road surface", tool: "strip blade", asmr_type: "formwork_strip", narration: "Stripping deck forms. Smooth roadway revealed!" }
-          ]
-        },
-        {
-          part: 4,
-          title: "Parapets, Formwork Strip & Stream Reveal",
-          subtitle_2word: "BRIDGE REVEAL",
-          milestone: "Upper / Roof / Reveal",
-          prior_state: "Stone spandrel walls with reinforced concrete roadbed deck slab.",
-          problem: "The bridge requires safety parapets, final formwork stripping, and flowing mountain water.",
-          solution: "Set miniature stone parapets, remove all remaining falsework, and flow water under the arch.",
-          structures_added: "Complete Stone Arch Bridge with parapets, crystal mountain stream, and natural rocks",
-          stages: [
-            { stage_num: 1, title: "Parapet Bedding", action: "Spreading mortar lines along both outer edges of the bridge deck", tool: "mini trowel", asmr_type: "trowel_scrape", narration: "Spreading mortar along the bridge edges." },
-            { stage_num: 2, title: "Stone Parapets", action: "Setting miniature carved stone parapet capstones along both sides", tool: "parapet stones and tweezers", asmr_type: "brick_tap", narration: "Setting miniature stone parapet rails." },
-            { stage_num: 3, title: "Final Stripping", action: "Stripping all remaining pins and wood braces from under the bridge", tool: "pin puller", asmr_type: "formwork_strip", narration: "Stripping all remaining wooden braces." },
-            { stage_num: 4, title: "Stone Pointing", action: "Pointing stone joints flush with a fine miniature tuck trowel", tool: "tuck pointing trowel", asmr_type: "trowel_scrape", narration: "Pointing stone joints clean and flush." },
-            { stage_num: 5, title: "Stream Reveal", action: "Releasing crystal clear water to flow under the completed stone arch", tool: "water pipette and river pebbles", asmr_type: "formwork_strip", narration: "Stream flowing under the arch. Completed bridge!" }
-          ]
-        }
-      ]
+      name: "Stone Arch Bridge",
+      baseSand: "sand riverbed flanked by natural mountain studio rocks",
+      formwork: "thin plywood abutment boxes and curved arch centering",
+      pins: "heavy steel pins",
+      mesh: "white grid rebar mesh",
+      slurry: "viscous grey cement slurry",
+      blocks: "miniature natural cut stone blocks",
+      water: "rushing mountain stream",
+      subtitles: ["BRIDGE FOOTING", "ARCH VAULTING", "ROADBED DECK", "BRIDGE REVEAL"]
+    },
+    {
+      name: "Alpine Timber Chalet",
+      baseSand: "sloped mountain sand and loam base with studio granite boulders",
+      formwork: "split-level timber footing formwork",
+      pins: "timber anchor pins",
+      mesh: "woven white grid mesh",
+      slurry: "dense grey mountain cement slurry",
+      blocks: "miniature granite foundation stones",
+      water: "cascading hillside spring",
+      subtitles: ["CHALET FOOTING", "TIMBER FRAMING", "GRANITE WALLS", "CHALET REVEAL"]
+    },
+    {
+      name: "Step-Well & Aqueduct",
+      baseSand: "deep ravine sand base surrounded by stratified studio rocks",
+      formwork: "tiered step-well timber shuttering",
+      pins: "forged steel pins",
+      mesh: "heavy white rebar mesh",
+      slurry: "waterproof grey cement slurry",
+      blocks: "miniature coursed ashlar stones",
+      water: "clear mountain well water",
+      subtitles: ["WELL FOOTINGS", "AQUEDUCT ARCH", "ASHLAR WALLS", "SPRING REVEAL"]
+    },
+    {
+      name: "Mountain Watermill & Flume",
+      baseSand: "rocky river silt and gravel base with riverbed boulders",
+      formwork: "millrace box shuttering forms",
+      pins: "iron anchor pins",
+      mesh: "reinforced white grid mesh",
+      slurry: "hydraulic grey cement slurry",
+      blocks: "miniature river stone masonry blocks",
+      water: "flowing mill flume raceway",
+      subtitles: ["MILLRACE BASE", "TIMBER FLUME", "RIVERSTONE WALLS", "WATERMILL REVEAL"]
+    },
+    {
+      name: "Cliffside Bastion & Keep",
+      baseSand: "bedrock sand ledge with massive studio granite cliff rocks",
+      formwork: "battered cliffside timber shuttering",
+      pins: "heavy bedrock expansion pins",
+      mesh: "high-strength white grid mesh",
+      slurry: "heavy-aggregate grey cement slurry",
+      blocks: "miniature dressed castle stone blocks",
+      water: "rock-hewn keep reservoir",
+      subtitles: ["BASTION BASE", "WATCH TERRACE", "CASTLE WALLS", "BASTION REVEAL"]
+    },
+    {
+      name: "Timber Trestle Viaduct",
+      baseSand: "mountain gorge sand bed between vertical studio rock walls",
+      formwork: "pier foundation box formwork",
+      pins: "trestle joint pins",
+      mesh: "pier core white grid mesh",
+      slurry: "high-early-strength grey cement slurry",
+      blocks: "miniature masonry pier stone blocks",
+      water: "gorge river stream",
+      subtitles: ["VIADUCT PIERS", "TRESTLE BENTS", "APPROACH WALLS", "VIADUCT REVEAL"]
+    },
+    {
+      name: "Heavy Masonry Gatehouse",
+      baseSand: "mountain pass compacted sand base with studio scree stones",
+      formwork: "twin portal foundation boxes",
+      pins: "structural alignment pins",
+      mesh: "foundation white grid mesh",
+      slurry: "dense mountain grey cement slurry",
+      blocks: "miniature rough-hewn fieldstone blocks",
+      water: "gatehouse drainage moat",
+      subtitles: ["PORTAL FOOTING", "GATEWAY ARCHES", "FIELDSTONE WALLS", "GATEHOUSE REVEAL"]
+    },
+    {
+      name: "River Sluice & Mill Pond",
+      baseSand: "riverbed sand and pebble base with studio slate weir rocks",
+      formwork: "spillway flume shuttering boxes",
+      pins: "heavy steel tie pins",
+      mesh: "spillway white rebar mesh",
+      slurry: "waterproof hydraulic grey cement slurry",
+      blocks: "miniature granite weir blocks",
+      water: "overflowing sluice pond water",
+      subtitles: ["SLUICE CHANNEL", "WEIR BUTTRESS", "CHANNEL WALLS", "SLUICE REVEAL"]
+    },
+    {
+      name: "Highland Watchpost & Beacon",
+      baseSand: "high summit sand and rocky gravel base with studio crag rocks",
+      formwork: "hexagonal plinth shuttering forms",
+      pins: "crag anchor pins",
+      mesh: "hexagonal white grid mesh",
+      slurry: "rapid-set grey cement slurry",
+      blocks: "miniature dark basalt stone blocks",
+      water: "rock-cut cistern basin",
+      subtitles: ["BEACON PLINTH", "OBSERVATION DECK", "BASALT WALLS", "BEACON REVEAL"]
+    },
+    {
+      name: "Log Cabin & Stone Hearth",
+      baseSand: "forest loam and mountain sand base with studio river boulders",
+      formwork: "hearth footing box shuttering",
+      pins: "hearth tie pins",
+      mesh: "hearth white wire mesh",
+      slurry: "rich grey fireplace cement slurry",
+      blocks: "miniature river pebble stones",
+      water: "spring-fed brooklet",
+      subtitles: ["HEARTH FOOTING", "CABIN FRAME", "RIVERSTONE HEARTH", "CABIN REVEAL"]
     }
   ],
 
   desert_town: [
     {
-      structure_name: "Desert Oasis Villa",
-      parts: [
+      name: "Desert Oasis Villa",
+      baseSand: "reddish desert sand base with natural desert studio rocks",
+      formwork: "thin wood formwork strips for pool basin and colonnade",
+      pins: "metal pins",
+      mesh: "white grid rebar mesh",
+      slurry: "grey cement slurry",
+      blocks: "miniature terracotta bricks",
+      water: "turquoise oasis pool",
+      subtitles: ["OASIS BASE", "ADOBE ARCHES", "COURTYARD WALLS", "OASIS REVEAL"]
+    },
+    {
+      name: "Desert Watchtower & Rampart",
+      baseSand: "dense orange desert sand base with sandstone studio boulders",
+      formwork: "curved circular timber shuttering forms",
+      pins: "radial metal pins",
+      mesh: "curved white wire mesh",
+      slurry: "warm terracotta-tinted cement slurry",
+      blocks: "miniature sundried clay blocks",
+      water: "shaded tower cistern basin",
+      subtitles: ["TOWER PLINTH", "LOOKOUT DECK", "CLAY WALLS", "TOWER REVEAL"]
+    },
+    {
+      name: "Underground Cistern & Vault",
+      baseSand: "excavated desert trench bed surrounded by studio sandstone rocks",
+      formwork: "deep subterranean cistern shuttering boxes",
+      pins: "tie pins and bracing struts",
+      mesh: "subterranean white grid mesh",
+      slurry: "dense waterproof grey cement slurry",
+      blocks: "miniature yellow sandstone bricks",
+      water: "deep subterranean cistern water",
+      subtitles: ["CISTERN BASIN", "VAULT SPRINGERS", "SANDSTONE ARCH", "CISTERN REVEAL"]
+    },
+    {
+      name: "Adobe Caravanserai & Courtyard",
+      baseSand: "wide expanse of golden desert sand with studio flat rocks",
+      formwork: "quadrangle foundation timber shuttering",
+      pins: "staked perimeter pins",
+      mesh: "perimeter white grid mesh",
+      slurry: "earthen-colored cement slurry",
+      blocks: "miniature adobe mud bricks",
+      water: "central courtyard fountain basin",
+      subtitles: ["CARAVAN BASE", "COURTYARD ARCADE", "ADOBE WALLS", "CARAVAN REVEAL"]
+    },
+    {
+      name: "Sandstone Citadel & Gateway",
+      baseSand: "compacted red clay desert base with towering studio sandstone cliffs",
+      formwork: "battered gateway timber formwork boxes",
+      pins: "heavy steel expansion pins",
+      mesh: "structural white rebar mesh",
+      slurry: "heavy red-tinted cement slurry",
+      blocks: "miniature dressed red sandstone blocks",
+      water: "citadel moat reservoir",
+      subtitles: ["CITADEL BASE", "GATEWAY ARCHES", "SANDSTONE WALLS", "CITADEL REVEAL"]
+    },
+    {
+      name: "Step-Basin Bathhouse & Atrium",
+      baseSand: "mineral-rich desert sand bed with studio crystal mineral rocks",
+      formwork: "concentric step-basin shuttering forms",
+      pins: "precision brass pins",
+      mesh: "concentric white grid mesh",
+      slurry: "silky smooth grey cement slurry",
+      blocks: "miniature glazed terracotta pavers",
+      water: "thermal step-pool water",
+      subtitles: ["BATHHOUSE BASE", "PERISTYLE COLUMNS", "GLAZED WALLS", "BATHHOUSE REVEAL"]
+    },
+    {
+      name: "Desert Courtyard Riad",
+      baseSand: "fine orange sand base with studio limestone garden stones",
+      formwork: "central star-basin timber shuttering",
+      pins: "ornate brass pins",
+      mesh: "star-pattern white wire mesh",
+      slurry: "pure white and grey cement slurry",
+      blocks: "miniature earthen clay bricks",
+      water: "tiled riad fountain pool",
+      subtitles: ["RIAD FOUNDATION", "GALLERY COLUMNS", "CLAY BRICKWORK", "RIAD REVEAL"]
+    },
+    {
+      name: "Terracotta Arcaded Palace",
+      baseSand: "leveled desert terrace with studio red clay boulders",
+      formwork: "monumental arch formwork centering",
+      pins: "heavy iron formwork pins",
+      mesh: "high-density white grid mesh",
+      slurry: "warm terracotta-tinted cement slurry",
+      blocks: "miniature terracotta facade tiles and blocks",
+      water: "palace courtyard reflecting basin",
+      subtitles: ["PALACE BASE", "DOUBLE ARCHES", "TERRACOTTA WALLS", "PALACE REVEAL"]
+    },
+    {
+      name: "Sunken Clay Kiva & Shrine",
+      baseSand: "circular excavated desert sand pit with studio petrified wood rocks",
+      formwork: "circular sunken timber formwork bands",
+      pins: "radial wood and metal pins",
+      mesh: "woven circular white grid mesh",
+      slurry: "natural earthen clay cement slurry",
+      blocks: "miniature clay adobe stones",
+      water: "sacred spring water basin",
+      subtitles: ["KIVA BASIN", "RADIAL BENCHES", "ADOBE RINGWALL", "KIVA REVEAL"]
+    },
+    {
+      name: "Fortified Desert Outpost",
+      baseSand: "wind-swept desert ridge sand with jagged studio sandstone shards",
+      formwork: "bastion corner shuttering boxes",
+      pins: "heavy trench pins",
+      mesh: "bastion core white grid mesh",
+      slurry: "dense grey fortification cement slurry",
+      blocks: "miniature desert mud bricks",
+      water: "outpost well water",
+      subtitles: ["OUTPOST BASE", "CORNER BASTIONS", "MUD-BRICK WALLS", "OUTPOST REVEAL"]
+    }
+  ]
+};
+
+/**
+ * Procedural Multi-Part Miniature Structure Synthesizer
+ * Returns a fully fleshed-out 4-part structure blueprint for ANY structureIndex S >= 0.
+ * Guarantees infinite non-repeating content with varied materials, tools, studio setups, and camera angles.
+ */
+function getMiniatureStructure(townKey, structureIndex) {
+  const catalog = ARCHETYPE_BLUEPRINTS[townKey] || ARCHETYPE_BLUEPRINTS.smart_city;
+  const numArchetypes = catalog.length;
+  const archetype = catalog[structureIndex % numArchetypes];
+  const cycle = Math.floor(structureIndex / numArchetypes) + 1;
+
+  const cyclePrefixes = ["", "East Wing ", "Upper Terrace ", "South Quad ", "Highland ", "North Pavilion ", "Grand Promenade ", "Royal Annex "];
+  const prefix = cycle === 1 ? "" : (cyclePrefixes[(cycle - 1) % cyclePrefixes.length] || `Phase ${cycle} `);
+  const structureName = cycle === 1 ? archetype.name : `${prefix}${archetype.name}`;
+
+  // Variation in physical craft materials per cycle
+  let formworkDesc = archetype.formwork;
+  let pinsDesc = archetype.pins;
+  let meshDesc = archetype.mesh;
+  let slurryDesc = archetype.slurry;
+  let blocksDesc = archetype.blocks;
+
+  if (cycle === 2) {
+    formworkDesc = `dark walnut timber formwork boards`;
+    pinsDesc = `machined brass pins`;
+    meshDesc = `high-tensile copper wire rebar grid`;
+    slurryDesc = `dark charcoal-tinted cement slurry`;
+    blocksDesc = `miniature charcoal basalt pavers`;
+  } else if (cycle === 3) {
+    formworkDesc = `fine balsa shuttering strips`;
+    pinsDesc = `black oxide pins`;
+    meshDesc = `galvanized silver wire mesh`;
+    slurryDesc = `warm sandstone-tinted cement slurry`;
+    blocksDesc = `miniature cream limestone blocks`;
+  } else if (cycle >= 4) {
+    formworkDesc = `phenolic film-faced formwork`;
+    pinsDesc = `titanium pins`;
+    meshDesc = `composite glass-fiber mesh`;
+    slurryDesc = `volcanic basalt mineral cement slurry`;
+    blocksDesc = `miniature weathered slate blocks`;
+  }
+
+  // 4 Parts per structure with explicit milestone progression
+  const parts = [
+    {
+      part: 1,
+      title: `${structureName} - Foundation & Earthworks`,
+      subtitle_2word: archetype.subtitles[0] || "FOUNDATION BASE",
+      milestone: "Foundation / Stairs",
+      prior_state: `Raw leveled ${archetype.baseSand}.`,
+      problem: `The virgin ground base requires precise shuttering formwork and reinforced cement foundation footings for the ${structureName}.`,
+      solution: `Assemble ${formworkDesc}, secure with ${pinsDesc}, position ${meshDesc}, pour ${slurryDesc}, and strip formwork to reveal smooth stairs and slab.`,
+      structures_added: `Smooth concrete foundation slab and entrance stairs on ${archetype.baseSand}`,
+      stages: [
         {
-          part: 1,
-          title: "Clay Hardpan Base & Pool Formwork",
-          subtitle_2word: "OASIS BASE",
-          milestone: "Foundation / Stairs",
-          prior_state: "Raw reddish sand base surrounded by desert studio rocks.",
-          problem: "The arid sand base requires sunken pool formwork and reinforced concrete foundation footings.",
-          solution: "Carve sunken pool basin in sand, pin thin plywood shuttering, place white mesh, pour cement, and strip reveal.",
-          structures_added: "Sunken oasis pool foundation basin and terraced courtyard slab",
-          stages: [
-            { stage_num: 1, title: "Sand Grading", action: "Grading reddish desert sand and setting desert studio rocks", tool: "mini sand scraper", asmr_type: "sand_level", narration: "Grading desert sand and studio rocks." },
-            { stage_num: 2, title: "Pool Shuttering", action: "Assembling thin wood formwork for the sunken pool basin and stairs", tool: "thin wood shuttering and metal pins", asmr_type: "pin_placement", narration: "Wood formwork pinned for the pool basin." },
-            { stage_num: 3, title: "White Mesh", action: "Laying white grid rebar mesh into the pool floor and steps", tool: "white grid mesh and clips", asmr_type: "pin_placement", narration: "White grid mesh laid inside the pool." },
-            { stage_num: 4, title: "Slurry Pour", action: "Pouring grey cement slurry into the pool walls and troweling smooth", tool: "cement pouring pot and mini trowel", asmr_type: "cement_pour", narration: "Pouring grey cement slurry into the pool." },
-            { stage_num: 5, title: "Strip Reveal", action: "Stripping wood shuttering to reveal smooth concrete pool basin and stairs", tool: "pin puller and strip lever", asmr_type: "formwork_strip", narration: "Stripping formwork. Smooth pool basin revealed!" }
-          ]
+          stage_num: 1,
+          title: "Sand Leveling",
+          action: `Leveling ${archetype.baseSand} and placing natural studio rocks around the perimeter`,
+          tool: "miniature sand rake and brass level",
+          asmr_type: "sand_level",
+          narration: `Leveling the sand base and studio rocks.`
         },
         {
-          part: 2,
-          title: "Terracotta Columns & Arch Shuttering",
-          subtitle_2word: "ADOBE ARCHES",
-          milestone: "Deck / Columns",
-          prior_state: "Sunken oasis pool foundation basin and terraced courtyard slab.",
-          problem: "The courtyard requires structural pillars and shade arches surrounding the pool.",
-          solution: "Cast concrete pillar cores with rebar pins, place curved arch formwork, and demold sleek pillars.",
-          structures_added: "Surrounding colonnade with concrete pillars and curved shade arches",
-          stages: [
-            { stage_num: 1, title: "Pillar Boxes", action: "Setting vertical pillar shuttering boxes around the pool deck", tool: "timber pillar forms and pins", asmr_type: "pin_placement", narration: "Setting pillar shuttering around pool." },
-            { stage_num: 2, title: "Pillar Pour", action: "Pouring grey cement slurry into each pillar", tool: "mini funnel and tamp rod", asmr_type: "cement_pour", narration: "Pouring cement slurry into pillars." },
-            { stage_num: 3, title: "Arch Centering", action: "Placing curved wood arch centering forms across pillars", tool: "curved arch forms and mesh", asmr_type: "pin_placement", narration: "Placing curved arch centering forms." },
-            { stage_num: 4, title: "Arch Pour", action: "Pouring cement mix into arch forms and screeding flush", tool: "mini trowel and slurry", asmr_type: "trowel_scrape", narration: "Pouring cement into the arch forms." },
-            { stage_num: 5, title: "Arch Strip", action: "Stripping arch forms to reveal elegant colonnade arches", tool: "release spatula", asmr_type: "formwork_strip", narration: "Stripping formwork. Colonnade arches revealed!" }
-          ]
+          stage_num: 2,
+          title: "Formwork & Pins",
+          action: `Assembling ${formworkDesc} and securing with ${pinsDesc}`,
+          tool: `${formworkDesc} and ${pinsDesc}`,
+          asmr_type: "pin_placement",
+          narration: `Formwork pinned firmly in place.`
         },
         {
-          part: 3,
-          title: "Adobe Courtyard Brickwork & Lintels",
-          subtitle_2word: "COURTYARD WALLS",
-          milestone: "Walls / Blocks",
-          prior_state: "Surrounding colonnade with concrete pillars and curved shade arches.",
-          problem: "The colonnade needs miniature terracotta brick perimeter walls and window lintels.",
-          solution: "Stack miniature bricks with mortar, set timber lintel boxes over openings, and pour headers.",
-          structures_added: "Terracotta miniature brick walls with concrete window and door headers",
-          stages: [
-            { stage_num: 1, title: "Mortar Line", action: "Troweling mortar along the courtyard wall line", tool: "mini pointer trowel", asmr_type: "trowel_scrape", narration: "Troweling mortar along the wall line." },
-            { stage_num: 2, title: "Brick Stacking", action: "Stacking miniature terracotta bricks in neat courses", tool: "mini terracotta bricks", asmr_type: "brick_tap", narration: "Stacking miniature terracotta bricks." },
-            { stage_num: 3, title: "Lintel Formwork", action: "Installing small timber lintel boxes over doors", tool: "timber lintels and pins", asmr_type: "pin_placement", narration: "Wood lintel boxes pinned over doors." },
-            { stage_num: 4, title: "Lintel Pour", action: "Pouring cement into lintels and scraping flush", tool: "pouring spoon", asmr_type: "cement_pour", narration: "Pouring cement into the door lintels." },
-            { stage_num: 5, title: "Lintel Strip", action: "Stripping lintel forms to reveal solid door headers", tool: "release wedge", asmr_type: "formwork_strip", narration: "Stripping lintels. Courtyard walls locked." }
-          ]
+          stage_num: 3,
+          title: "Grid Mesh",
+          action: `Positioning ${meshDesc} flat inside the foundation formwork`,
+          tool: `${meshDesc} and tweezers`,
+          asmr_type: "pin_placement",
+          narration: `Reinforcing mesh laid inside the frame.`
         },
         {
-          part: 4,
-          title: "Terraced Flat Roof & Oasis Pool Reveal",
-          subtitle_2word: "OASIS REVEAL",
-          milestone: "Upper / Roof / Reveal",
-          prior_state: "Terracotta miniature brick walls with concrete window and door headers.",
-          problem: "The structure requires a flat roof slab, formwork stripping, and oasis pool water fill.",
-          solution: "Pour flat roof slab with white mesh, strip all formwork, and fill the oasis pool with water.",
-          structures_added: "Complete Desert Oasis Villa with roof terrace, filled pool, and desert rock landscaping",
-          stages: [
-            { stage_num: 1, title: "Roof Formwork", action: "Laying thin plywood roof shuttering across courtyard walls", tool: "plywood roof forms", asmr_type: "pin_placement", narration: "Laying thin plywood roof shuttering." },
-            { stage_num: 2, title: "Roof Mesh", action: "Spreading white grid mesh across the roof formwork", tool: "white grid mesh", asmr_type: "pin_placement", narration: "Spreading white grid mesh across roof." },
-            { stage_num: 3, title: "Roof Pour", action: "Pouring grey cement slurry for the flat roof terrace", tool: "cement pouring pot", asmr_type: "cement_pour", narration: "Pouring smooth grey roof slurry." },
-            { stage_num: 4, title: "Trowel Polish", action: "Burnishing the roof terrace surface to a clean finish", tool: "mini smoothing trowel", asmr_type: "trowel_scrape", narration: "Burnishing roof terrace surface smooth." },
-            { stage_num: 5, title: "Pool Fill Reveal", action: "Stripping all formwork and filling oasis pool with turquoise water", tool: "hand strip and water filler", asmr_type: "formwork_strip", narration: "Stripping formwork. Oasis pool filled and complete!" }
-          ]
+          stage_num: 4,
+          title: "Slurry Pour & Screed",
+          action: `Pouring ${slurryDesc} into the formwork and smoothing with a mini trowel`,
+          tool: "cement pouring vessel and mini stainless trowel",
+          asmr_type: "cement_pour",
+          narration: `Pouring the wet cement slurry.`
+        },
+        {
+          stage_num: 5,
+          title: "Formwork Strip Reveal",
+          action: `Stripping the ${formworkDesc} to reveal razor-smooth cured concrete foundation and stairs`,
+          tool: "pin puller and gentle hand strip",
+          asmr_type: "formwork_strip",
+          narration: `Stripping the formwork. Look at this finish!`
+        }
+      ]
+    },
+    {
+      part: 2,
+      title: `${structureName} - Structural Columns & Deck`,
+      subtitle_2word: archetype.subtitles[1] || "CONCRETE COLUMNS",
+      milestone: "Deck / Columns",
+      prior_state: `Cured smooth concrete foundation slab and entrance stairs on ${archetype.baseSand}.`,
+      problem: `The foundation slab needs structural load-bearing columns and a ground terrace deck.`,
+      solution: `Set vertical column formwork boxes with ${pinsDesc}, pour ${slurryDesc}, and demold sleek concrete pillars and terrace deck.`,
+      structures_added: `Erected smooth concrete structural columns and ground patio deck slab`,
+      stages: [
+        {
+          stage_num: 1,
+          title: "Column Formwork",
+          action: `Erecting vertical timber column formwork boxes over foundation anchor pins`,
+          tool: "vertical column shuttering boxes and pins",
+          asmr_type: "pin_placement",
+          narration: `Setting column formwork over anchor pins.`
+        },
+        {
+          stage_num: 2,
+          title: "Column Pour",
+          action: `Pouring ${slurryDesc} into each column box and tamping with a metal pin`,
+          tool: "funnel and miniature tamp rod",
+          asmr_type: "cement_pour",
+          narration: `Pouring cement slurry into each column.`
+        },
+        {
+          stage_num: 3,
+          title: "Deck Shuttering & Mesh",
+          action: `Laying horizontal ${formworkDesc} deck sheets and placing ${meshDesc} between columns`,
+          tool: "plywood decking sheets and mesh",
+          asmr_type: "pin_placement",
+          narration: `Deck shuttering and mesh in position.`
+        },
+        {
+          stage_num: 4,
+          title: "Deck Troweling",
+          action: `Pouring ${slurryDesc} across deck formwork and leveling with an aluminum screed bar`,
+          tool: "mini aluminum screed bar and trowel",
+          asmr_type: "trowel_scrape",
+          narration: `Screeding the deck slab dead-flat.`
+        },
+        {
+          stage_num: 5,
+          title: "Column Demolding Reveal",
+          action: `Peeling off column and deck formwork to reveal sleek concrete columns and terrace slab`,
+          tool: "demolding spatula and gentle peel",
+          asmr_type: "formwork_strip",
+          narration: `Stripping formwork. Sleek concrete pillars revealed.`
+        }
+      ]
+    },
+    {
+      part: 3,
+      title: `${structureName} - Walls & Masonry Lintels`,
+      subtitle_2word: archetype.subtitles[2] || "MASONRY WALLS",
+      milestone: "Walls / Blocks",
+      prior_state: `Cured concrete columns, terrace deck, and foundation slab on ${archetype.baseSand}.`,
+      problem: `The structural frame requires perimeter walls and reinforced concrete lintels over openings.`,
+      solution: `Stack ${blocksDesc} with troweled mortar, place timber lintel boxes, and cast solid concrete headers.`,
+      structures_added: `Stacked ${blocksDesc} perimeter walls with cast concrete window and door lintels`,
+      stages: [
+        {
+          stage_num: 1,
+          title: "Mortar Bedding",
+          action: `Spreading a thin bed of mortar onto the concrete deck using a mini pointed trowel`,
+          tool: "mini pointed stainless steel trowel",
+          asmr_type: "trowel_scrape",
+          narration: `Spreading fresh mortar on the concrete deck.`
+        },
+        {
+          stage_num: 2,
+          title: "Block Stacking",
+          action: `Stacking individual ${blocksDesc} in staggered courses and tapping level with trowel handle`,
+          tool: `${blocksDesc} and trowel handle`,
+          asmr_type: "brick_tap",
+          narration: `Stacking miniature blocks course by course.`
+        },
+        {
+          stage_num: 3,
+          title: "Lintel Formwork",
+          action: `Installing timber lintel formwork boxes across window and door openings`,
+          tool: "timber lintel boxes and metal clips",
+          asmr_type: "pin_placement",
+          narration: `Wood lintel formwork over door frames.`
+        },
+        {
+          stage_num: 4,
+          title: "Lintel Cement Pour",
+          action: `Pouring ${slurryDesc} into lintel formwork and scraping joints flush`,
+          tool: "cement ladle and joint scraper",
+          asmr_type: "cement_pour",
+          narration: `Pouring concrete lintels and scraping flush.`
+        },
+        {
+          stage_num: 5,
+          title: "Lintel Demolding Reveal",
+          action: `Stripping timber lintel formwork to reveal neat masonry walls and solid concrete headers`,
+          tool: "formwork release wedge",
+          asmr_type: "formwork_strip",
+          narration: `Stripping lintels. The walls are locked solid.`
+        }
+      ]
+    },
+    {
+      part: 4,
+      title: `${structureName} - Roof Slab & Grand Transformation`,
+      subtitle_2word: archetype.subtitles[3] || "GRAND REVEAL",
+      milestone: "Upper / Roof / Reveal",
+      prior_state: `Complete masonry walls, concrete columns, lintels, and foundation slab on ${archetype.baseSand}.`,
+      problem: `The structure requires a cantilever roof slab, formwork stripping, and finished water landscaping.`,
+      solution: `Pour and cure upper concrete roof, strip all formwork, and fill the ${archetype.water} for the grand payoff.`,
+      structures_added: `Complete ${structureName} with roof slab, stripped formwork, filled ${archetype.water}, and natural landscaping`,
+      stages: [
+        {
+          stage_num: 1,
+          title: "Roof Formwork",
+          action: `Fitting wide ${formworkDesc} roof shuttering across top of walls`,
+          tool: `${formworkDesc} and ${pinsDesc}`,
+          asmr_type: "pin_placement",
+          narration: `Fitting wide roof shuttering boards.`
+        },
+        {
+          stage_num: 2,
+          title: "Roof Mesh Placement",
+          action: `Laying double-layer ${meshDesc} across the entire roof shuttering`,
+          tool: `${meshDesc} sheets`,
+          asmr_type: "pin_placement",
+          narration: `Reinforcing mesh spanning the entire roof.`
+        },
+        {
+          stage_num: 3,
+          title: "Roof Slurry Pour",
+          action: `Pouring a rich layer of ${slurryDesc} across the roof formwork`,
+          tool: "cement pouring vessel and mini screed",
+          asmr_type: "cement_pour",
+          narration: `Pouring the smooth roof slab.`
+        },
+        {
+          stage_num: 4,
+          title: "Burnish Finishing",
+          action: `Burnishing wet cement slab to a mirror-smooth finish with a flexible mini trowel`,
+          tool: "mini stainless finishing trowel",
+          asmr_type: "trowel_scrape",
+          narration: `Burnishing the surface to a silky polish.`
+        },
+        {
+          stage_num: 5,
+          title: "Grand Demolding Reveal",
+          action: `Stripping all formwork to reveal the finished architectural build and filling ${archetype.water}`,
+          tool: "demolding spatula and water pipette",
+          asmr_type: "formwork_strip",
+          narration: `Stripping formwork for the grand reveal. Complete!`
         }
       ]
     }
-  ]
+  ];
+
+  return {
+    structure_name: structureName,
+    cycle,
+    parts
+  };
+}
+
+// Pre-instantiated catalog for backward-compatibility with direct property access
+const MINIATURE_STRUCTURE_SERIES = {
+  smart_city: ARCHETYPE_BLUEPRINTS.smart_city.map((_, idx) => getMiniatureStructure('smart_city', idx)),
+  mountain_village: ARCHETYPE_BLUEPRINTS.mountain_village.map((_, idx) => getMiniatureStructure('mountain_village', idx)),
+  desert_town: ARCHETYPE_BLUEPRINTS.desert_town.map((_, idx) => getMiniatureStructure('desert_town', idx))
 };
 
 // Aliased for backward compatibility with existing procedural runners
@@ -473,31 +643,45 @@ const PROCEDURAL_BLUEPRINTS = MINIATURE_STRUCTURE_SERIES;
  * Builds the exact prompt for Gemini 2.5 Flash to plan the next episode
  */
 function buildGeminiPrompt(townKey, townMemory, nextEpisode) {
-  const structureList = MINIATURE_STRUCTURE_SERIES[townKey] || MINIATURE_STRUCTURE_SERIES.smart_city;
   const ep = Math.max(1, nextEpisode || 1);
   const partsPerStructure = 4;
-  const structureIndex = Math.floor((ep - 1) / partsPerStructure) % structureList.length;
-  const partNumber = ((ep - 1) % partsPerStructure) + 1;
-  const currentStructure = structureList[structureIndex];
+  let structureIndex;
+  let partNumber;
+
+  if (townMemory && townMemory.active_multipart && townMemory.active_multipart.part && townMemory.active_multipart.total_parts === partsPerStructure) {
+    structureIndex = typeof townMemory.active_multipart.structure_index === 'number'
+      ? townMemory.active_multipart.structure_index
+      : Math.floor((ep - 1) / partsPerStructure);
+    partNumber = townMemory.active_multipart.part;
+  } else {
+    structureIndex = Math.floor((ep - 1) / partsPerStructure);
+    partNumber = ((ep - 1) % partsPerStructure) + 1;
+  }
+
+  const currentStructure = getMiniatureStructure(townKey, structureIndex);
+  const partData = currentStructure.parts[partNumber - 1];
 
   return `You are the Lead Miniature Architect and Director of Viral Hands-On Miniature Construction Videos for 9:16 vertical Shorts and Reels.
 Project: "${townMemory.name}" (${townKey})
 Current Episode: ${ep}
 Structure Series: "Mini ${currentStructure.structure_name}"
 Active Part: Part ${partNumber} of ${partsPerStructure}
+Current Milestone: ${partData.milestone}
+Prior Worksite State: ${partData.prior_state}
 
 MISSION:
 Plan Episode ${ep} as a high-retention, hands-on miniature construction video (9:16 vertical, 720p, 5s duration per clip).
 The scene is set on a fine sand and soil base with natural studio rocks and a consistent backdrop across shots.
+Every stage must continue directly from the prior part's completed state: "${partData.prior_state}".
 
 CRITICAL VISUAL & ASMR STYLE REQUIREMENTS:
 1. Physical Miniature Building Process:
    - Thin wood/plywood shuttering/formwork held by metal pins.
-   - White grid reinforcing mesh positioned before pouring.
-   - Pouring viscous wet grey cement slurry.
+   - Grid reinforcing mesh positioned before pouring.
+   - Pouring viscous wet grey/colored cement slurry.
    - Leveling and screeding with a mini stainless steel trowel or aluminum bar.
    - Stripping formwork to reveal razor-smooth cured concrete slabs, stairs, and pillars.
-   - Stacking miniature red bricks / grey concrete blocks with mini troweled mortar.
+   - Stacking miniature bricks / stone blocks with mini troweled mortar.
 2. Fast Step-by-Step Cuts: Snappy ~0.8s–2.2s visual rhythm across a 14–18s total vertical reel.
 3. Crisp ASMR Audio: Crisp pour, scrape, tap, and peel sounds (cement_pour, trowel_scrape, formwork_strip, brick_tap, pin_placement, sand_level).
 4. Minimal Voiceover Clutter: Exactly 1 ultra-short, punchy ASMR line per stage (4–7 words max). Zero long lectures.
@@ -508,28 +692,35 @@ Output ONLY valid JSON matching this exact structure:
 {
   "episode": ${ep},
   "title": "Mini ${currentStructure.structure_name} Part ${partNumber}",
-  "subtitle_2word": "TWO WORDS",
-  "problem": "Brief miniature construction challenge",
-  "solution": "Clear practical miniature building solution",
+  "structure_name": "${currentStructure.structure_name}",
+  "series_label": "Mini ${currentStructure.structure_name} Part ${partNumber}",
+  "part": ${partNumber},
+  "total_parts": ${partsPerStructure},
+  "subtitle_2word": "${partData.subtitle_2word}",
+  "problem": "${partData.problem}",
+  "solution": "${partData.solution}",
   "is_multipart": true,
   "multipart_info": {
     "structure_name": "${currentStructure.structure_name}",
+    "structure_index": ${structureIndex},
     "series_label": "Mini ${currentStructure.structure_name} Part ${partNumber}",
     "part": ${partNumber},
-    "total_parts": ${partsPerStructure}
+    "total_parts": ${partsPerStructure},
+    "milestone": "${partData.milestone}",
+    "prior_state": "${partData.prior_state}"
   },
   "updated_anchor_prompt": "Hands-on miniature construction worksite on sand base with studio rocks and consistent backdrop",
-  "structures_added": "Name of newly revealed structure milestone",
+  "structures_added": "${partData.structures_added}",
   "stages": [
     {
       "stage_num": 1,
-      "title": "Short title",
-      "action": "Hands-on miniature action (formwork, pins, mesh, cement pour, mini trowel, strip reveal)",
-      "tool": "Miniature tool held",
+      "title": "${partData.stages[0].title}",
+      "action": "${partData.stages[0].action}",
+      "tool": "${partData.stages[0].tool}",
       "image_prompt": "Complete macro photorealistic prompt for Stage 1",
       "motion_prompt": "Smooth continuous motion description for 720p 5s video",
-      "asmr_type": "sand_level",
-      "narration": "Short 4-7 word punchy ASMR line"
+      "asmr_type": "${partData.stages[0].asmr_type}",
+      "narration": "${partData.stages[0].narration}"
     },
     ... (stages 2, 3, 4, 5)
   ]
@@ -617,22 +808,33 @@ async function callGemini(prompt, apiKey) {
  * Computes deterministic multi-part series progression (Part 1 -> Part 2 -> Part 3 -> Part 4 -> Next Structure Part 1)
  */
 function generateProceduralPlan(townKey, townMemory, nextEpisode) {
-  const structureList = MINIATURE_STRUCTURE_SERIES[townKey] || MINIATURE_STRUCTURE_SERIES.smart_city;
   const ep = Math.max(1, nextEpisode || 1);
   const partsPerStructure = 4;
-  const structureIndex = Math.floor((ep - 1) / partsPerStructure) % structureList.length;
-  const partNumber = ((ep - 1) % partsPerStructure) + 1;
-  const currentStructure = structureList[structureIndex];
+
+  let structureIndex;
+  let partNumber;
+
+  if (townMemory && townMemory.active_multipart && townMemory.active_multipart.part && townMemory.active_multipart.total_parts === partsPerStructure) {
+    structureIndex = typeof townMemory.active_multipart.structure_index === 'number'
+      ? townMemory.active_multipart.structure_index
+      : Math.floor((ep - 1) / partsPerStructure);
+    partNumber = townMemory.active_multipart.part;
+  } else {
+    structureIndex = Math.floor((ep - 1) / partsPerStructure);
+    partNumber = ((ep - 1) % partsPerStructure) + 1;
+  }
+
+  const currentStructure = getMiniatureStructure(townKey, structureIndex);
   const partData = currentStructure.parts[partNumber - 1];
 
   const seriesLabel = `Mini ${currentStructure.structure_name} Part ${partNumber}`;
   const episodeTitle = `${seriesLabel}: ${partData.title}`;
 
-  const builtSoFar = townMemory.built_structures && townMemory.built_structures.length > 0
+  const builtSoFar = townMemory && townMemory.built_structures && townMemory.built_structures.length > 0
     ? `Completed on site: ${townMemory.built_structures.slice(-3).join("; ")}.`
     : "Fresh sand and soil base with studio rocks.";
 
-  const updatedAnchor = `Hands-on miniature construction worksite on sand and soil base with studio rocks. ${builtSoFar} Current milestone: ${partData.structures_added}. Consistent studio backdrop with warm directional lighting.`;
+  const updatedAnchor = `Hands-on miniature construction worksite on sand and soil base with studio rocks. Prior state: ${partData.prior_state} ${builtSoFar} Current milestone: ${partData.structures_added}. Consistent studio backdrop with warm directional lighting.`;
 
   const stages = partData.stages.map((stage, idx) => {
     const isFirst = idx === 0;
@@ -645,23 +847,23 @@ function generateProceduralPlan(townKey, townMemory, nextEpisode) {
       angleStyle = "Wide macro establishing angle showing craftsman hands preparing formwork on the sand base";
       motionCamera = "Smooth macro push-in tracking the formwork setup";
     } else if (stage.stage_num === 2) {
-      angleStyle = "Eye-level close-up showing metal pins and white grid mesh placement";
+      angleStyle = "Eye-level close-up showing metal pins and grid mesh placement";
       motionCamera = "Low-angle lateral macro glide tracking pin alignment";
     } else if (stage.stage_num === 3) {
-      angleStyle = "Dynamic macro action angle capturing viscous grey cement slurry pouring";
+      angleStyle = "Dynamic macro action angle capturing wet cement slurry pouring";
       motionCamera = "Top-down macro tilt tracking wet cement flow";
     } else if (stage.stage_num === 4) {
-      angleStyle = "Razor-sharp macro detail of mini trowel smoothing and leveling the wet cement";
+      angleStyle = "Razor-sharp macro detail of mini trowel smoothing and leveling";
       motionCamera = "Precise diagonal glide following the mini trowel blade";
     } else {
       angleStyle = "Grand macro reveal angle stripping the wood formwork to reveal razor-smooth cured concrete";
       motionCamera = "Majestic slow pull-back and elevation reveal of the demolded structure";
     }
 
-    const imagePrompt = `Stage ${stage.stage_num}/5 of ${seriesLabel}: Hands-on miniature construction photography (9:16 vertical). ${angleStyle}. Craftsman hands actively performing: ${stage.action} using ${stage.tool}. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, white grid mesh, grey cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.`;
+    const imagePrompt = `Stage ${stage.stage_num}/5 of ${seriesLabel}: Hands-on miniature construction photography (9:16 vertical). ${angleStyle}. Craftsman hands actively performing: ${stage.action} using ${stage.tool}. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.`;
 
     const nextActionDesc = !isLast ? partData.stages[idx + 1].action.toLowerCase() : "celebrating the smooth demolded concrete reveal";
-    const motionPrompt = `Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): ${motionCamera}. Craftsman hands perform ${stage.action} using ${stage.tool}, progressing cleanly toward ${nextActionDesc}. Thin wood shuttering, metal pins, grey cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.`;
+    const motionPrompt = `Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): ${motionCamera}. Craftsman hands perform ${stage.action} using ${stage.tool}, progressing cleanly toward ${nextActionDesc}. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.`;
 
     return {
       stage_num: stage.stage_num,
@@ -679,6 +881,7 @@ function generateProceduralPlan(townKey, townMemory, nextEpisode) {
     episode: ep,
     title: episodeTitle,
     structure_name: currentStructure.structure_name,
+    structure_index: structureIndex,
     series_label: seriesLabel,
     part: partNumber,
     total_parts: partsPerStructure,
@@ -688,6 +891,7 @@ function generateProceduralPlan(townKey, townMemory, nextEpisode) {
     is_multipart: true,
     multipart_info: {
       structure_name: currentStructure.structure_name,
+      structure_index: structureIndex,
       series_label: seriesLabel,
       part: partNumber,
       total_parts: partsPerStructure,
@@ -733,8 +937,10 @@ async function planEpisode(townKey, townMemory, forcedEpisode = null) {
 module.exports = {
   planEpisode,
   generateProceduralPlan,
-  CRAFTSMAN_HANDS_DESCRIPTION,
-  CAMERA_BASE_PROMPT,
+  getMiniatureStructure,
+  ARCHETYPE_BLUEPRINTS,
   MINIATURE_STRUCTURE_SERIES,
-  PROCEDURAL_BLUEPRINTS
+  PROCEDURAL_BLUEPRINTS,
+  CRAFTSMAN_HANDS_DESCRIPTION,
+  CAMERA_BASE_PROMPT
 };
