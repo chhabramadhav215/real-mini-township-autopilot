@@ -7,13 +7,34 @@
     "cron_utc": "06:00 UTC",
     "cron_ist": "11:30 AM IST",
     "cron_schedule": "0 6 * * *",
-    "episode": 0,
+    "episode": 5,
     "camera_seed": 482910,
     "diorama_anchor_prompt": "Hands-on miniature alpine architecture worksite on mountain sand and river silt base with natural studio granite rocks. Thin timber shuttering formwork, metal pins, white grid mesh, smooth poured grey concrete.",
-    "built_structures": [],
-    "active_multipart": null,
+    "built_structures": [
+      "Mini Alpine Timber Chalet Part 1: Smooth concrete foundation slab and entrance stairs on sloped mountain sand and loam base with studio granite boulders"
+    ],
+    "active_multipart": {
+      "structure_name": "Alpine Timber Chalet",
+      "structure_index": 1,
+      "series_label": "Mini Alpine Timber Chalet Part 2",
+      "part": 2,
+      "total_parts": 4,
+      "milestone": "Part 2 construction",
+      "prior_state": "Smooth concrete foundation slab and entrance stairs on sloped mountain sand and loam base with studio granite boulders"
+    },
     "last_frame_path": "state/last_frame_mountain_village.jpg",
-    "history": []
+    "history": [
+      {
+        "episode": 5,
+        "title": "Mini Alpine Timber Chalet Part 1: Alpine Timber Chalet - Foundation & Earthworks",
+        "structure_name": "Alpine Timber Chalet",
+        "series_label": "Mini Alpine Timber Chalet Part 1",
+        "part": 1,
+        "total_parts": 4,
+        "subtitle_2word": "CHALET FOOTING",
+        "completed_at": "2026-11-21T22:03:19.089Z"
+      }
+    ]
   },
   "smart_city": {
     "name": "Smart City",

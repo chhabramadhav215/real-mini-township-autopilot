@@ -1199,7 +1199,107 @@
           }
         ]
       }
+    },
+    {
+      "id": "queue_mountain_village_ep5",
+      "townKey": "mountain_village",
+      "episode": 5,
+      "title": "Mini Alpine Timber Chalet Part 1: Alpine Timber Chalet - Foundation & Earthworks",
+      "structure_name": "Alpine Timber Chalet",
+      "series_label": "Mini Alpine Timber Chalet Part 1",
+      "part": 1,
+      "total_parts": 4,
+      "subtitle_2word": "CHALET FOOTING",
+      "problem": "The virgin ground base requires precise shuttering formwork and reinforced cement foundation footings for the Alpine Timber Chalet.",
+      "solution": "Assemble split-level timber footing formwork, secure with timber anchor pins, position woven white grid mesh, pour dense grey mountain cement slurry, and strip formwork to reveal smooth stairs and slab.",
+      "tag_name": "queue-mountain_village-ep5",
+      "release_id": null,
+      "video_asset_name": "mountain_village_ep5.mp4",
+      "thumb_asset_name": "mountain_village_ep5_thumb.jpg",
+      "video_download_url": null,
+      "thumb_download_url": null,
+      "local_video_path": "C:\\real-mini-township\\queue_out\\mountain_village_ep5\\mountain_village_ep5.mp4",
+      "local_thumb_path": "C:\\real-mini-township\\queue_out\\mountain_village_ep5\\mountain_village_ep5_thumb.jpg",
+      "created_at": "2026-11-21T22:03:19.084Z",
+      "uploaded": false,
+      "uploaded_at": null,
+      "plan": {
+        "episode": 5,
+        "title": "Mini Alpine Timber Chalet Part 1: Alpine Timber Chalet - Foundation & Earthworks",
+        "structure_name": "Alpine Timber Chalet",
+        "structure_index": 1,
+        "series_label": "Mini Alpine Timber Chalet Part 1",
+        "part": 1,
+        "total_parts": 4,
+        "subtitle_2word": "CHALET FOOTING",
+        "problem": "The virgin ground base requires precise shuttering formwork and reinforced cement foundation footings for the Alpine Timber Chalet.",
+        "solution": "Assemble split-level timber footing formwork, secure with timber anchor pins, position woven white grid mesh, pour dense grey mountain cement slurry, and strip formwork to reveal smooth stairs and slab.",
+        "is_multipart": true,
+        "multipart_info": {
+          "structure_name": "Alpine Timber Chalet",
+          "structure_index": 1,
+          "series_label": "Mini Alpine Timber Chalet Part 1",
+          "part": 1,
+          "total_parts": 4,
+          "milestone": "Foundation / Stairs",
+          "prior_state": "Raw leveled sloped mountain sand and loam base with studio granite boulders."
+        },
+        "updated_anchor_prompt": "Hands-on miniature construction worksite on sand and soil base with studio rocks. Prior state: Raw leveled sloped mountain sand and loam base with studio granite boulders. Fresh sand and soil base with studio rocks. Current milestone: Smooth concrete foundation slab and entrance stairs on sloped mountain sand and loam base with studio granite boulders. Consistent studio backdrop with warm directional lighting.",
+        "structures_added": "Smooth concrete foundation slab and entrance stairs on sloped mountain sand and loam base with studio granite boulders",
+        "stages": [
+          {
+            "stage_num": 1,
+            "title": "Sand Leveling",
+            "action": "Leveling sloped mountain sand and loam base with studio granite boulders and placing natural studio rocks around the perimeter",
+            "tool": "miniature sand rake and brass level",
+            "image_prompt": "Stage 1/5 of Mini Alpine Timber Chalet Part 1: Hands-on miniature construction photography (9:16 vertical). Wide macro establishing angle showing craftsman hands preparing formwork on the sand base. Craftsman hands actively performing: Leveling sloped mountain sand and loam base with studio granite boulders and placing natural studio rocks around the perimeter using miniature sand rake and brass level. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Smooth macro push-in tracking the formwork setup. Craftsman hands perform Leveling sloped mountain sand and loam base with studio granite boulders and placing natural studio rocks around the perimeter using miniature sand rake and brass level, progressing cleanly toward assembling split-level timber footing formwork and securing with timber anchor pins. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "sand_level",
+            "narration": "Leveling the sand base and studio rocks."
+          },
+          {
+            "stage_num": 2,
+            "title": "Formwork & Pins",
+            "action": "Assembling split-level timber footing formwork and securing with timber anchor pins",
+            "tool": "split-level timber footing formwork and timber anchor pins",
+            "image_prompt": "Stage 2/5 of Mini Alpine Timber Chalet Part 1: Hands-on miniature construction photography (9:16 vertical). Eye-level close-up showing metal pins and grid mesh placement. Craftsman hands actively performing: Assembling split-level timber footing formwork and securing with timber anchor pins using split-level timber footing formwork and timber anchor pins. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Low-angle lateral macro glide tracking pin alignment. Craftsman hands perform Assembling split-level timber footing formwork and securing with timber anchor pins using split-level timber footing formwork and timber anchor pins, progressing cleanly toward positioning woven white grid mesh flat inside the foundation formwork. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "pin_placement",
+            "narration": "Formwork pinned firmly in place."
+          },
+          {
+            "stage_num": 3,
+            "title": "Grid Mesh",
+            "action": "Positioning woven white grid mesh flat inside the foundation formwork",
+            "tool": "woven white grid mesh and tweezers",
+            "image_prompt": "Stage 3/5 of Mini Alpine Timber Chalet Part 1: Hands-on miniature construction photography (9:16 vertical). Dynamic macro action angle capturing wet cement slurry pouring. Craftsman hands actively performing: Positioning woven white grid mesh flat inside the foundation formwork using woven white grid mesh and tweezers. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Top-down macro tilt tracking wet cement flow. Craftsman hands perform Positioning woven white grid mesh flat inside the foundation formwork using woven white grid mesh and tweezers, progressing cleanly toward pouring dense grey mountain cement slurry into the formwork and smoothing with a mini trowel. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "pin_placement",
+            "narration": "Reinforcing mesh laid inside the frame."
+          },
+          {
+            "stage_num": 4,
+            "title": "Slurry Pour & Screed",
+            "action": "Pouring dense grey mountain cement slurry into the formwork and smoothing with a mini trowel",
+            "tool": "cement pouring vessel and mini stainless trowel",
+            "image_prompt": "Stage 4/5 of Mini Alpine Timber Chalet Part 1: Hands-on miniature construction photography (9:16 vertical). Razor-sharp macro detail of mini trowel smoothing and leveling. Craftsman hands actively performing: Pouring dense grey mountain cement slurry into the formwork and smoothing with a mini trowel using cement pouring vessel and mini stainless trowel. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Precise diagonal glide following the mini trowel blade. Craftsman hands perform Pouring dense grey mountain cement slurry into the formwork and smoothing with a mini trowel using cement pouring vessel and mini stainless trowel, progressing cleanly toward stripping the split-level timber footing formwork to reveal razor-smooth cured concrete foundation and stairs. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "cement_pour",
+            "narration": "Pouring the wet cement slurry."
+          },
+          {
+            "stage_num": 5,
+            "title": "Formwork Strip Reveal",
+            "action": "Stripping the split-level timber footing formwork to reveal razor-smooth cured concrete foundation and stairs",
+            "tool": "pin puller and gentle hand strip",
+            "image_prompt": "Stage 5/5 of Mini Alpine Timber Chalet Part 1: Hands-on miniature construction photography (9:16 vertical). Grand macro reveal angle stripping the wood formwork to reveal razor-smooth cured concrete. Craftsman hands actively performing: Stripping the split-level timber footing formwork to reveal razor-smooth cured concrete foundation and stairs using pin puller and gentle hand strip. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Majestic slow pull-back and elevation reveal of the demolded structure. Craftsman hands perform Stripping the split-level timber footing formwork to reveal razor-smooth cured concrete foundation and stairs using pin puller and gentle hand strip, progressing cleanly toward celebrating the smooth demolded concrete reveal. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "formwork_strip",
+            "narration": "Stripping the formwork. Look at this finish!"
+          }
+        ]
+      }
     }
   ],
-  "last_updated": "2026-11-21T21:49:57.472Z"
+  "last_updated": "2026-11-21T22:03:19.086Z"
 }
