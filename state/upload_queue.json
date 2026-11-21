@@ -1299,7 +1299,107 @@
           }
         ]
       }
+    },
+    {
+      "id": "queue_smart_city_ep9",
+      "townKey": "smart_city",
+      "episode": 9,
+      "title": "Mini Minimalist Pavilion & Pool Part 1: Minimalist Pavilion & Pool - Foundation & Earthworks",
+      "structure_name": "Minimalist Pavilion & Pool",
+      "series_label": "Mini Minimalist Pavilion & Pool Part 1",
+      "part": 1,
+      "total_parts": 4,
+      "subtitle_2word": "PAVILION BASE",
+      "problem": "The virgin ground base requires precise shuttering formwork and reinforced cement foundation footings for the Minimalist Pavilion & Pool.",
+      "solution": "Assemble balsa wood shuttering forms, secure with brass anchor pins, position fine white wire grid mesh, pour light grey architectural cement slurry, and strip formwork to reveal smooth stairs and slab.",
+      "tag_name": "queue-smart_city-ep9",
+      "release_id": null,
+      "video_asset_name": "smart_city_ep9.mp4",
+      "thumb_asset_name": "smart_city_ep9_thumb.jpg",
+      "video_download_url": null,
+      "thumb_download_url": null,
+      "local_video_path": "C:\\real-mini-township\\queue_out\\smart_city_ep9\\smart_city_ep9.mp4",
+      "local_thumb_path": "C:\\real-mini-township\\queue_out\\smart_city_ep9\\smart_city_ep9_thumb.jpg",
+      "created_at": "2026-11-21T22:13:44.929Z",
+      "uploaded": false,
+      "uploaded_at": null,
+      "plan": {
+        "episode": 9,
+        "title": "Mini Minimalist Pavilion & Pool Part 1: Minimalist Pavilion & Pool - Foundation & Earthworks",
+        "structure_name": "Minimalist Pavilion & Pool",
+        "structure_index": 2,
+        "series_label": "Mini Minimalist Pavilion & Pool Part 1",
+        "part": 1,
+        "total_parts": 4,
+        "subtitle_2word": "PAVILION BASE",
+        "problem": "The virgin ground base requires precise shuttering formwork and reinforced cement foundation footings for the Minimalist Pavilion & Pool.",
+        "solution": "Assemble balsa wood shuttering forms, secure with brass anchor pins, position fine white wire grid mesh, pour light grey architectural cement slurry, and strip formwork to reveal smooth stairs and slab.",
+        "is_multipart": true,
+        "multipart_info": {
+          "structure_name": "Minimalist Pavilion & Pool",
+          "structure_index": 2,
+          "series_label": "Mini Minimalist Pavilion & Pool Part 1",
+          "part": 1,
+          "total_parts": 4,
+          "milestone": "Foundation / Stairs",
+          "prior_state": "Raw leveled compacted sand base with polished studio river stones."
+        },
+        "updated_anchor_prompt": "Hands-on miniature construction worksite on sand and soil base with studio rocks. Prior state: Raw leveled compacted sand base with polished studio river stones. Completed on site: Mini Modern Villa: Structural concrete columns and ground terrace deck; Mini Modern Villa: Stacked miniature brick walls and concrete headers; Mini Modern Villa: Cantilever roof slab and filled infinity pool. Current milestone: Smooth concrete foundation slab and entrance stairs on compacted sand base with polished studio river stones. Consistent studio backdrop with warm directional lighting.",
+        "structures_added": "Smooth concrete foundation slab and entrance stairs on compacted sand base with polished studio river stones",
+        "stages": [
+          {
+            "stage_num": 1,
+            "title": "Sand Leveling",
+            "action": "Leveling compacted sand base with polished studio river stones and placing natural studio rocks around the perimeter",
+            "tool": "miniature sand rake and brass level",
+            "image_prompt": "Stage 1/5 of Mini Minimalist Pavilion & Pool Part 1: Hands-on miniature construction photography (9:16 vertical). Wide macro establishing angle showing craftsman hands preparing formwork on the sand base. Craftsman hands actively performing: Leveling compacted sand base with polished studio river stones and placing natural studio rocks around the perimeter using miniature sand rake and brass level. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Smooth macro push-in tracking the formwork setup. Craftsman hands perform Leveling compacted sand base with polished studio river stones and placing natural studio rocks around the perimeter using miniature sand rake and brass level, progressing cleanly toward assembling balsa wood shuttering forms and securing with brass anchor pins. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "sand_level",
+            "narration": "Leveling the sand base and studio rocks."
+          },
+          {
+            "stage_num": 2,
+            "title": "Formwork & Pins",
+            "action": "Assembling balsa wood shuttering forms and securing with brass anchor pins",
+            "tool": "balsa wood shuttering forms and brass anchor pins",
+            "image_prompt": "Stage 2/5 of Mini Minimalist Pavilion & Pool Part 1: Hands-on miniature construction photography (9:16 vertical). Eye-level close-up showing metal pins and grid mesh placement. Craftsman hands actively performing: Assembling balsa wood shuttering forms and securing with brass anchor pins using balsa wood shuttering forms and brass anchor pins. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Low-angle lateral macro glide tracking pin alignment. Craftsman hands perform Assembling balsa wood shuttering forms and securing with brass anchor pins using balsa wood shuttering forms and brass anchor pins, progressing cleanly toward positioning fine white wire grid mesh flat inside the foundation formwork. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "pin_placement",
+            "narration": "Formwork pinned firmly in place."
+          },
+          {
+            "stage_num": 3,
+            "title": "Grid Mesh",
+            "action": "Positioning fine white wire grid mesh flat inside the foundation formwork",
+            "tool": "fine white wire grid mesh and tweezers",
+            "image_prompt": "Stage 3/5 of Mini Minimalist Pavilion & Pool Part 1: Hands-on miniature construction photography (9:16 vertical). Dynamic macro action angle capturing wet cement slurry pouring. Craftsman hands actively performing: Positioning fine white wire grid mesh flat inside the foundation formwork using fine white wire grid mesh and tweezers. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Top-down macro tilt tracking wet cement flow. Craftsman hands perform Positioning fine white wire grid mesh flat inside the foundation formwork using fine white wire grid mesh and tweezers, progressing cleanly toward pouring light grey architectural cement slurry into the formwork and smoothing with a mini trowel. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "pin_placement",
+            "narration": "Reinforcing mesh laid inside the frame."
+          },
+          {
+            "stage_num": 4,
+            "title": "Slurry Pour & Screed",
+            "action": "Pouring light grey architectural cement slurry into the formwork and smoothing with a mini trowel",
+            "tool": "cement pouring vessel and mini stainless trowel",
+            "image_prompt": "Stage 4/5 of Mini Minimalist Pavilion & Pool Part 1: Hands-on miniature construction photography (9:16 vertical). Razor-sharp macro detail of mini trowel smoothing and leveling. Craftsman hands actively performing: Pouring light grey architectural cement slurry into the formwork and smoothing with a mini trowel using cement pouring vessel and mini stainless trowel. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Precise diagonal glide following the mini trowel blade. Craftsman hands perform Pouring light grey architectural cement slurry into the formwork and smoothing with a mini trowel using cement pouring vessel and mini stainless trowel, progressing cleanly toward stripping the balsa wood shuttering forms to reveal razor-smooth cured concrete foundation and stairs. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "cement_pour",
+            "narration": "Pouring the wet cement slurry."
+          },
+          {
+            "stage_num": 5,
+            "title": "Formwork Strip Reveal",
+            "action": "Stripping the balsa wood shuttering forms to reveal razor-smooth cured concrete foundation and stairs",
+            "tool": "pin puller and gentle hand strip",
+            "image_prompt": "Stage 5/5 of Mini Minimalist Pavilion & Pool Part 1: Hands-on miniature construction photography (9:16 vertical). Grand macro reveal angle stripping the wood formwork to reveal razor-smooth cured concrete. Craftsman hands actively performing: Stripping the balsa wood shuttering forms to reveal razor-smooth cured concrete foundation and stairs using pin puller and gentle hand strip. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Majestic slow pull-back and elevation reveal of the demolded structure. Craftsman hands perform Stripping the balsa wood shuttering forms to reveal razor-smooth cured concrete foundation and stairs using pin puller and gentle hand strip, progressing cleanly toward celebrating the smooth demolded concrete reveal. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "formwork_strip",
+            "narration": "Stripping the formwork. Look at this finish!"
+          }
+        ]
+      }
     }
   ],
-  "last_updated": "2026-11-21T22:03:19.086Z"
+  "last_updated": "2026-11-21T22:13:44.930Z"
 }

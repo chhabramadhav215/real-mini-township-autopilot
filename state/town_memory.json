@@ -44,16 +44,25 @@
     "cron_utc": "12:00 UTC",
     "cron_ist": "05:30 PM IST",
     "cron_schedule": "0 12 * * *",
-    "episode": 4,
+    "episode": 9,
     "camera_seed": 739215,
     "diorama_anchor_prompt": "Hands-on miniature modern architecture worksite on fine white quartz sand base with natural studio rocks and consistent backdrop. Thin birch plywood shuttering formwork, metal pins, white grid mesh, smooth poured grey concrete.",
     "built_structures": [
       "Mini Modern Villa: Smooth concrete foundation slab and entrance stairs",
       "Mini Modern Villa: Structural concrete columns and ground terrace deck",
       "Mini Modern Villa: Stacked miniature brick walls and concrete headers",
-      "Mini Modern Villa: Cantilever roof slab and filled infinity pool"
+      "Mini Modern Villa: Cantilever roof slab and filled infinity pool",
+      "Mini Minimalist Pavilion & Pool Part 1: Smooth concrete foundation slab and entrance stairs on compacted sand base with polished studio river stones"
     ],
-    "active_multipart": null,
+    "active_multipart": {
+      "structure_name": "Minimalist Pavilion & Pool",
+      "structure_index": 2,
+      "series_label": "Mini Minimalist Pavilion & Pool Part 2",
+      "part": 2,
+      "total_parts": 4,
+      "milestone": "Part 2 construction",
+      "prior_state": "Smooth concrete foundation slab and entrance stairs on compacted sand base with polished studio river stones"
+    },
     "completed_series": [
       "Mini Modern Villa (Parts 1-4 Complete)"
     ],
@@ -98,6 +107,16 @@
         "total_parts": 4,
         "subtitle_2word": "VILLA REVEAL",
         "completed_at": "2026-11-19T17:29:27.835Z"
+      },
+      {
+        "episode": 9,
+        "title": "Mini Minimalist Pavilion & Pool Part 1: Minimalist Pavilion & Pool - Foundation & Earthworks",
+        "structure_name": "Minimalist Pavilion & Pool",
+        "series_label": "Mini Minimalist Pavilion & Pool Part 1",
+        "part": 1,
+        "total_parts": 4,
+        "subtitle_2word": "PAVILION BASE",
+        "completed_at": "2026-11-21T22:13:44.932Z"
       }
     ]
   },
