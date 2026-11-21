@@ -107,24 +107,24 @@ function buildSanitizedEngineeringPrompt(stage, townKey) {
 
   let basePrompt = stage.image_prompt || '';
 
-  // Dynamic macro studio camera angles per stage
-  let stageFraming = 'Macro 45-degree angle focusing on hands-on miniature construction';
+  // Dynamic macro studio camera angles per stage with continuous physical craftsmanship
+  let stageFraming = 'Macro 45-degree angle with active craftsman hands performing hands-on miniature construction';
   if (stageNum === 1) {
-    stageFraming = 'Wide establishing macro angle showing craftsman hands preparing the sand base and thin plywood shuttering formwork';
+    stageFraming = 'Continuous hands-on action: craftsman hands actively setting up and pressing thin plywood shuttering boards and inserting metal pins on the sand base';
   } else if (stageNum === 2) {
-    stageFraming = 'Crisp eye-level close-up showing steel pins securing wood formwork and white grid mesh placement';
+    stageFraming = 'Continuous hands-on action: craftsman hands actively securing formwork joints with metal pins and tweezers placing white grid mesh';
   } else if (stageNum === 3) {
-    stageFraming = 'Dynamic macro action shot of pouring viscous grey cement slurry into the formwork';
+    stageFraming = 'Continuous live-action pouring: craftsman hands steadily pouring viscous flowing grey cement slurry into the formwork channels';
   } else if (stageNum === 4) {
-    stageFraming = 'Razor-sharp macro detail of mini stainless steel trowel screeding wet cement dead-flat';
+    stageFraming = 'Continuous hands-on screeding: craftsman hands actively dragging and vibrating a mini stainless steel trowel and screed blade across wet cement dead-flat';
   } else {
-    stageFraming = 'Grand cinematic reveal shot stripping away the wood formwork to reveal razor-smooth cured concrete and stairs';
+    stageFraming = 'Continuous hands-on demolding reveal: craftsman hands actively pulling metal pins and peeling away wood shuttering boards to reveal razor-smooth cured concrete';
   }
 
   // Reject and replace any legacy full-scale roadwork or monsoon prompt
   const hasLegacyTerms = /\b(monsoon|culvert|asphalt|trench|excavator|bulldozer|traffic cone|roadwork|catch basin|pothole)\b/i.test(basePrompt);
   if (!basePrompt || basePrompt.length < 50 || hasLegacyTerms) {
-    basePrompt = `Stage ${stageNum}/5: Authentic hands-on miniature construction photography (9:16 vertical). ${stageFraming}. Craftsman hands performing: ${cleanAction} using ${cleanTool}. Real miniature building materials on a fine sand and soil base with studio rocks: thin plywood shuttering formwork, metal pins, white grid mesh, wet grey cement slurry, and miniature bricks. Warm directional studio lighting casting crisp shadows, macro lens with shallow depth of field, Sony FX6 cinema camera, 8k resolution physical craftsmanship.`;
+    basePrompt = `Stage ${stageNum}/5: Authentic hands-on miniature construction photography (9:16 vertical). ${stageFraming}. Craftsman hands performing: ${cleanAction} using ${cleanTool}. Real miniature building materials on a fine sand and soil base with studio rocks: thin plywood shuttering formwork, metal pins, white grid mesh, wet grey cement slurry, and miniature bricks. Warm directional studio lighting casting crisp shadows, macro lens with shallow depth of field, Sony FX6 cinema camera, crisp macro physical craftsmanship.`;
   }
 
   // Clean any remaining legacy terms
@@ -138,7 +138,7 @@ function buildSanitizedEngineeringPrompt(stage, townKey) {
   // Append explicit negative guidance / realism enforcement
   const cleanPrompt = `${basePrompt.trim()} Consistent studio background, sand and soil base with natural studio rocks. Real miniature craftsmanship: thin wood shuttering, metal pins, white grid mesh, pouring grey cement slurry, mini trowel screed, formwork stripping reveal. Zero full-size construction machinery, no giant vehicles, no heavy excavators, no bulldozers, no monsoon flooding, no deformed fingers, no CGI cartoons. Crisp photorealistic macro studio cinematography.`;
 
-  return cleanPrompt.replace(/\b4k\b/gi, '720p, 5s duration');
+  return cleanPrompt.replace(/\b(4k|8k|1080p|1440p|uhd)\b/gi, '720p, 5s duration');
 }
 
 /**
@@ -517,21 +517,21 @@ function getStageMotionFilter(stageNum, duration) {
   const num = ((Math.max(1, stageNum) - 1) % 5) + 1;
   switch (num) {
     case 1:
-      // Stage 1: Establishing Push-In + Upward Tilt
-      return `scale=w='2*trunc((1080*(1.05+0.12*(t/${D})))/2)':h='2*trunc((1920*(1.05+0.12*(t/${D})))/2)':eval=frame,crop=1080:1920:'(in_w-1080)*(0.30+0.40*(t/${D}))':'(in_h-1920)*(0.65-0.35*(t/${D}))'`;
+      // Stage 1: Active Hands-On Push-In & Upward Tilt Tracking
+      return `scale=w='2*trunc((1080*(1.08+0.22*(t/${D})))/2)':h='2*trunc((1920*(1.08+0.22*(t/${D})))/2)':eval=frame,crop=1080:1920:'(in_w-1080)*(0.25+0.55*(t/${D}))':'(in_h-1920)*(0.70-0.45*(t/${D}))'`;
     case 2:
-      // Stage 2: Smooth Lateral Dolly Pan Left-to-Right
-      return `scale=w='2*trunc((1080*1.16)/2)':h='2*trunc((1920*1.16)/2)':eval=init,crop=1080:1920:'(in_w-1080)*(0.15+0.70*(t/${D}))':'(in_h-1920)*(0.45+0.08*sin(t*1.2))'`;
+      // Stage 2: Dynamic Lateral Dolly Pan Left-to-Right
+      return `scale=w='2*trunc((1080*1.24)/2)':h='2*trunc((1920*1.24)/2)':eval=init,crop=1080:1920:'(in_w-1080)*(0.10+0.80*(t/${D}))':'(in_h-1920)*(0.40+0.18*sin(t*1.5))'`;
     case 3:
-      // Stage 3: Close-Up Worksite Push & Diagonal Glide
-      return `scale=w='2*trunc((1080*(1.08+0.14*(t/${D})))/2)':h='2*trunc((1920*(1.08+0.14*(t/${D})))/2)':eval=frame,crop=1080:1920:'(in_w-1080)*(0.20+0.55*(t/${D}))':'(in_h-1920)*(0.30+0.40*(t/${D}))'`;
+      // Stage 3: Close-Up Worksite Push & Diagonal Glide (active material pouring)
+      return `scale=w='2*trunc((1080*(1.12+0.20*(t/${D})))/2)':h='2*trunc((1920*(1.12+0.20*(t/${D})))/2)':eval=frame,crop=1080:1920:'(in_w-1080)*(0.15+0.65*(t/${D}))':'(in_h-1920)*(0.25+0.50*(t/${D}))'`;
     case 4:
-      // Stage 4: Smooth Lateral Dolly Pan Right-to-Left
-      return `scale=w='2*trunc((1080*1.16)/2)':h='2*trunc((1920*1.16)/2)':eval=init,crop=1080:1920:'(in_w-1080)*(0.85-0.70*(t/${D}))':'(in_h-1920)*(0.50-0.08*cos(t*1.2))'`;
+      // Stage 4: Dynamic Lateral Dolly Pan Right-to-Left (screed & leveling)
+      return `scale=w='2*trunc((1080*1.24)/2)':h='2*trunc((1920*1.24)/2)':eval=init,crop=1080:1920:'(in_w-1080)*(0.90-0.80*(t/${D}))':'(in_h-1920)*(0.55-0.18*cos(t*1.5))'`;
     case 5:
     default:
-      // Stage 5: Grand Cinematic Pull-Back & Elevation Reveal
-      return `scale=w='2*trunc((1080*(1.18-0.12*(t/${D})))/2)':h='2*trunc((1920*(1.18-0.12*(t/${D})))/2)':eval=frame,crop=1080:1920:'(in_w-1080)*(0.65-0.35*(t/${D}))':'(in_h-1920)*(0.35+0.30*(t/${D}))'`;
+      // Stage 5: Grand Reveal Pull-Back & Elevation Glide (demolding reveal)
+      return `scale=w='2*trunc((1080*(1.26-0.20*(t/${D})))/2)':h='2*trunc((1920*(1.26-0.20*(t/${D})))/2)':eval=frame,crop=1080:1920:'(in_w-1080)*(0.75-0.50*(t/${D}))':'(in_h-1920)*(0.30+0.45*(t/${D}))'`;
   }
 }
 

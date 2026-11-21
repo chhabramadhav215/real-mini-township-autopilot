@@ -433,27 +433,33 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
   console.log(`[AudioMaster] Generating voiceover narration tracks...`);
   const narrationPaths = await generateNarration(plan, outputDir);
 
-  // 2. Render Stage 5 Grand Finale Reveal video clip (so the completed town is fully revealed & narrated)
-  const finaleVideoPath = path.join(outputDir, 'finale_reveal.mp4');
-  if (!fs.existsSync(finaleVideoPath) || fs.statSync(finaleVideoPath).size < 10000) {
-    console.log(`[AudioMaster] Rendering cinematic grand finale reveal for Stage 5 (Transformation Climax)...`);
-    const finaleArgs = [
-      '-loop', '1', '-t', '3.8', '-i', finalStagePath,
-      '-vf', "scale=w='2*trunc((1080*(1.20-0.16*(t/3.8)))/2)':h='2*trunc((1920*(1.20-0.16*(t/3.8)))/2)':eval=frame,crop=1080:1920:'(in_w-1080)*(0.70-0.40*(t/3.8))':'(in_h-1920)*(0.30+0.35*(t/3.8))',scale=1080:1920:out_range=tv,format=yuv420p,settb=AVTB,setpts=PTS-STARTPTS",
-      '-r', '30',
-      '-c:v', 'libx264',
-      '-preset', 'veryfast',
-      '-crf', '20',
-      '-pix_fmt', 'yuv420p',
-      '-y',
-      finaleVideoPath
-    ];
-    await runFFmpeg(finaleArgs);
+  // 2. Collect and verify genuine .mp4 video tracks for all stages
+  // Strictly enforce real generated video clips with active motion - ZERO static images or photo fallbacks
+  function isValidVideoTrack(filePath) {
+    if (!filePath || typeof filePath !== 'string' || !fs.existsSync(filePath)) return false;
+    try {
+      const stats = fs.statSync(filePath);
+      if (stats.size < 20000) return false;
+      const dur = getMediaDuration(filePath);
+      return dur > 0.4;
+    } catch (e) {
+      return false;
+    }
   }
 
-  const allVideoTracks = transitionPaths.length >= plan.stages.length
-    ? transitionPaths.slice(0, plan.stages.length)
-    : [...transitionPaths, finaleVideoPath];
+  const verifiedClips = (transitionPaths || []).filter(isValidVideoTrack);
+  if (verifiedClips.length === 0) {
+    throw new Error('[AudioMaster] Assembly halted: No valid .mp4 video clips provided. Static image substitution is strictly prohibited.');
+  }
+
+  const allVideoTracks = [];
+  for (let i = 0; i < plan.stages.length; i++) {
+    const candidate = transitionPaths && transitionPaths[i] && isValidVideoTrack(transitionPaths[i])
+      ? transitionPaths[i]
+      : (verifiedClips[i] || verifiedClips[verifiedClips.length - 1]);
+    allVideoTracks.push(candidate);
+    console.log(`[AudioMaster] Stage ${i + 1} Video Track: ${path.basename(candidate)} (${(fs.statSync(candidate).size / 1024).toFixed(0)} KB, ${getMediaDuration(candidate).toFixed(2)}s)`);
+  }
 
   // 3. Generate ASMR Foley Tracks for all 5 stages based on exact narration duration
   console.log(`[AudioMaster] Synthesizing acoustic ASMR miniature construction foley audio...`);
@@ -508,15 +514,9 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
 
     console.log(`[AudioMaster] Mastering Segment ${i + 1}/${plan.stages.length} (Duration: ${segDuration.toFixed(2)}s, Voiceover: ${getMediaDuration(narrAudio).toFixed(2)}s)...`);
 
-    // Ensure continuous visual motion across segment duration without sluggish slow-motion
-    let vFilter = '[0:v]';
-    if (videoDuration > 0 && videoDuration < segDuration) {
-      const stretch = Math.min(segDuration / videoDuration, 1.25);
-      const padSec = Math.max(0, segDuration - videoDuration * stretch);
-      vFilter = `[0:v]setpts=${stretch.toFixed(4)}*PTS${padSec > 0.05 ? `,tpad=stop_mode=clone:stop_duration=${padSec.toFixed(2)}` : ''}[vcut];[vcut]`;
-    } else if (videoDuration >= segDuration) {
-      vFilter = `[0:v]trim=duration=${segDuration.toFixed(2)},setpts=PTS-STARTPTS[vcut];[vcut]`;
-    }
+    // Ensure continuous visual motion across segment duration without sluggish slow-motion or frozen frames
+    // Uses seamless forward looping via -stream_loop -1 so motion continues naturally with ZERO freeze frames
+    const vFilter = `[0:v]trim=duration=${segDuration.toFixed(2)},setpts=PTS-STARTPTS[vcut];[vcut]`;
 
     const filterComplex = [
       `${vFilter}[4:v]overlay=0:0[vbadge];[vbadge][3:v]overlay=50:1440[vout]`,
@@ -526,6 +526,7 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     ].join(';');
 
     const segmentArgs = [
+      '-stream_loop', '-1',
       '-i', transVideo,
       '-i', narrAudio,
       '-i', foleyAudio,

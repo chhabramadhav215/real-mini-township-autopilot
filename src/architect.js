@@ -840,30 +840,30 @@ function generateProceduralPlan(townKey, townMemory, nextEpisode) {
     const isFirst = idx === 0;
     const isLast = idx === 4;
 
-    let angleStyle = "Macro 45-degree angle focusing on hands-on miniature construction";
-    let motionCamera = "Smooth macro motorized tracking glide";
+    let angleStyle = "Macro 45-degree angle with active human hands in motion, continuous physical craftsmanship";
+    let motionCamera = "Continuous physical hands-on motion: smooth macro motorized tracking glide with uninterrupted hand movement";
 
     if (stage.stage_num === 1) {
-      angleStyle = "Wide macro establishing angle showing craftsman hands preparing formwork on the sand base";
-      motionCamera = "Smooth macro push-in tracking the formwork setup";
+      angleStyle = "Continuous hands-on action: craftsman hands actively setting up and pressing thin wood shuttering formwork boards and inserting metal pins on the sand base";
+      motionCamera = "Continuous physical hands-on motion throughout the clip: craftsman hands actively pressing and aligning wood shuttering formwork into the sand base with uninterrupted hand movement, zero static shots";
     } else if (stage.stage_num === 2) {
-      angleStyle = "Eye-level close-up showing metal pins and grid mesh placement";
-      motionCamera = "Low-angle lateral macro glide tracking pin alignment";
+      angleStyle = "Continuous hands-on action: craftsman hands actively aligning joints, inserting metal anchor pins, and laying white grid mesh";
+      motionCamera = "Continuous physical hands-on motion throughout the clip: hands actively securing formwork joints with pins and placing grid mesh with steady non-stop movement";
     } else if (stage.stage_num === 3) {
-      angleStyle = "Dynamic macro action angle capturing wet cement slurry pouring";
-      motionCamera = "Top-down macro tilt tracking wet cement flow";
+      angleStyle = "Continuous live-action pouring: hands steadily pouring viscous flowing grey cement slurry into the formwork channels";
+      motionCamera = "Continuous live-action pouring motion throughout the clip: craftsman hands steadily pouring wet grey cement slurry into the formwork channels, liquid mortar filling the forms with visible flowing motion throughout";
     } else if (stage.stage_num === 4) {
-      angleStyle = "Razor-sharp macro detail of mini trowel smoothing and leveling";
-      motionCamera = "Precise diagonal glide following the mini trowel blade";
+      angleStyle = "Continuous hands-on screeding: hands actively dragging and vibrating a mini stainless steel trowel and screed blade back and forth across wet mortar";
+      motionCamera = "Continuous hands-on leveling motion throughout the clip: craftsman hands actively dragging a mini trowel and screed bar across wet cement, leveling dead-flat with uninterrupted physical movement";
     } else {
-      angleStyle = "Grand macro reveal angle stripping the wood formwork to reveal razor-smooth cured concrete";
-      motionCamera = "Majestic slow pull-back and elevation reveal of the demolded structure";
+      angleStyle = "Continuous hands-on demolding reveal: craftsman hands actively pulling metal pins and peeling away wood shuttering boards to reveal razor-smooth cured concrete";
+      motionCamera = "Continuous hands-on reveal motion throughout the clip: craftsman hands actively peeling away wood formwork boards one by one to reveal razor-smooth cured concrete pillars, steps, and slabs, active hand movement revealing fine details throughout the clip";
     }
 
-    const imagePrompt = `Stage ${stage.stage_num}/5 of ${seriesLabel}: Hands-on miniature construction photography (9:16 vertical). ${angleStyle}. Craftsman hands actively performing: ${stage.action} using ${stage.tool}. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.`;
+    const imagePrompt = `Stage ${stage.stage_num}/5 of ${seriesLabel}: Hands-on miniature construction photography (9:16 vertical). ${angleStyle}. Craftsman hands actively performing: ${stage.action} using ${stage.tool}. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, crisp macro studio cinematography, authentic miniature craftsmanship.`;
 
     const nextActionDesc = !isLast ? partData.stages[idx + 1].action.toLowerCase() : "celebrating the smooth demolded concrete reveal";
-    const motionPrompt = `Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): ${motionCamera}. Craftsman hands perform ${stage.action} using ${stage.tool}, progressing cleanly toward ${nextActionDesc}. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.`;
+    const motionPrompt = `Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): ${motionCamera}. Craftsman hands perform ${stage.action} using ${stage.tool}, progressing cleanly toward ${nextActionDesc}. Active human hand and tool movement in every single frame, continuous live hands-on craftsmanship throughout the entire 5 seconds, zero frozen frames, thin wood shuttering, metal pins, flowing cement slurry, mini trowel screed, hands stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.`;
 
     return {
       stage_num: stage.stage_num,

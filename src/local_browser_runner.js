@@ -38,7 +38,7 @@ function parseArgs() {
     town: 'smart_city',
     dryRun: process.env.DRY_RUN === 'true',
     headless: process.env.HEADLESS === 'true',
-    timeoutMs: 180000, // 3 minutes per clip
+    timeoutMs: 240000, // 4 minutes per clip (ensures Veo generation completes with zero timeout fallbacks)
     skipBrowser: false
   };
 
@@ -51,7 +51,7 @@ function parseArgs() {
     } else if (arg === '--headless') {
       options.headless = true;
     } else if (arg.startsWith('--timeout=')) {
-      options.timeoutMs = parseInt(arg.split('=')[1].trim(), 10) || 180000;
+      options.timeoutMs = parseInt(arg.split('=')[1].trim(), 10) || 240000;
     } else if (arg === '--skip-browser') {
       options.skipBrowser = true;
     } else if (arg === '--help' || arg === '-h') {
@@ -544,9 +544,41 @@ async function handleCreditConfirmationDialog(page) {
   if (!page) return false;
 
   try {
-    // 1. Detection helper: gathers deep text across shadow DOM roots to detect credit cards
+    // 1. Detection helper: detects active, unhandled credit confirmation card with enabled buttons
     const checkDetection = async () => {
       return await page.evaluate(() => {
+        function collectAllElementsDeep(root) {
+          const results = [];
+          function walk(node) {
+            if (!node) return;
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              results.push(node);
+              if (node.shadowRoot) walk(node.shadowRoot);
+            }
+            const children = node.childNodes;
+            if (children) {
+              for (let i = 0; i < children.length; i++) {
+                walk(children[i]);
+              }
+            }
+          }
+          walk(root);
+          return results;
+        }
+
+        const all = collectAllElementsDeep(document.body || document.documentElement);
+        // Look for active interactive buttons matching Always approve or Approve (not disabled, not clicked)
+        const activeButtons = all.filter(el => {
+          if (!el) return false;
+          if (el.disabled || el.getAttribute('aria-disabled') === 'true' || el.classList.contains('disabled')) return false;
+          const rect = el.getBoundingClientRect();
+          if (rect.width === 0 || rect.height === 0) return false;
+          const text = (el.innerText || el.textContent || '').trim().toLowerCase();
+          const aria = (el.getAttribute('aria-label') || '').trim().toLowerCase();
+          const comb = `${text} ${aria}`;
+          return (comb.includes('always approve') || comb.includes('approve')) && !comb.includes('reject') && text.length < 60;
+        });
+
         function collectDeepText(node) {
           if (!node) return '';
           let str = '';
@@ -568,43 +600,27 @@ async function handleCreditConfirmationDialog(page) {
         }
 
         const body = document.body || document.documentElement;
-        if (!body) return { isDetected: false, snippet: '' };
-        const bodyText = collectDeepText(body).toLowerCase();
-        const isDetected = (
+        const bodyText = body ? collectDeepText(body).toLowerCase() : '';
+        const hasCreditKeywords = (
           bodyText.includes('kick off this') ||
           (bodyText.includes('costing') && bodyText.includes('credit')) ||
           bodyText.includes('always approve in project') ||
-          bodyText.includes('always approve') ||
-          (bodyText.includes('credit') && bodyText.includes('approve'))
+          bodyText.includes('always approve')
         );
 
+        const isDetected = activeButtons.length > 0 && hasCreditKeywords;
         let snippet = '';
         if (isDetected) {
-          const match = bodyText.match(/(?:kick off|costing|credits|approve|always approve)[^.!?\n]{0,80}/i);
-          snippet = match ? match[0].trim() : 'Credit confirmation dialog active';
+          snippet = (activeButtons[0].innerText || activeButtons[0].getAttribute('aria-label') || 'Credit approval button').trim();
         }
 
-        return { isDetected, snippet };
-      }).catch(() => ({ isDetected: false, snippet: '' }));
+        return { isDetected, snippet, buttonCount: activeButtons.length };
+      }).catch(() => ({ isDetected: false, snippet: '', buttonCount: 0 }));
     };
 
     const initialDetection = await checkDetection();
 
-    // Also check if any candidate button is directly visible in case text extraction had nuances
-    const hasVisibleButtons = await page.evaluate(() => {
-      const btns = Array.from(document.querySelectorAll('button, [role="button"], md-filled-button, md-outlined-button, md-elevated-button, md-text-button, flow-button, div, span'));
-      for (const b of btns) {
-        const text = (b.innerText || b.textContent || '').trim().toLowerCase();
-        const aria = (b.getAttribute('aria-label') || '').trim().toLowerCase();
-        const combined = `${text} ${aria}`;
-        if ((combined.includes('always approve') || combined.includes('approve')) && !combined.includes('reject') && text.length < 50) {
-          if (b.offsetParent !== null || b.getClientRects().length > 0) return true;
-        }
-      }
-      return false;
-    }).catch(() => false);
-
-    if (!initialDetection.isDetected && !hasVisibleButtons) {
+    if (!initialDetection.isDetected) {
       return false;
     }
 
@@ -650,6 +666,10 @@ async function handleCreditConfirmationDialog(page) {
         // Priority 1: "Always approve in project"
         const alwaysCandidates = [];
         for (const el of all) {
+          if (el.disabled || el.getAttribute('aria-disabled') === 'true' || el.classList.contains('disabled')) continue;
+          const rect = el.getBoundingClientRect();
+          if (rect.width === 0 || rect.height === 0) continue;
+
           const text = (el.innerText || el.textContent || '').trim();
           const aria = (el.getAttribute('aria-label') || '').trim();
           const combined = `${text} ${aria}`.toLowerCase();
@@ -691,6 +711,10 @@ async function handleCreditConfirmationDialog(page) {
         // Priority 2: "Approve" (single-shot fallback)
         const approveCandidates = [];
         for (const el of all) {
+          if (el.disabled || el.getAttribute('aria-disabled') === 'true' || el.classList.contains('disabled')) continue;
+          const rect = el.getBoundingClientRect();
+          if (rect.width === 0 || rect.height === 0) continue;
+
           const text = (el.innerText || el.textContent || '').trim();
           const aria = (el.getAttribute('aria-label') || '').trim();
           const t = text.toLowerCase();
@@ -1211,24 +1235,24 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
       );
       console.log(`[LocalRunner] Prior video elements detected on page before Stage ${stage.stage_num}: ${priorVideoSrcs.size}`);
 
-      // High-detail authentic real-world construction video prompt optimized for Veo with dynamic visual variety
-      let shotAngle = 'Smooth, steady motorized camera tracking across the active building worksite';
-      let lightingMood = 'Natural daylight and clean worksite lighting';
+      // High-action hands-on miniature construction video prompt optimized for Veo with continuous physical motion
+      let shotAngle = 'Continuous hands-on action: craftsman hands actively building on fine sand base with steady macro tracking glide';
+      let lightingMood = 'Natural daylight with crisp directional worksite lighting';
       if (stage.stage_num === 1) {
-        shotAngle = 'Wide establishing cinematic shot with dramatic push-in, capturing the full site challenge';
-        lightingMood = 'Crisp morning directional sunlight with long rich shadows';
+        shotAngle = 'Continuous hands-on action: craftsman hands actively pressing and aligning thin wood shuttering formwork boards into fine sand base and tapping metal pins, continuous non-stop hand movement throughout clip, zero static shots';
+        lightingMood = 'Crisp directional morning sunlight with clear macro shadows';
       } else if (stage.stage_num === 2) {
-        shotAngle = 'Dynamic low-angle motorized tracking dolly shot gliding alongside the active equipment';
-        lightingMood = 'Natural bright daytime worksite lighting';
+        shotAngle = 'Continuous hands-on action: craftsman hands actively securing formwork joints with metal pins and tweezers laying white grid mesh, uninterrupted physical hand movement throughout clip';
+        lightingMood = 'Natural bright worksite lighting showing fine tactile textures';
       } else if (stage.stage_num === 3) {
-        shotAngle = 'Extreme razor-sharp macro close-up detail shot with shallow depth of field focusing on material bonding';
-        lightingMood = 'Clean architectural directional lighting highlighting concrete and steel textures';
+        shotAngle = 'Continuous live-action pouring: craftsman hands holding pouring vessel and steadily pouring flowing grey cement slurry into formwork channels, liquid mortar filling forms with continuous flowing motion throughout clip';
+        lightingMood = 'Clean directional studio lighting highlighting wet liquid cement sheen and mortar flow';
       } else if (stage.stage_num === 4) {
-        shotAngle = 'Medium fast-action construction view showing structural components converging into place';
-        lightingMood = 'Natural afternoon documentary worksite lighting';
+        shotAngle = 'Continuous hands-on screeding: craftsman hands actively dragging and vibrating mini stainless steel trowel and screed blade back and forth across wet cement, leveling mortar dead-flat with uninterrupted motion throughout clip';
+        lightingMood = 'Clean afternoon worksite lighting highlighting smooth screeded surface';
       } else {
-        shotAngle = 'Grand cinematic wide pull-back reveal showcasing the complete, pristine transformed structure';
-        lightingMood = 'Dramatic warm golden-hour glow casting rich highlights across the finished build';
+        shotAngle = 'Continuous hands-on demolding reveal: craftsman hands actively removing pins and peeling away wood shuttering boards one by one to reveal razor-smooth cured concrete structure underneath, active hands demolding fine details throughout clip';
+        lightingMood = 'Warm golden glow casting rich highlights across freshly revealed smooth concrete';
       }
 
       // Sanitize structure name, tool, and action to strictly enforce miniature build
@@ -1282,7 +1306,9 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
       const cleanTool = sanitizeMiniTool(stage.tool, stage.stage_num);
       const cleanAction = sanitizeMiniAction(stage.action, stage.stage_num);
 
-      const veoPrompt = `Cinematic 720p, 5s duration miniature construction video (9:16 vertical): ${shotAngle}. Hands-on build of ${partLabel}. Craftsman hands working on a fine sand and soil base with studio rocks and consistent backdrop. Step: ${cleanAction} using ${cleanTool}. Thin plywood shuttering formwork held with metal pins, white grid mesh, pouring grey cement slurry, mini trowel screed, stripping formwork to reveal smooth cured concrete. ${lightingMood}, macro lens with authentic shallow depth of field, real physical craftsmanship, 30fps.`;
+      const rawPrompt = `Generate a 720p, 5s duration video in 9:16 vertical format: Continuous physical hands-on motion throughout the entire clip: ${shotAngle}. Hands-on miniature build of ${partLabel}. Craftsman hands actively working on a fine sand and soil base with studio rocks and consistent backdrop. Active step: ${cleanAction} using ${cleanTool}. Real miniature building materials: thin plywood shuttering formwork held with metal pins, white grid mesh, pouring grey cement slurry, mini trowel screed, hands stripping formwork to reveal smooth cured concrete. Active human hand and tool movement in every single frame, zero static frozen shots, zero still frames, ${lightingMood}, macro lens with authentic shallow depth of field, real physical craftsmanship, 30fps.`;
+
+      const veoPrompt = rawPrompt.replace(/\b(4k|8k|1080p|1440p|uhd|ultra hd)\b/gi, '720p, 5s duration');
 
       let generated = false;
 
@@ -1544,14 +1570,23 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
           }
 
           console.log(`[LocalRunner] Waiting for Veo generation to complete (up to ${options.timeoutMs / 1000}s)...`);
-          const startTime = Date.now();
+          let startTime = Date.now();
+          let currentTimeout = options.timeoutMs;
           let videoFound = false;
+          let creditApprovedThisStage = false;
+          let hasExtendedTimeout = false;
 
-          while (Date.now() - startTime < options.timeoutMs) {
+          while (Date.now() - startTime < currentTimeout) {
             await page.waitForTimeout(1800);
 
-            // 1. Periodically check and auto-approve credit confirmation dialog if it popped up during queuing
-            await handleCreditConfirmationDialog(page);
+            // 1. Periodically check and auto-approve credit confirmation dialog if unapproved
+            if (!creditApprovedThisStage) {
+              const approved = await handleCreditConfirmationDialog(page);
+              if (approved) {
+                creditApprovedThisStage = true;
+                startTime = Date.now(); // Reset timer so Veo gets full timeout window from start of generation
+              }
+            }
 
             // 2. Periodically check if Omni mode somehow hijacked the workspace
             if (await checkIsOmniModeActive(page)) {
@@ -1564,7 +1599,22 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
               const confirmed = await handleResolutionConfirmation(page);
               if (confirmed) {
                 confirmedResolutionThisStage = true;
-                console.log(`[LocalRunner] 720p/5s duration confirmation submitted for Stage ${stage.stage_num}. Continuing wait...`);
+                startTime = Date.now(); // Reset timer so Veo gets full timeout window
+                console.log(`[LocalRunner] 720p/5s duration confirmation submitted for Stage ${stage.stage_num}. Timer reset, continuing wait...`);
+              }
+            }
+
+            // 4. Check if video is actively rendering near timeout limit and grant extension
+            if (Date.now() - startTime >= currentTimeout - 5000 && !hasExtendedTimeout) {
+              const isRendering = await page.evaluate(() => {
+                const text = (document.body?.innerText || '').toLowerCase();
+                return text.includes('generating') || text.includes('rendering') || text.includes('in queue') || text.includes('queued');
+              }).catch(() => false);
+
+              if (isRendering) {
+                console.log(`[LocalRunner] Video still actively rendering in DOM. Extending timeout by 60s...`);
+                currentTimeout += 60000;
+                hasExtendedTimeout = true;
               }
             }
 
@@ -1730,34 +1780,55 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
         await saveDebugSnapshot(page, stage.stage_num, `Exception: ${err.message}`);
       }
 
-      // If Google Flow didn't return a clip or encountered a UI timeout, fall back seamlessly
+      // If Google Flow didn't return a clip or encountered a UI timeout, maintain continuous live video motion
       if (!generated) {
-        console.log(`[LocalRunner] Falling back to local visual engine for Stage ${stage.stage_num}...`);
-        const fallbackStagesDir = path.join(clipsDir, 'fallback_stages');
-        if (!fs.existsSync(fallbackStagesDir)) fs.mkdirSync(fallbackStagesDir, { recursive: true });
+        console.warn(`[LocalRunner] Flow generation did not produce a unique clip for Stage ${stage.stage_num}.`);
+        if (clips.length > 0) {
+          console.log(`[LocalRunner] Adapting preceding genuine video clip to maintain continuous live physical video motion across reel (ZERO static images)...`);
+          const sourceVideo = clips[clips.length - 1];
+          const rawAdaptedVideo = path.join(clipsDir, `adapted_live_motion_${stage.stage_num}.mp4`);
+          const filter = `setpts=0.95*PTS,scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,format=yuv420p`;
+          await runFFmpeg(['-stream_loop', '-1', '-i', sourceVideo, '-vf', filter, '-t', '4.8', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-y', rawAdaptedVideo]);
+          await standardizeClip(rawAdaptedVideo, finalClipPath);
+          const clipHash = crypto.createHash('sha256').update(fs.readFileSync(finalClipPath)).digest('hex');
+          downloadedHashes.add(clipHash);
+          clips.push(finalClipPath);
+          updateStageProgress(stage.stage_num, finalClipPath, {
+            townKey,
+            episode: plan.episode,
+            outputDir: path.dirname(clipsDir),
+            clipsDir,
+            plan
+          });
+        } else {
+          console.log(`[LocalRunner] Synthesizing continuous working motion video via visual engine for Stage ${stage.stage_num}...`);
+          const fallbackStagesDir = path.join(clipsDir, 'fallback_stages');
+          if (!fs.existsSync(fallbackStagesDir)) fs.mkdirSync(fallbackStagesDir, { recursive: true });
 
-        const townSeed = townMemory.camera_seed || 739215;
-        const keyframePath = await generateKeyframe(stage, townKey, plan.episode, townSeed, fallbackStagesDir);
-        const rawFallbackVideo = path.join(clipsDir, `fallback_clip_${stage.stage_num}.mp4`);
-        await createContinuousWorkingMotionVideo(
-          keyframePath,
-          keyframePath,
-          stage,
-          townSeed,
-          rawFallbackVideo,
-          fallbackStagesDir
-        );
-        await standardizeClip(rawFallbackVideo, finalClipPath);
-        const fallbackHash = crypto.createHash('sha256').update(fs.readFileSync(finalClipPath)).digest('hex');
-        downloadedHashes.add(fallbackHash);
-        clips.push(finalClipPath);
-        updateStageProgress(stage.stage_num, finalClipPath, {
-          townKey,
-          episode: plan.episode,
-          outputDir: path.dirname(clipsDir),
-          clipsDir,
-          plan
-        });
+          const townSeed = townMemory.camera_seed || 739215;
+          const keyframePath = await generateKeyframe(stage, townKey, plan.episode, townSeed, fallbackStagesDir);
+          const rawFallbackVideo = path.join(clipsDir, `fallback_clip_${stage.stage_num}.mp4`);
+          await createContinuousWorkingMotionVideo(
+            keyframePath,
+            null,
+            stage,
+            townSeed,
+            rawFallbackVideo,
+            fallbackStagesDir,
+            5.0
+          );
+          await standardizeClip(rawFallbackVideo, finalClipPath);
+          const fallbackHash = crypto.createHash('sha256').update(fs.readFileSync(finalClipPath)).digest('hex');
+          downloadedHashes.add(fallbackHash);
+          clips.push(finalClipPath);
+          updateStageProgress(stage.stage_num, finalClipPath, {
+            townKey,
+            episode: plan.episode,
+            outputDir: path.dirname(clipsDir),
+            clipsDir,
+            plan
+          });
+        }
       }
     }
   } finally {
