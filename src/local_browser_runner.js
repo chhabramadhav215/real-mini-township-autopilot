@@ -1109,7 +1109,12 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
         lightingMood = 'Dramatic warm golden-hour glow casting rich highlights across the finished build';
       }
 
-      const veoPrompt = `Cinematic 720p, 5s duration real-world construction process video: ${shotAngle}. Skilled adult craftsman male hands with visible skin texture and rolled dark denim work sleeves use ${stage.tool} to ${stage.action}. Authentic construction surroundings: concrete foundations, structural framing, building materials, clean ground worksite, and natural construction environment. ${lightingMood}, real physical construction craftsmanship, genuine working motion, steady camera angle, razor-sharp focus on the active build, 30fps.`;
+      const projectTitle = plan.title || 'Civil Engineering Construction';
+      const structureFocus = plan.structures_added || 'active civil infrastructure';
+      const cleanTool = (stage.tool || 'construction equipment').trim();
+      const cleanAction = (stage.action || 'assembling structure').trim();
+
+      const veoPrompt = `Cinematic 720p, 5s duration real-world construction process video: ${shotAngle}. Project: "${projectTitle}". Continuous construction of ${structureFocus}. Skilled adult craftsman male hands with visible skin texture and rolled dark denim work sleeves use ${cleanTool} to ${cleanAction}. Authentic civil construction site: concrete foundations, structural framing, building materials, clean ground worksite, and natural construction environment. ${lightingMood}, real physical construction craftsmanship, genuine working motion, steady camera angle, razor-sharp focus on the active build, 30fps. Zero gardening, no hedge walls, no pruning, no miniature diorama toys.`;
 
       let generated = false;
 

@@ -238,9 +238,13 @@ function createSubtitleOverlay(text, destSvgPath) {
   if (currentLine) lines.push(currentLine.trim());
 
   const displayLines = lines.slice(0, 2);
-  const svgHeight = displayLines.length === 1 ? 100 : 154;
-  const line1Y = displayLines.length === 1 ? 64 : 58;
-  const line2Y = 118;
+  const maxLineLength = Math.max(...displayLines.map(l => l.length), 10);
+  const pillWidth = Math.min(940, Math.max(480, maxLineLength * 31 + 80));
+  const pillX = Math.round((980 - pillWidth) / 2);
+
+  const svgHeight = displayLines.length === 1 ? 104 : 160;
+  const line1Y = displayLines.length === 1 ? 66 : 60;
+  const line2Y = 120;
 
   const svg = `<svg width="980" height="${svgHeight}" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -248,12 +252,16 @@ function createSubtitleOverlay(text, destSvgPath) {
         <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.95"/>
       </filter>
     </defs>
-    <!-- Subtle Modern Frosted Pill Backing -->
-    <rect x="16" y="8" width="948" height="${svgHeight - 16}" rx="22" fill="#000000" fill-opacity="0.52" stroke="rgba(255,255,255,0.20)" stroke-width="2"/>
-    <!-- Line 1: High-Contrast Crisp White -->
-    <text x="490" y="${line1Y}" font-family="system-ui, -apple-system, Arial, Helvetica, sans-serif" font-size="44" font-weight="900" fill="#ffffff" stroke="#000000" stroke-width="4.5" stroke-linejoin="round" text-anchor="middle" filter="url(#captionShadow)" letter-spacing="1">${displayLines[0] || ''}</text>
-    <!-- Line 2: High-Retention Accent Yellow -->
-    ${displayLines[1] ? `<text x="490" y="${line2Y}" font-family="system-ui, -apple-system, Arial, Helvetica, sans-serif" font-size="42" font-weight="900" fill="#fde047" stroke="#000000" stroke-width="4.5" stroke-linejoin="round" text-anchor="middle" filter="url(#captionShadow)" letter-spacing="1">${displayLines[1]}</text>` : ''}
+    <!-- Dynamic Rounded Frosted Backing Pill -->
+    <rect x="${pillX}" y="8" width="${pillWidth}" height="${svgHeight - 16}" rx="24" fill="#030712" fill-opacity="0.68" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+    <!-- Line 1: Background Heavy Stroke Pass (Outlined without shrinking glyph interior) -->
+    <text x="490" y="${line1Y}" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="44" font-weight="900" fill="none" stroke="#000000" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" text-anchor="middle" filter="url(#captionShadow)" letter-spacing="1">${displayLines[0] || ''}</text>
+    <!-- Line 1: Foreground Pure White Fill -->
+    <text x="490" y="${line1Y}" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="44" font-weight="900" fill="#ffffff" stroke="none" text-anchor="middle" letter-spacing="1">${displayLines[0] || ''}</text>
+    ${displayLines[1] ? `<!-- Line 2: Background Heavy Stroke Pass -->
+    <text x="490" y="${line2Y}" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="42" font-weight="900" fill="none" stroke="#000000" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" text-anchor="middle" filter="url(#captionShadow)" letter-spacing="1">${displayLines[1]}</text>
+    <!-- Line 2: Foreground High-Retention Yellow Fill -->
+    <text x="490" y="${line2Y}" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="42" font-weight="900" fill="#fde047" stroke="none" text-anchor="middle" letter-spacing="1">${displayLines[1]}</text>` : ''}
   </svg>`;
 
   fs.writeFileSync(destSvgPath, svg, 'utf8');
@@ -362,11 +370,11 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     const stage = plan.stages[i];
     const narrAudio = narrationPaths[i] || narrationPaths[0];
     const narrDuration = getMediaDuration(narrAudio);
-    // Crisp, fast-paced reel timing: 0.25s pre-roll + voiceover + 0.35s post-roll
+    // Dynamic speech fit: 0.25s pre-roll delay + voiceover + 0.45s breathing room (never truncated)
     const isClimax = (i === plan.stages.length - 1);
-    const minDur = isClimax ? 3.4 : 2.6;
-    const maxDur = isClimax ? 4.2 : 3.8;
-    const segDuration = Math.min(Math.max(narrDuration + 0.6, minDur), maxDur);
+    const minDur = isClimax ? 3.6 : 2.8;
+    const requiredDuration = narrDuration + 0.25 + 0.45;
+    const segDuration = Math.max(requiredDuration, minDur);
     segDurations.push(segDuration);
 
     const foleyPath = path.join(foleyDir, `foley_${i + 1}.wav`);
@@ -396,10 +404,10 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     // Ensure continuous visual motion across segment duration without sluggish slow-motion
     let vFilter = '[0:v]';
     if (videoDuration > 0 && videoDuration < segDuration) {
-      const stretch = Math.min(segDuration / videoDuration, 1.15);
+      const stretch = Math.min(segDuration / videoDuration, 1.25);
       const padSec = Math.max(0, segDuration - videoDuration * stretch);
       vFilter = `[0:v]setpts=${stretch.toFixed(4)}*PTS${padSec > 0.05 ? `,tpad=stop_mode=clone:stop_duration=${padSec.toFixed(2)}` : ''}[vcut];[vcut]`;
-    } else if (videoDuration > segDuration) {
+    } else if (videoDuration >= segDuration) {
       vFilter = `[0:v]trim=duration=${segDuration.toFixed(2)},setpts=PTS-STARTPTS[vcut];[vcut]`;
     }
 

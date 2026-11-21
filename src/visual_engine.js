@@ -101,8 +101,13 @@ function verifyImageFile(imagePath) {
  * Enforces dynamic visual variety across cuts (wide establishing -> tracking -> macro -> assembly -> grand reveal).
  */
 function buildSanitizedEngineeringPrompt(stage, townKey) {
-  const cleanTool = (stage.tool || 'construction equipment').trim().replace(/\b4k\b/gi, '720p, 5s duration');
-  const cleanAction = (stage.action || 'assembling structure').trim().replace(/\b4k\b/gi, '720p, 5s duration');
+  const cleanTool = (stage.tool || 'construction equipment').trim()
+    .replace(/hedge wall|pruning shears|gardening shears|hand shears/gi, 'heavy excavation equipment')
+    .replace(/\b4k\b/gi, '720p, 5s duration');
+  const cleanAction = (stage.action || 'assembling structure').trim()
+    .replace(/hedge wall|pruning shears|gardening shears/gi, 'excavation trench')
+    .replace(/clearing wild brush|trimming hedge/gi, 'excavating ground foundation')
+    .replace(/\b4k\b/gi, '720p, 5s duration');
   const stageNum = stage.stage_num || 1;
 
   let basePrompt = stage.image_prompt || '';
@@ -138,6 +143,8 @@ function buildSanitizedEngineeringPrompt(stage, townKey) {
     .replace(/extreme close-up/gi, 'macro worksite perspective')
     .replace(/macro lens/gi, '35mm cinema lens')
     .replace(/miniature|diorama|ho-scale|1:87|cutting mat|tweezers|scale model/gi, 'real-world construction')
+    .replace(/hedge wall|pruning shears|gardening shears/gi, 'heavy excavation equipment')
+    .replace(/clearing wild brush|trimming hedge/gi, 'excavating ground foundation')
     .replace(/\b4k\b/gi, '720p, 5s duration');
 
   // If no base prompt was available or it was too short, build a fresh crisp prompt
@@ -146,7 +153,7 @@ function buildSanitizedEngineeringPrompt(stage, townKey) {
   }
 
   // Append explicit negative guidance / realism enforcement
-  const cleanPrompt = `${basePrompt.trim()} Clean civil engineering scene, ${stageFraming}, sharp focus on physical structural materials. Zero human limb distortions, no disembodied hands, no surreal clay or wooden figures, no toy people, no figurines. Crisp photorealistic 8k documentary cinematography.`;
+  const cleanPrompt = `${basePrompt.trim()} Clean civil engineering scene, ${stageFraming}, sharp focus on physical structural materials. Zero human limb distortions, no disembodied hands, no surreal clay or wooden figures, no toy people, no figurines. Zero gardening themes, no green hedges, no hedge walls, no pruning shears, no axes, no household tools, no diorama, no miniature models. Crisp photorealistic 8k documentary cinematography.`;
 
   return cleanPrompt.replace(/\b4k\b/gi, '720p, 5s duration');
 }
@@ -420,7 +427,7 @@ async function tryHFI2VSpaces(firstFramePath, lastFramePath, motionPrompt, hfTok
       endpoint: '/image_to_video',
       buildArgs: (file) => [
         motionPrompt.slice(0, 200),
-        'worst quality, inconsistent motion, blurry, jittery, distorted, deformed hands, extra limbs, miniature, toy, diorama, static, frozen',
+        'worst quality, inconsistent motion, blurry, jittery, distorted, deformed hands, extra limbs, miniature, toy, diorama, static, frozen, hedge walls, pruning shears, gardening',
         file,
         null, // video_i
         704,  // height
@@ -634,38 +641,43 @@ async function generateEpisodeVisuals(plan, townKey, townMemory, outputDir) {
     keyframePaths.push(keyframePath);
   }
 
-  // 2. Generate 4 transitions connecting the 5 stages
+  // 2. Generate continuous stage motion videos for each of the 5 stages
   const transitionPaths = [];
-  for (let i = 0; i < keyframePaths.length - 1; i++) {
-    const firstPath = keyframePaths[i];
-    const lastPath = keyframePaths[i + 1];
+  for (let i = 0; i < plan.stages.length; i++) {
+    const stageKeyframe = keyframePaths[i];
     const stage = plan.stages[i];
-    const motionPrompt = stage.motion_prompt;
-    const destVideo = path.join(transitionsDir, `transition_${i + 1}.mp4`);
+    const stageNum = stage.stage_num || (i + 1);
+    const motionPrompt = stage.motion_prompt || stage.action;
+    const destVideo = path.join(transitionsDir, `stage_motion_${stageNum}.mp4`);
+    const legacyVideo = path.join(transitionsDir, `transition_${stageNum}.mp4`);
 
     if (fs.existsSync(destVideo) && fs.statSync(destVideo).size > 10000) {
-      console.log(`[VisualEngine] Using existing transition: ${path.basename(destVideo)}`);
+      console.log(`[VisualEngine] Using existing stage motion video: ${path.basename(destVideo)}`);
       transitionPaths.push(destVideo);
+      continue;
+    } else if (fs.existsSync(legacyVideo) && fs.statSync(legacyVideo).size > 10000) {
+      console.log(`[VisualEngine] Using existing transition video: ${path.basename(legacyVideo)}`);
+      transitionPaths.push(legacyVideo);
       continue;
     }
 
     console.log(`\n[VisualEngine] ==========================================`);
-    console.log(`[VisualEngine] Generating Motion Transition ${i + 1}/4 (Stage ${i + 1} -> ${i + 2})`);
+    console.log(`[VisualEngine] Generating Motion Video ${stageNum}/${plan.stages.length} (Stage ${stageNum})`);
     console.log(`[VisualEngine] Action: ${stage.action}`);
     console.log(`[VisualEngine] Tool:   ${stage.tool}`);
     console.log(`[VisualEngine] ==========================================`);
 
     // 1. Try External Commercial Video APIs (Fal.ai, Replicate, Pollinations Video)
-    let videoSuccess = await tryExternalVideoAPIs(firstPath, motionPrompt, destVideo);
+    let videoSuccess = await tryExternalVideoAPIs(stageKeyframe, motionPrompt, destVideo);
 
     // 2. Try Hugging Face I2V Spaces (LTX-Video, SVD, CogVideoX)
     if (!videoSuccess) {
-      videoSuccess = await tryHFI2VSpaces(firstPath, lastPath, motionPrompt, hfToken, destVideo);
+      videoSuccess = await tryHFI2VSpaces(stageKeyframe, null, motionPrompt, hfToken, destVideo);
     }
 
     // 3. Guaranteed Continuous Working Motion Synthesizer (Zero Dissolve Grain / Zero Ghosting)
     if (!videoSuccess) {
-      videoSuccess = await createContinuousWorkingMotionVideo(firstPath, lastPath, stage, townSeed, destVideo, transitionsDir);
+      videoSuccess = await createContinuousWorkingMotionVideo(stageKeyframe, null, stage, townSeed, destVideo, transitionsDir, 5.0);
     }
 
     transitionPaths.push(destVideo);

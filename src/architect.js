@@ -28,9 +28,9 @@ const PROCEDURAL_BLUEPRINTS = {
       stages: [
         {
           stage_num: 1,
-          action: "Clearing stubborn surface roots and wild brush from the ground using steel shears and trenching cutters",
-          tool: "heavy hand shears and ground cutters",
-          asmr_type: "grass_trimming",
+          action: "Excavating dense rocky soil and clearing raw ground along the corridor using a heavy steel mattock pickaxe and trenching spade",
+          tool: "heavy steel mattock pickaxe and trenching spade",
+          asmr_type: "dirt_scraping",
           narration: "This raw corridor was completely blocked by stubborn roots and rocks. Watch us carve the avenue."
         },
         {
@@ -313,9 +313,9 @@ const PROCEDURAL_BLUEPRINTS = {
       stages: [
         {
           stage_num: 1,
-          action: "Clearing brush and dense roots from the mountain trail using heavy hand shears and clearing hooks",
-          tool: "hand shears and clearing hook",
-          asmr_type: "grass_trimming",
+          action: "Excavating jagged alpine rocks and leveling the rocky mountain corridor using a heavy steel mattock pickaxe and rock chisel",
+          tool: "heavy steel mattock pickaxe and rock chisel",
+          asmr_type: "dirt_scraping",
           narration: "Jagged rocks and steep cliffs blocked all access to the village. Watch us carve the road."
         },
         {
@@ -390,7 +390,7 @@ const PROCEDURAL_BLUEPRINTS = {
           stage_num: 5,
           action: "Setting wide flat capstones along the wall crest and pointing joints with a setting mallet",
           tool: "masonry trowel and setting mallet",
-          asmr_type: "grass_trimming",
+          asmr_type: "brick_tapping",
           narration: "Wide capstones tapped tight. This massive retaining wall will hold the mountain for centuries!"
         }
       ]
@@ -459,7 +459,7 @@ const PROCEDURAL_BLUEPRINTS = {
           stage_num: 1,
           action: "Brushing away dry red sand drifts and clearing brittle desert scrub with clearing rakes",
           tool: "sand broom and clearing rake",
-          asmr_type: "grass_trimming",
+          asmr_type: "dirt_scraping",
           narration: "Shifting sand dunes swallowed every vehicle in this desert. Watch us pave it forever."
         },
         {
@@ -812,6 +812,7 @@ async function planEpisode(townKey, townMemory, forcedEpisode = null) {
 
 module.exports = {
   planEpisode,
+  generateProceduralPlan,
   CRAFTSMAN_HANDS_DESCRIPTION,
   CAMERA_BASE_PROMPT,
   PROCEDURAL_BLUEPRINTS
