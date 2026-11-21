@@ -1109,11 +1109,56 @@ async function generateClipsViaGoogleFlow(plan, townKey, townMemory, clipsDir, o
         lightingMood = 'Dramatic warm golden-hour glow casting rich highlights across the finished build';
       }
 
-      const structureName = plan.multipart_info?.structure_name || plan.structure_name || plan.title || 'Structure';
+      // Sanitize structure name, tool, and action to strictly enforce miniature build
+      function sanitizeMiniStructureName(name, key) {
+        if (!name || typeof name !== 'string') {
+          return key === 'mountain_village' ? 'Stone Arch Bridge' : (key === 'desert_town' ? 'Desert Oasis Villa' : 'Modern Villa');
+        }
+        let clean = name.replace(/^Mini\s+/i, '').replace(/\s*[•\-–]\s*Part\s*\d+.*$/i, '').trim();
+        if (/expansion|phase|installing|clearing|subterranean|drainage|culvert|road|pavement/i.test(clean) || clean.length > 25) {
+          return key === 'mountain_village' ? 'Stone Arch Bridge' : (key === 'desert_town' ? 'Desert Oasis Villa' : 'Modern Villa');
+        }
+        return clean || 'Modern Villa';
+      }
+
+      function sanitizeMiniAction(act, sNum) {
+        const defaults = [
+          "leveling fine sand base and studio rocks around the perimeter",
+          "assembling thin plywood shuttering formwork and securing with metal pins",
+          "positioning white grid reinforcing mesh flat inside the formwork",
+          "pouring grey cement slurry into the formwork and smoothing with a mini trowel",
+          "stripping plywood shuttering to reveal smooth concrete foundation and stairs"
+        ];
+        const idx = Math.max(0, Math.min(4, (sNum || 1) - 1));
+        if (!act || typeof act !== 'string') return defaults[idx];
+        if (/monsoon|culvert|asphalt|trench|pothole|traffic cone|roadwork|catch basin/i.test(act)) {
+          return defaults[idx];
+        }
+        return act.trim();
+      }
+
+      function sanitizeMiniTool(tool, sNum) {
+        const defaults = [
+          "miniature sand rake and brass level",
+          "thin plywood shuttering boards and metal pins",
+          "white grid mesh and tweezers",
+          "cement pouring vessel and mini stainless trowel",
+          "pin puller and gentle hand strip"
+        ];
+        const idx = Math.max(0, Math.min(4, (sNum || 1) - 1));
+        if (!tool || typeof tool !== 'string') return defaults[idx];
+        if (/trenching spade|utility scoop|alignment tongs|mortar nozzle|setting mallet|roller/i.test(tool)) {
+          return defaults[idx];
+        }
+        return tool.trim();
+      }
+
+      const rawStructure = plan.multipart_info?.structure_name || plan.structure_name || '';
+      const structureName = sanitizeMiniStructureName(rawStructure, townKey);
       const partNum = plan.multipart_info?.part || plan.part || (((plan.episode - 1) % 4) + 1);
       const partLabel = `Mini ${structureName} Part ${partNum}`;
-      const cleanTool = (stage.tool || 'miniature tools').trim();
-      const cleanAction = (stage.action || 'assembling miniature structure').trim();
+      const cleanTool = sanitizeMiniTool(stage.tool, stage.stage_num);
+      const cleanAction = sanitizeMiniAction(stage.action, stage.stage_num);
 
       const veoPrompt = `Cinematic 720p, 5s duration miniature construction video (9:16 vertical): ${shotAngle}. Hands-on build of ${partLabel}. Craftsman hands working on a fine sand and soil base with studio rocks and consistent backdrop. Step: ${cleanAction} using ${cleanTool}. Thin plywood shuttering formwork held with metal pins, white grid mesh, pouring grey cement slurry, mini trowel screed, stripping formwork to reveal smooth cured concrete. ${lightingMood}, macro lens with authentic shallow depth of field, real physical craftsmanship, 30fps.`;
 

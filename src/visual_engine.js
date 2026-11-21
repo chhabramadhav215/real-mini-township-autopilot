@@ -96,8 +96,9 @@ function verifyImageFile(imagePath) {
 
 /**
  * Sanitize and format a photorealistic hands-on miniature construction prompt (9:16 vertical).
- * Features sand/soil base, studio rocks, thin wood shuttering formwork, metal pins,
+ * Strictly features sand/soil base, studio rocks, thin wood shuttering formwork, metal pins,
  * white grid mesh, pouring grey cement slurry, leveling with mini trowel, and formwork stripping reveal.
+ * Strips out and rejects any legacy roadwork, monsoon floods, trenches, culverts, or heavy vehicles.
  */
 function buildSanitizedEngineeringPrompt(stage, townKey) {
   const cleanTool = (stage.tool || 'miniature construction tools').trim().replace(/\b4k\b/gi, '720p, 5s duration');
@@ -120,13 +121,22 @@ function buildSanitizedEngineeringPrompt(stage, townKey) {
     stageFraming = 'Grand cinematic reveal shot stripping away the wood formwork to reveal razor-smooth cured concrete and stairs';
   }
 
-  // If no base prompt was available or it was too short, build a fresh crisp prompt
-  if (!basePrompt || basePrompt.length < 50) {
+  // Reject and replace any legacy full-scale roadwork or monsoon prompt
+  const hasLegacyTerms = /\b(monsoon|culvert|asphalt|trench|excavator|bulldozer|traffic cone|roadwork|catch basin|pothole)\b/i.test(basePrompt);
+  if (!basePrompt || basePrompt.length < 50 || hasLegacyTerms) {
     basePrompt = `Stage ${stageNum}/5: Authentic hands-on miniature construction photography (9:16 vertical). ${stageFraming}. Craftsman hands performing: ${cleanAction} using ${cleanTool}. Real miniature building materials on a fine sand and soil base with studio rocks: thin plywood shuttering formwork, metal pins, white grid mesh, wet grey cement slurry, and miniature bricks. Warm directional studio lighting casting crisp shadows, macro lens with shallow depth of field, Sony FX6 cinema camera, 8k resolution physical craftsmanship.`;
   }
 
+  // Clean any remaining legacy terms
+  basePrompt = basePrompt
+    .replace(/\bmonsoon floods?[^.]*\./gi, 'Leveling the sand base and studio rocks.')
+    .replace(/\bculverts?\b/gi, 'shuttering formwork')
+    .replace(/\basphalt avenue\b/gi, 'miniature foundation')
+    .replace(/\btrenching spade\b/gi, 'miniature trowel')
+    .replace(/\bcatch basins?\b/gi, 'concrete footings');
+
   // Append explicit negative guidance / realism enforcement
-  const cleanPrompt = `${basePrompt.trim()} Consistent studio background, sand and soil base with studio rocks. Zero full-size construction machinery, no giant human limbs, no CGI cartoons, no low resolution, no deformed fingers, no blurry morphing. Crisp photorealistic macro studio cinematography.`;
+  const cleanPrompt = `${basePrompt.trim()} Consistent studio background, sand and soil base with natural studio rocks. Real miniature craftsmanship: thin wood shuttering, metal pins, white grid mesh, pouring grey cement slurry, mini trowel screed, formwork stripping reveal. Zero full-size construction machinery, no giant vehicles, no heavy excavators, no bulldozers, no monsoon flooding, no deformed fingers, no CGI cartoons. Crisp photorealistic macro studio cinematography.`;
 
   return cleanPrompt.replace(/\b4k\b/gi, '720p, 5s duration');
 }
@@ -400,7 +410,7 @@ async function tryHFI2VSpaces(firstFramePath, lastFramePath, motionPrompt, hfTok
       endpoint: '/image_to_video',
       buildArgs: (file) => [
         motionPrompt.slice(0, 200),
-        'worst quality, inconsistent motion, blurry, jittery, distorted, deformed hands, extra limbs, miniature, toy, diorama, static, frozen, hedge walls, pruning shears, gardening',
+        'worst quality, inconsistent motion, blurry, jittery, distorted, deformed hands, extra limbs, full-scale excavators, heavy construction vehicles, monsoon flooding, full-size roadwork, static, frozen, hedge walls, pruning shears',
         file,
         null, // video_i
         704,  // height

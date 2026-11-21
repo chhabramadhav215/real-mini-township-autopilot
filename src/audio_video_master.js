@@ -41,6 +41,49 @@ function getMediaDuration(mediaPath) {
 }
 
 /**
+ * Sanitize stage narration to strictly enforce punchy, short ASMR lines (4-7 words)
+ * and reject any legacy full-scale roadwork, monsoon floods, trenches, or culverts.
+ */
+function sanitizeNarration(text, stageNum) {
+  const defaults = [
+    "Leveling the sand base and studio rocks.",
+    "Formwork pinned firmly in place.",
+    "Reinforcing mesh laid inside frame.",
+    "Pouring the wet cement slurry.",
+    "Stripping formwork. Look at this finish!"
+  ];
+  const stageIdx = Math.max(0, Math.min(4, (stageNum || 1) - 1));
+  if (!text || typeof text !== 'string') return defaults[stageIdx];
+
+  const forbidden = /\b(monsoon|culvert|asphalt|trench|pothole|traffic cone|roadwork|catch basin|avenue one|flood-proof|excavating|bedding|lowered and aligned|drainage)\b/i;
+  if (forbidden.test(text) || text.split(/\s+/).length > 9) {
+    return defaults[stageIdx];
+  }
+  return text.trim();
+}
+
+/**
+ * Sanitize structure name to prevent legacy runaway titles from breaking badge pills
+ */
+function sanitizeStructureName(name, townKey) {
+  if (!name || typeof name !== 'string') {
+    if (townKey === 'mountain_village') return 'Stone Arch Bridge';
+    if (townKey === 'desert_town') return 'Desert Oasis Villa';
+    return 'Modern Villa';
+  }
+
+  let clean = name.replace(/^Mini\s+/i, '').trim();
+  clean = clean.replace(/\s*[•\-–]\s*Part\s*\d+.*$/i, '').replace(/\s+Part\s*\d+.*$/i, '').trim();
+
+  if (/expansion|phase|installing|clearing|subterranean|drainage|culvert|road|pavement|petrol station|streetlamp|well/i.test(clean) || clean.length > 25) {
+    if (townKey === 'mountain_village') return 'Stone Arch Bridge';
+    if (townKey === 'desert_town') return 'Desert Oasis Villa';
+    return 'Modern Villa';
+  }
+  return clean || 'Modern Villa';
+}
+
+/**
  * Generate calm US-English narration using edge-tts (en-US-AndrewNeural)
  */
 async function generateNarration(plan, outputDir) {
@@ -52,13 +95,19 @@ async function generateNarration(plan, outputDir) {
   for (let i = 0; i < plan.stages.length; i++) {
     const stage = plan.stages[i];
     const destMp3 = path.join(narrationDir, `narration_${stage.stage_num}.mp3`);
+    const txtMetaPath = path.join(narrationDir, `narration_${stage.stage_num}.txt`);
 
-    if (fs.existsSync(destMp3) && fs.statSync(destMp3).size > 1000) {
-      narrationPaths.push(destMp3);
-      continue;
+    const text = sanitizeNarration(stage.narration, stage.stage_num);
+
+    // Reuse audio only if existing MP3 exists AND matches the sanitized text
+    if (fs.existsSync(destMp3) && fs.existsSync(txtMetaPath) && fs.statSync(destMp3).size > 1000) {
+      const existingText = fs.readFileSync(txtMetaPath, 'utf8').trim();
+      if (existingText === text) {
+        narrationPaths.push(destMp3);
+        continue;
+      }
     }
 
-    const text = stage.narration || `Stage ${stage.stage_num}: authentic construction process.`;
     let synthesized = false;
 
     // Retry with delay and fresh instance for robust Edge TTS synthesis
@@ -85,8 +134,9 @@ async function generateNarration(plan, outputDir) {
           } catch (e) {
             fs.copyFileSync(generatedAudio, destMp3);
           }
+          fs.writeFileSync(txtMetaPath, text, 'utf8');
           fs.rmSync(tempSubDir, { recursive: true, force: true });
-          console.log(`[AudioMaster] Generated punchy TTS narration for Stage ${stage.stage_num} via AndrewNeural (1.12x)`);
+          console.log(`[AudioMaster] Generated punchy TTS narration for Stage ${stage.stage_num} via AndrewNeural (1.12x): "${text}"`);
           synthesized = true;
           // Short delay between requests to respect edge socket reset
           await new Promise(r => setTimeout(r, 600));
@@ -109,6 +159,7 @@ async function generateNarration(plan, outputDir) {
         destMp3
       ];
       await runFFmpeg(synthArgs);
+      fs.writeFileSync(txtMetaPath, text, 'utf8');
     }
 
     narrationPaths.push(destMp3);
@@ -184,20 +235,28 @@ async function generateBackgroundMusic(durationSeconds, destPath) {
  * Create clean top-left part/series label badge SVG (e.g., Mini Modern Villa • Part 1)
  */
 function createPartLabelOverlay(partLabel, destSvgPath) {
-  const cleanLabel = (partLabel || 'Mini Build • Part 1')
+  let cleanLabel = (partLabel || 'Mini Build • Part 1')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .trim();
 
+  // Enforce "Mini [Structure] • Part N" format
+  if (!cleanLabel.startsWith('Mini ')) {
+    cleanLabel = `Mini ${cleanLabel}`;
+  }
+  if (!cleanLabel.includes('• Part ')) {
+    cleanLabel = `${cleanLabel} • Part 1`;
+  }
+
   const labelLength = cleanLabel.length;
-  const pillWidth = Math.min(860, Math.max(380, labelLength * 18 + 80));
-  const pillX = 60;
+  const pillWidth = Math.min(880, Math.max(340, labelLength * 17 + 80));
+  const pillX = 50;
 
   const svg = `<svg width="1080" height="180" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <filter id="pillShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <filter id="pillShadow" x="-20%" y="-20%" width="140%" height="140%">
         <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.85"/>
       </filter>
       <linearGradient id="dotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -205,12 +264,12 @@ function createPartLabelOverlay(partLabel, destSvgPath) {
         <stop offset="100%" stop-color="#059669"/>
       </linearGradient>
     </defs>
-    <!-- Frosted Dark Pill Backing -->
-    <rect x="${pillX}" y="60" width="${pillWidth}" height="68" rx="22" fill="#030712" fill-opacity="0.80" stroke="rgba(255,255,255,0.22)" stroke-width="2" filter="url(#pillShadow)"/>
-    <!-- Glowing Accent Dot -->
-    <circle cx="${pillX + 32}" cy="94" r="8" fill="url(#dotGrad)"/>
+    <!-- Frosted Dark High-Contrast Pill Backing -->
+    <rect x="${pillX}" y="50" width="${pillWidth}" height="66" rx="22" fill="#090d18" fill-opacity="0.88" stroke="rgba(255,255,255,0.28)" stroke-width="2" filter="url(#pillShadow)"/>
+    <!-- Glowing Emerald Status Dot -->
+    <circle cx="${pillX + 28}" cy="83" r="7" fill="url(#dotGrad)"/>
     <!-- Clean Part / Series Label Typography -->
-    <text x="${pillX + 54}" y="103" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="28" font-weight="900" fill="#ffffff" letter-spacing="1.2">${cleanLabel}</text>
+    <text x="${pillX + 48}" y="92" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="26" font-weight="900" fill="#ffffff" letter-spacing="1.2">${cleanLabel}</text>
   </svg>`;
 
   fs.writeFileSync(destSvgPath, svg, 'utf8');
@@ -254,7 +313,7 @@ function createBadgeOverlay(townKey, townMemory, episodeNum, destSvgPath) {
 
 /**
  * Create lower-center high-retention short-form subtitle overlay
- * Features crisp typography, high-contrast yellow/white gradient, bold dark stroke, and drop shadow
+ * Features crisp typography, high-contrast yellow/white gradient, bold dark stroke behind fill, and drop shadow
  */
 function createSubtitleOverlay(text, destSvgPath) {
   const cleanText = (text || '')
@@ -264,13 +323,13 @@ function createSubtitleOverlay(text, destSvgPath) {
     .replace(/"/g, '&quot;')
     .trim();
 
-  // Split into punchy 3-5 word lines (max ~28 chars per line)
+  // Split into punchy 3-5 word lines (max ~24 chars per line)
   const words = cleanText.split(/\s+/);
   const lines = [];
   let currentLine = '';
 
   for (const w of words) {
-    if ((currentLine + ' ' + w).length > 28) {
+    if ((currentLine + ' ' + w).length > 24) {
       lines.push(currentLine.trim());
       currentLine = w;
     } else {
@@ -281,12 +340,12 @@ function createSubtitleOverlay(text, destSvgPath) {
 
   const displayLines = lines.slice(0, 2);
   const maxLineLength = Math.max(...displayLines.map(l => l.length), 10);
-  const pillWidth = Math.min(940, Math.max(480, maxLineLength * 31 + 80));
+  const pillWidth = Math.min(940, Math.max(380, maxLineLength * 28 + 64));
   const pillX = Math.round((980 - pillWidth) / 2);
 
-  const svgHeight = displayLines.length === 1 ? 104 : 160;
-  const line1Y = displayLines.length === 1 ? 66 : 60;
-  const line2Y = 120;
+  const svgHeight = displayLines.length === 1 ? 96 : 150;
+  const line1Y = displayLines.length === 1 ? 60 : 54;
+  const line2Y = 112;
 
   const svg = `<svg width="980" height="${svgHeight}" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -294,16 +353,12 @@ function createSubtitleOverlay(text, destSvgPath) {
         <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.95"/>
       </filter>
     </defs>
-    <!-- Dynamic Rounded Frosted Backing Pill -->
-    <rect x="${pillX}" y="8" width="${pillWidth}" height="${svgHeight - 16}" rx="24" fill="#030712" fill-opacity="0.68" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
-    <!-- Line 1: Background Heavy Stroke Pass (Outlined without shrinking glyph interior) -->
-    <text x="490" y="${line1Y}" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="44" font-weight="900" fill="none" stroke="#000000" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" text-anchor="middle" filter="url(#captionShadow)" letter-spacing="1">${displayLines[0] || ''}</text>
-    <!-- Line 1: Foreground Pure White Fill -->
-    <text x="490" y="${line1Y}" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="44" font-weight="900" fill="#ffffff" stroke="none" text-anchor="middle" letter-spacing="1">${displayLines[0] || ''}</text>
-    ${displayLines[1] ? `<!-- Line 2: Background Heavy Stroke Pass -->
-    <text x="490" y="${line2Y}" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="42" font-weight="900" fill="none" stroke="#000000" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" text-anchor="middle" filter="url(#captionShadow)" letter-spacing="1">${displayLines[1]}</text>
-    <!-- Line 2: Foreground High-Retention Yellow Fill -->
-    <text x="490" y="${line2Y}" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="42" font-weight="900" fill="#fde047" stroke="none" text-anchor="middle" letter-spacing="1">${displayLines[1]}</text>` : ''}
+    <!-- Dynamic Rounded Frosted High-Contrast Backing Pill -->
+    <rect x="${pillX}" y="6" width="${pillWidth}" height="${svgHeight - 12}" rx="22" fill="#090d18" fill-opacity="0.88" stroke="rgba(255,255,255,0.28)" stroke-width="2"/>
+    <!-- Line 1: Pure White Bold Text with Outer Stroke Protection -->
+    <text x="490" y="${line1Y}" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="42" font-weight="900" fill="#ffffff" stroke="#000000" stroke-width="4" paint-order="stroke fill" text-anchor="middle" filter="url(#captionShadow)" letter-spacing="0.8">${displayLines[0] || ''}</text>
+    ${displayLines[1] ? `<!-- Line 2: Vibrant Yellow Accent Text with Outer Stroke Protection -->
+    <text x="490" y="${line2Y}" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="40" font-weight="900" fill="#fde047" stroke="#000000" stroke-width="4" paint-order="stroke fill" text-anchor="middle" filter="url(#captionShadow)" letter-spacing="0.8">${displayLines[1]}</text>` : ''}
   </svg>`;
 
   fs.writeFileSync(destSvgPath, svg, 'utf8');
@@ -428,7 +483,8 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
   const segmentsDir = path.join(outputDir, 'segments');
   if (!fs.existsSync(segmentsDir)) fs.mkdirSync(segmentsDir, { recursive: true });
 
-  const structureName = plan.multipart_info?.structure_name || plan.structure_name || plan.title || 'Structure';
+  const rawStructure = plan.multipart_info?.structure_name || plan.structure_name || '';
+  const structureName = sanitizeStructureName(rawStructure, townKey);
   const partNum = plan.multipart_info?.part || plan.part || (((plan.episode - 1) % 4) + 1);
   const partLabel = `Mini ${structureName} • Part ${partNum}`;
   const partBadgeSvgPath = path.join(segmentsDir, 'part_badge.svg');
@@ -447,7 +503,8 @@ async function assembleMasterVideo(plan, townKey, townMemory, visualResult, outp
     const segmentDest = path.join(segmentsDir, `segment_${i + 1}.mp4`);
 
     const subSvgPath = path.join(segmentsDir, `sub_${i + 1}.svg`);
-    createSubtitleOverlay(stage.narration, subSvgPath);
+    const cleanNarrText = sanitizeNarration(stage.narration, stage.stage_num);
+    createSubtitleOverlay(cleanNarrText, subSvgPath);
 
     console.log(`[AudioMaster] Mastering Segment ${i + 1}/${plan.stages.length} (Duration: ${segDuration.toFixed(2)}s, Voiceover: ${getMediaDuration(narrAudio).toFixed(2)}s)...`);
 

@@ -905,6 +905,42 @@ function generateProceduralPlan(townKey, townMemory, nextEpisode) {
 }
 
 /**
+ * Strict Miniature Plan Validator
+ * Rejects any plan that contains forbidden full-scale roadwork, monsoon flooding, trenches, or culverts,
+ * or exceeds short punchy ASMR narration limits.
+ */
+function isStrictMiniaturePlan(plan) {
+  if (!plan || !plan.stages || plan.stages.length !== 5) return false;
+  if (!plan.is_multipart) return false;
+  if (!plan.structure_name || typeof plan.part !== 'number') return false;
+
+  const forbiddenTerms = [
+    'monsoon', 'culvert', 'asphalt', 'trenching spade', 'pothole',
+    'traffic cone', 'roadwork', 'catch basin', 'bulldozer', 'excavator',
+    'full-scale', 'civil engineering', 'sewer grate', 'fuel vault',
+    'drainage trenches', 'box culverts'
+  ];
+
+  const fullText = JSON.stringify(plan).toLowerCase();
+  for (const term of forbiddenTerms) {
+    if (fullText.includes(term)) {
+      console.warn(`[Architect] Strict miniature validation rejected plan containing forbidden term: "${term}"`);
+      return false;
+    }
+  }
+
+  // Ensure narrations are short (max 10 words per stage)
+  for (const stage of plan.stages) {
+    if (!stage.narration || stage.narration.split(/\s+/).length > 10) {
+      console.warn(`[Architect] Strict miniature validation rejected plan with overly long narration (${stage.narration?.split(/\s+/).length} words).`);
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
  * Main Architect Plan Generator
  */
 async function planEpisode(townKey, townMemory, forcedEpisode = null) {
@@ -920,8 +956,12 @@ async function planEpisode(townKey, townMemory, forcedEpisode = null) {
       console.log(`[Architect] Contacting Gemini 2.5 Flash API...`);
       const prompt = buildGeminiPrompt(townKey, townMemory, nextEpisode);
       const plan = await callGemini(prompt, apiKey);
-      console.log(`[Architect] Generated plan via Gemini: "${plan.title}"`);
-      return plan;
+      if (isStrictMiniaturePlan(plan)) {
+        console.log(`[Architect] Generated plan via Gemini: "${plan.title}"`);
+        return plan;
+      } else {
+        console.warn(`[Architect] Gemini plan failed strict miniature validation. Engaging procedural miniature generator.`);
+      }
     } catch (err) {
       console.warn(`[Architect] Gemini Notice: ${err.message}. Engaging miniature multi-part scenario generator.`);
     }
@@ -938,6 +978,7 @@ module.exports = {
   planEpisode,
   generateProceduralPlan,
   getMiniatureStructure,
+  isStrictMiniaturePlan,
   ARCHETYPE_BLUEPRINTS,
   MINIATURE_STRUCTURE_SERIES,
   PROCEDURAL_BLUEPRINTS,

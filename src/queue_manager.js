@@ -10,6 +10,36 @@ const QUEUE_FILE_PATH = path.resolve('state', 'upload_queue.json');
 const MAX_QUEUE_STORAGE_BYTES = 1800 * 1024 * 1024; // 1800 MB soft threshold
 const HARD_CAP_STORAGE_BYTES = 2048 * 1024 * 1024;  // 2048 MB (2.0 GB) hard cap
 
+function sanitizeQueueEntry(item) {
+  if (!item) return item;
+  const isLegacy = !item.plan || !item.plan.is_multipart ||
+    /monsoon|culvert|asphalt|trench|drainage|pothole|expansion phase/i.test(JSON.stringify(item.plan));
+
+  if (isLegacy) {
+    try {
+      const { generateProceduralPlan } = require('./architect');
+      const memoryPath = path.resolve('state', 'town_memory.json');
+      const memory = fs.existsSync(memoryPath) ? JSON.parse(fs.readFileSync(memoryPath, 'utf8')) : {};
+      const townMem = memory[item.townKey] || { name: item.townKey, episode: 0 };
+      const epNum = Number(item.episode) || 1;
+      const cleanPlan = generateProceduralPlan(item.townKey, townMem, epNum);
+
+      item.title = cleanPlan.title;
+      item.structure_name = cleanPlan.structure_name;
+      item.series_label = cleanPlan.series_label;
+      item.part = cleanPlan.part;
+      item.total_parts = cleanPlan.total_parts;
+      item.subtitle_2word = cleanPlan.subtitle_2word;
+      item.problem = cleanPlan.problem;
+      item.solution = cleanPlan.solution;
+      item.plan = cleanPlan;
+    } catch (e) {
+      // circular require guard during bootstrap
+    }
+  }
+  return item;
+}
+
 function loadQueue() {
   if (!fs.existsSync(QUEUE_FILE_PATH)) {
     const initial = {
@@ -22,7 +52,23 @@ function loadQueue() {
 
   try {
     const raw = fs.readFileSync(QUEUE_FILE_PATH, 'utf8');
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (parsed && Array.isArray(parsed.queue)) {
+      let modified = false;
+      parsed.queue = parsed.queue.map(item => {
+        const isLegacy = !item.plan || !item.plan.is_multipart ||
+          /monsoon|culvert|asphalt|trench|drainage|pothole|expansion phase/i.test(JSON.stringify(item.plan));
+        if (isLegacy) {
+          modified = true;
+          return sanitizeQueueEntry(item);
+        }
+        return item;
+      });
+      if (modified) {
+        saveQueue(parsed);
+      }
+    }
+    return parsed;
   } catch (e) {
     console.warn(`[QueueManager] Warning reading upload_queue.json (${e.message}). Resetting queue structure.`);
     const fallback = { queue: [], last_updated: new Date().toISOString() };
