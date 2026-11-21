@@ -1499,7 +1499,107 @@
           }
         ]
       }
+    },
+    {
+      "id": "queue_mountain_village_ep6",
+      "townKey": "mountain_village",
+      "episode": 6,
+      "title": "Mini Alpine Timber Chalet Part 2: Alpine Timber Chalet - Structural Columns & Deck",
+      "structure_name": "Alpine Timber Chalet",
+      "series_label": "Mini Alpine Timber Chalet Part 2",
+      "part": 2,
+      "total_parts": 4,
+      "subtitle_2word": "TIMBER FRAMING",
+      "problem": "The foundation slab needs structural load-bearing columns and a ground terrace deck.",
+      "solution": "Set vertical column formwork boxes with timber anchor pins, pour dense grey mountain cement slurry, and demold sleek concrete pillars and terrace deck.",
+      "tag_name": "queue-mountain_village-ep6",
+      "release_id": null,
+      "video_asset_name": "mountain_village_ep6.mp4",
+      "thumb_asset_name": "mountain_village_ep6_thumb.jpg",
+      "video_download_url": null,
+      "thumb_download_url": null,
+      "local_video_path": "C:\\real-mini-township\\queue_out\\mountain_village_ep6\\mountain_village_ep6.mp4",
+      "local_thumb_path": "C:\\real-mini-township\\queue_out\\mountain_village_ep6\\mountain_village_ep6_thumb.jpg",
+      "created_at": "2026-11-21T22:34:48.589Z",
+      "uploaded": false,
+      "uploaded_at": null,
+      "plan": {
+        "episode": 6,
+        "title": "Mini Alpine Timber Chalet Part 2: Alpine Timber Chalet - Structural Columns & Deck",
+        "structure_name": "Alpine Timber Chalet",
+        "structure_index": 1,
+        "series_label": "Mini Alpine Timber Chalet Part 2",
+        "part": 2,
+        "total_parts": 4,
+        "subtitle_2word": "TIMBER FRAMING",
+        "problem": "The foundation slab needs structural load-bearing columns and a ground terrace deck.",
+        "solution": "Set vertical column formwork boxes with timber anchor pins, pour dense grey mountain cement slurry, and demold sleek concrete pillars and terrace deck.",
+        "is_multipart": true,
+        "multipart_info": {
+          "structure_name": "Alpine Timber Chalet",
+          "structure_index": 1,
+          "series_label": "Mini Alpine Timber Chalet Part 2",
+          "part": 2,
+          "total_parts": 4,
+          "milestone": "Deck / Columns",
+          "prior_state": "Cured smooth concrete foundation slab and entrance stairs on sloped mountain sand and loam base with studio granite boulders."
+        },
+        "updated_anchor_prompt": "Hands-on miniature construction worksite on sand and soil base with studio rocks. Prior state: Cured smooth concrete foundation slab and entrance stairs on sloped mountain sand and loam base with studio granite boulders. Completed on site: Mini Alpine Timber Chalet Part 1: Smooth concrete foundation slab and entrance stairs on sloped mountain sand and loam base with studio granite boulders. Current milestone: Erected smooth concrete structural columns and ground patio deck slab. Consistent studio backdrop with warm directional lighting.",
+        "structures_added": "Erected smooth concrete structural columns and ground patio deck slab",
+        "stages": [
+          {
+            "stage_num": 1,
+            "title": "Column Formwork",
+            "action": "Erecting vertical timber column formwork boxes over foundation anchor pins",
+            "tool": "vertical column shuttering boxes and pins",
+            "image_prompt": "Stage 1/5 of Mini Alpine Timber Chalet Part 2: Hands-on miniature construction photography (9:16 vertical). Wide macro establishing angle showing craftsman hands preparing formwork on the sand base. Craftsman hands actively performing: Erecting vertical timber column formwork boxes over foundation anchor pins using vertical column shuttering boxes and pins. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Smooth macro push-in tracking the formwork setup. Craftsman hands perform Erecting vertical timber column formwork boxes over foundation anchor pins using vertical column shuttering boxes and pins, progressing cleanly toward pouring dense grey mountain cement slurry into each column box and tamping with a metal pin. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "pin_placement",
+            "narration": "Setting column formwork over anchor pins."
+          },
+          {
+            "stage_num": 2,
+            "title": "Column Pour",
+            "action": "Pouring dense grey mountain cement slurry into each column box and tamping with a metal pin",
+            "tool": "funnel and miniature tamp rod",
+            "image_prompt": "Stage 2/5 of Mini Alpine Timber Chalet Part 2: Hands-on miniature construction photography (9:16 vertical). Eye-level close-up showing metal pins and grid mesh placement. Craftsman hands actively performing: Pouring dense grey mountain cement slurry into each column box and tamping with a metal pin using funnel and miniature tamp rod. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Low-angle lateral macro glide tracking pin alignment. Craftsman hands perform Pouring dense grey mountain cement slurry into each column box and tamping with a metal pin using funnel and miniature tamp rod, progressing cleanly toward laying horizontal split-level timber footing formwork deck sheets and placing woven white grid mesh between columns. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "cement_pour",
+            "narration": "Pouring cement slurry into each column."
+          },
+          {
+            "stage_num": 3,
+            "title": "Deck Shuttering & Mesh",
+            "action": "Laying horizontal split-level timber footing formwork deck sheets and placing woven white grid mesh between columns",
+            "tool": "plywood decking sheets and mesh",
+            "image_prompt": "Stage 3/5 of Mini Alpine Timber Chalet Part 2: Hands-on miniature construction photography (9:16 vertical). Dynamic macro action angle capturing wet cement slurry pouring. Craftsman hands actively performing: Laying horizontal split-level timber footing formwork deck sheets and placing woven white grid mesh between columns using plywood decking sheets and mesh. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Top-down macro tilt tracking wet cement flow. Craftsman hands perform Laying horizontal split-level timber footing formwork deck sheets and placing woven white grid mesh between columns using plywood decking sheets and mesh, progressing cleanly toward pouring dense grey mountain cement slurry across deck formwork and leveling with an aluminum screed bar. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "pin_placement",
+            "narration": "Deck shuttering and mesh in position."
+          },
+          {
+            "stage_num": 4,
+            "title": "Deck Troweling",
+            "action": "Pouring dense grey mountain cement slurry across deck formwork and leveling with an aluminum screed bar",
+            "tool": "mini aluminum screed bar and trowel",
+            "image_prompt": "Stage 4/5 of Mini Alpine Timber Chalet Part 2: Hands-on miniature construction photography (9:16 vertical). Razor-sharp macro detail of mini trowel smoothing and leveling. Craftsman hands actively performing: Pouring dense grey mountain cement slurry across deck formwork and leveling with an aluminum screed bar using mini aluminum screed bar and trowel. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Precise diagonal glide following the mini trowel blade. Craftsman hands perform Pouring dense grey mountain cement slurry across deck formwork and leveling with an aluminum screed bar using mini aluminum screed bar and trowel, progressing cleanly toward peeling off column and deck formwork to reveal sleek concrete columns and terrace slab. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "trowel_scrape",
+            "narration": "Screeding the deck slab dead-flat."
+          },
+          {
+            "stage_num": 5,
+            "title": "Column Demolding Reveal",
+            "action": "Peeling off column and deck formwork to reveal sleek concrete columns and terrace slab",
+            "tool": "demolding spatula and gentle peel",
+            "image_prompt": "Stage 5/5 of Mini Alpine Timber Chalet Part 2: Hands-on miniature construction photography (9:16 vertical). Grand macro reveal angle stripping the wood formwork to reveal razor-smooth cured concrete. Craftsman hands actively performing: Peeling off column and deck formwork to reveal sleek concrete columns and terrace slab using demolding spatula and gentle peel. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, 8k resolution, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Majestic slow pull-back and elevation reveal of the demolded structure. Craftsman hands perform Peeling off column and deck formwork to reveal sleek concrete columns and terrace slab using demolding spatula and gentle peel, progressing cleanly toward celebrating the smooth demolded concrete reveal. Thin wood shuttering, metal pins, cement slurry, mini trowel screed, stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "formwork_strip",
+            "narration": "Stripping formwork. Sleek concrete pillars revealed."
+          }
+        ]
+      }
     }
   ],
-  "last_updated": "2026-11-21T22:22:21.853Z"
+  "last_updated": "2026-11-21T22:34:48.591Z"
 }
