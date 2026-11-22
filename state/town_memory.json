@@ -157,21 +157,22 @@
     "cron_utc": "17:00 UTC",
     "cron_ist": "10:30 PM IST",
     "cron_schedule": "0 17 * * *",
-    "episode": 5,
+    "episode": 6,
     "camera_seed": 618492,
     "diorama_anchor_prompt": "Hands-on miniature desert architecture worksite on reddish desert sand base with natural studio sandstone rocks and consistent backdrop. Thin wood shuttering, metal pins, white grid mesh, smooth poured concrete.",
     "built_structures": [
       "Mini Desert Oasis Villa Part 4: Complete Desert Oasis Villa with roof slab, stripped formwork, filled turquoise oasis pool, and natural landscaping",
-      "Mini Desert Watchtower & Rampart Part 1: Smooth concrete foundation slab and entrance stairs on dense orange desert sand base with sandstone studio boulders"
+      "Mini Desert Watchtower & Rampart Part 1: Smooth concrete foundation slab and entrance stairs on dense orange desert sand base with sandstone studio boulders",
+      "Mini Desert Watchtower & Rampart Part 2: Erected smooth concrete structural columns and ground patio deck slab"
     ],
     "active_multipart": {
       "structure_name": "Desert Watchtower & Rampart",
       "structure_index": 1,
-      "series_label": "Mini Desert Watchtower & Rampart Part 2",
-      "part": 2,
+      "series_label": "Mini Desert Watchtower & Rampart Part 3",
+      "part": 3,
       "total_parts": 4,
-      "milestone": "Part 2 construction",
-      "prior_state": "Smooth concrete foundation slab and entrance stairs on dense orange desert sand base with sandstone studio boulders"
+      "milestone": "Part 3 construction",
+      "prior_state": "Erected smooth concrete structural columns and ground patio deck slab"
     },
     "last_frame_path": "state/last_frame_desert_town.jpg",
     "history": [
@@ -194,6 +195,16 @@
         "total_parts": 4,
         "subtitle_2word": "TOWER PLINTH",
         "completed_at": "2026-11-21T22:22:21.857Z"
+      },
+      {
+        "episode": 6,
+        "title": "Mini Desert Watchtower & Rampart Part 2: Desert Watchtower & Rampart - Structural Columns & Deck",
+        "structure_name": "Desert Watchtower & Rampart",
+        "series_label": "Mini Desert Watchtower & Rampart Part 2",
+        "part": 2,
+        "total_parts": 4,
+        "subtitle_2word": "LOOKOUT DECK",
+        "completed_at": "2026-11-22T11:31:25.797Z"
       }
     ],
     "completed_series": [

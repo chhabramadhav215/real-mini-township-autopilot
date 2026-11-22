@@ -1699,7 +1699,107 @@
           }
         ]
       }
+    },
+    {
+      "id": "queue_desert_town_ep6",
+      "townKey": "desert_town",
+      "episode": 6,
+      "title": "Mini Desert Watchtower & Rampart Part 2: Desert Watchtower & Rampart - Structural Columns & Deck",
+      "structure_name": "Desert Watchtower & Rampart",
+      "series_label": "Mini Desert Watchtower & Rampart Part 2",
+      "part": 2,
+      "total_parts": 4,
+      "subtitle_2word": "LOOKOUT DECK",
+      "problem": "The foundation slab needs structural load-bearing columns and a ground terrace deck.",
+      "solution": "Set vertical column formwork boxes with radial metal pins, pour warm terracotta-tinted cement slurry, and demold sleek concrete pillars and terrace deck.",
+      "tag_name": "queue-desert_town-ep6",
+      "release_id": null,
+      "video_asset_name": "desert_town_ep6.mp4",
+      "thumb_asset_name": "desert_town_ep6_thumb.jpg",
+      "video_download_url": null,
+      "thumb_download_url": null,
+      "local_video_path": "C:\\real-mini-township\\queue_out\\desert_town_ep6\\desert_town_ep6.mp4",
+      "local_thumb_path": "C:\\real-mini-township\\queue_out\\desert_town_ep6\\desert_town_ep6_thumb.jpg",
+      "created_at": "2026-11-22T11:31:25.784Z",
+      "uploaded": false,
+      "uploaded_at": null,
+      "plan": {
+        "episode": 6,
+        "title": "Mini Desert Watchtower & Rampart Part 2: Desert Watchtower & Rampart - Structural Columns & Deck",
+        "structure_name": "Desert Watchtower & Rampart",
+        "structure_index": 1,
+        "series_label": "Mini Desert Watchtower & Rampart Part 2",
+        "part": 2,
+        "total_parts": 4,
+        "subtitle_2word": "LOOKOUT DECK",
+        "problem": "The foundation slab needs structural load-bearing columns and a ground terrace deck.",
+        "solution": "Set vertical column formwork boxes with radial metal pins, pour warm terracotta-tinted cement slurry, and demold sleek concrete pillars and terrace deck.",
+        "is_multipart": true,
+        "multipart_info": {
+          "structure_name": "Desert Watchtower & Rampart",
+          "structure_index": 1,
+          "series_label": "Mini Desert Watchtower & Rampart Part 2",
+          "part": 2,
+          "total_parts": 4,
+          "milestone": "Deck / Columns",
+          "prior_state": "Cured smooth concrete foundation slab and entrance stairs on dense orange desert sand base with sandstone studio boulders."
+        },
+        "updated_anchor_prompt": "Hands-on miniature construction worksite on sand and soil base with studio rocks. Prior state: Cured smooth concrete foundation slab and entrance stairs on dense orange desert sand base with sandstone studio boulders. Completed on site: Mini Desert Oasis Villa Part 4: Complete Desert Oasis Villa with roof slab, stripped formwork, filled turquoise oasis pool, and natural landscaping; Mini Desert Watchtower & Rampart Part 1: Smooth concrete foundation slab and entrance stairs on dense orange desert sand base with sandstone studio boulders. Current milestone: Erected smooth concrete structural columns and ground patio deck slab. Consistent studio backdrop with warm directional lighting.",
+        "structures_added": "Erected smooth concrete structural columns and ground patio deck slab",
+        "stages": [
+          {
+            "stage_num": 1,
+            "title": "Column Formwork",
+            "action": "Erecting vertical timber column formwork boxes over foundation anchor pins",
+            "tool": "vertical column shuttering boxes and pins",
+            "image_prompt": "Stage 1/5 of Mini Desert Watchtower & Rampart Part 2: Hands-on miniature construction photography (9:16 vertical). Continuous hands-on action: craftsman hands actively setting up and pressing thin wood shuttering formwork boards and inserting metal pins on the sand base. Craftsman hands actively performing: Erecting vertical timber column formwork boxes over foundation anchor pins using vertical column shuttering boxes and pins. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, crisp macro studio cinematography, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Continuous physical hands-on motion throughout the clip: craftsman hands actively pressing and aligning wood shuttering formwork into the sand base with uninterrupted hand movement, zero static shots. Craftsman hands perform Erecting vertical timber column formwork boxes over foundation anchor pins using vertical column shuttering boxes and pins, progressing cleanly toward pouring warm terracotta-tinted cement slurry into each column box and tamping with a metal pin. Active human hand and tool movement in every single frame, continuous live hands-on craftsmanship throughout the entire 5 seconds, zero frozen frames, thin wood shuttering, metal pins, flowing cement slurry, mini trowel screed, hands stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "pin_placement",
+            "narration": "Setting column formwork over anchor pins."
+          },
+          {
+            "stage_num": 2,
+            "title": "Column Pour",
+            "action": "Pouring warm terracotta-tinted cement slurry into each column box and tamping with a metal pin",
+            "tool": "funnel and miniature tamp rod",
+            "image_prompt": "Stage 2/5 of Mini Desert Watchtower & Rampart Part 2: Hands-on miniature construction photography (9:16 vertical). Continuous hands-on action: craftsman hands actively aligning joints, inserting metal anchor pins, and laying white grid mesh. Craftsman hands actively performing: Pouring warm terracotta-tinted cement slurry into each column box and tamping with a metal pin using funnel and miniature tamp rod. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, crisp macro studio cinematography, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Continuous physical hands-on motion throughout the clip: hands actively securing formwork joints with pins and placing grid mesh with steady non-stop movement. Craftsman hands perform Pouring warm terracotta-tinted cement slurry into each column box and tamping with a metal pin using funnel and miniature tamp rod, progressing cleanly toward laying horizontal curved circular timber shuttering forms deck sheets and placing curved white wire mesh between columns. Active human hand and tool movement in every single frame, continuous live hands-on craftsmanship throughout the entire 5 seconds, zero frozen frames, thin wood shuttering, metal pins, flowing cement slurry, mini trowel screed, hands stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "cement_pour",
+            "narration": "Pouring cement slurry into each column."
+          },
+          {
+            "stage_num": 3,
+            "title": "Deck Shuttering & Mesh",
+            "action": "Laying horizontal curved circular timber shuttering forms deck sheets and placing curved white wire mesh between columns",
+            "tool": "plywood decking sheets and mesh",
+            "image_prompt": "Stage 3/5 of Mini Desert Watchtower & Rampart Part 2: Hands-on miniature construction photography (9:16 vertical). Continuous live-action pouring: hands steadily pouring viscous flowing grey cement slurry into the formwork channels. Craftsman hands actively performing: Laying horizontal curved circular timber shuttering forms deck sheets and placing curved white wire mesh between columns using plywood decking sheets and mesh. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, crisp macro studio cinematography, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Continuous live-action pouring motion throughout the clip: craftsman hands steadily pouring wet grey cement slurry into the formwork channels, liquid mortar filling the forms with visible flowing motion throughout. Craftsman hands perform Laying horizontal curved circular timber shuttering forms deck sheets and placing curved white wire mesh between columns using plywood decking sheets and mesh, progressing cleanly toward pouring warm terracotta-tinted cement slurry across deck formwork and leveling with an aluminum screed bar. Active human hand and tool movement in every single frame, continuous live hands-on craftsmanship throughout the entire 5 seconds, zero frozen frames, thin wood shuttering, metal pins, flowing cement slurry, mini trowel screed, hands stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "pin_placement",
+            "narration": "Deck shuttering and mesh in position."
+          },
+          {
+            "stage_num": 4,
+            "title": "Deck Troweling",
+            "action": "Pouring warm terracotta-tinted cement slurry across deck formwork and leveling with an aluminum screed bar",
+            "tool": "mini aluminum screed bar and trowel",
+            "image_prompt": "Stage 4/5 of Mini Desert Watchtower & Rampart Part 2: Hands-on miniature construction photography (9:16 vertical). Continuous hands-on screeding: hands actively dragging and vibrating a mini stainless steel trowel and screed blade back and forth across wet mortar. Craftsman hands actively performing: Pouring warm terracotta-tinted cement slurry across deck formwork and leveling with an aluminum screed bar using mini aluminum screed bar and trowel. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, crisp macro studio cinematography, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Continuous hands-on leveling motion throughout the clip: craftsman hands actively dragging a mini trowel and screed bar across wet cement, leveling dead-flat with uninterrupted physical movement. Craftsman hands perform Pouring warm terracotta-tinted cement slurry across deck formwork and leveling with an aluminum screed bar using mini aluminum screed bar and trowel, progressing cleanly toward peeling off column and deck formwork to reveal sleek concrete columns and terrace slab. Active human hand and tool movement in every single frame, continuous live hands-on craftsmanship throughout the entire 5 seconds, zero frozen frames, thin wood shuttering, metal pins, flowing cement slurry, mini trowel screed, hands stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "trowel_scrape",
+            "narration": "Screeding the deck slab dead-flat."
+          },
+          {
+            "stage_num": 5,
+            "title": "Column Demolding Reveal",
+            "action": "Peeling off column and deck formwork to reveal sleek concrete columns and terrace slab",
+            "tool": "demolding spatula and gentle peel",
+            "image_prompt": "Stage 5/5 of Mini Desert Watchtower & Rampart Part 2: Hands-on miniature construction photography (9:16 vertical). Continuous hands-on demolding reveal: craftsman hands actively pulling metal pins and peeling away wood shuttering boards to reveal razor-smooth cured concrete. Craftsman hands actively performing: Peeling off column and deck formwork to reveal sleek concrete columns and terrace slab using demolding spatula and gentle peel. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, crisp macro studio cinematography, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Continuous hands-on reveal motion throughout the clip: craftsman hands actively peeling away wood formwork boards one by one to reveal razor-smooth cured concrete pillars, steps, and slabs, active hand movement revealing fine details throughout the clip. Craftsman hands perform Peeling off column and deck formwork to reveal sleek concrete columns and terrace slab using demolding spatula and gentle peel, progressing cleanly toward celebrating the smooth demolded concrete reveal. Active human hand and tool movement in every single frame, continuous live hands-on craftsmanship throughout the entire 5 seconds, zero frozen frames, thin wood shuttering, metal pins, flowing cement slurry, mini trowel screed, hands stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "formwork_strip",
+            "narration": "Stripping formwork. Sleek concrete pillars revealed."
+          }
+        ]
+      }
     }
   ],
-  "last_updated": "2026-11-22T11:15:13.388Z"
+  "last_updated": "2026-11-22T11:31:25.793Z"
 }
