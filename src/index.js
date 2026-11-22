@@ -71,7 +71,7 @@ async function runTownshipAutopilot(targetTownKey = null) {
 
       if (fs.existsSync(localVideoPath) && fs.statSync(localVideoPath).size > 100000) {
         console.log(`[Publisher] Pre-rendered asset verified (${(fs.statSync(localVideoPath).size / (1024 * 1024)).toFixed(2)} MB).`);
-        console.log(`[Publisher] Dispatching scheduled upload to YouTube Shorts...`);
+        console.log(`[Publisher] Dispatching scheduled multi-platform upload (YouTube Shorts, Instagram Reels, Facebook Reels)...`);
 
         const uploadResult = await processUploadAndStateCommit(
           townKey,
@@ -79,19 +79,24 @@ async function runTownshipAutopilot(targetTownKey = null) {
           queuedItem.plan || { episode: queuedItem.episode, title: queuedItem.title, subtitle_2word: queuedItem.subtitle_2word },
           localVideoPath,
           localThumbPath,
-          localThumbPath
+          localThumbPath,
+          queuedItem.video_download_url
         );
 
-        // Delete cloud release asset to conserve GitHub cloud storage
+        // Delete cloud release asset to conserve GitHub cloud storage only AFTER all platform uploads finish
         if (queuedItem.release_id || queuedItem.tag_name) {
-          console.log(`[Publisher] Deleting GitHub Release ${queuedItem.tag_name} to conserve cloud quota...`);
-          await deleteReleaseAndTag(queuedItem.release_id, queuedItem.tag_name).catch(() => {});
+          console.log(`[Publisher] All platform uploads finished. Deleting GitHub Release ${queuedItem.tag_name} to conserve cloud quota...`);
+          await deleteReleaseAndTag(queuedItem.release_id, queuedItem.tag_name).catch((delErr) => {
+            console.warn(`[Publisher] Notice deleting release: ${delErr.message}`);
+          });
         }
 
         // Mark as uploaded in queue
         markEpisodeUploaded(townKey, queuedItem.episode, {
           published_via: 'github_actions_scheduled_queue',
-          youtube_upload: uploadResult?.youtube || null
+          youtube_upload: uploadResult?.youtube || null,
+          instagram_upload: uploadResult?.instagram || null,
+          facebook_upload: uploadResult?.facebook || null
         });
 
         // Trigger post-publish local cleanup
