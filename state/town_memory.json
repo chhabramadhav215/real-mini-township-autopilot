@@ -72,7 +72,7 @@
     "cron_utc": "12:00 UTC",
     "cron_ist": "05:30 PM IST",
     "cron_schedule": "0 12 * * *",
-    "episode": 12,
+    "episode": 13,
     "camera_seed": 739215,
     "diorama_anchor_prompt": "Hands-on miniature construction worksite on sand and soil base with studio rocks. Prior state: Cured smooth concrete foundation slab and entrance stairs on compacted sand base with polished studio river stones. Completed on site: Mini Modern Villa: Stacked miniature brick walls and concrete headers; Mini Modern Villa: Cantilever roof slab and filled infinity pool; Mini Minimalist Pavilion & Pool Part 1: Smooth concrete foundation slab and entrance stairs on compacted sand base with polished studio river stones. Current milestone: Erected smooth concrete structural columns and ground patio deck slab. Consistent studio backdrop with warm directional lighting.",
     "built_structures": [
@@ -83,19 +83,13 @@
       "Mini Minimalist Pavilion & Pool Part 1: Smooth concrete foundation slab and entrance stairs on compacted sand base with polished studio river stones",
       "Erected smooth concrete structural columns and ground patio deck slab",
       "Mini Minimalist Pavilion & Pool Part 2: Erected smooth concrete structural columns and ground patio deck slab",
-      "Mini Minimalist Pavilion & Pool Part 3: Stacked dark slate miniature blocks perimeter walls with cast concrete window and door lintels"
+      "Mini Minimalist Pavilion & Pool Part 3: Stacked dark slate miniature blocks perimeter walls with cast concrete window and door lintels",
+      "Mini Minimalist Pavilion & Pool Part 4: Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping"
     ],
-    "active_multipart": {
-      "structure_name": "Minimalist Pavilion & Pool",
-      "structure_index": 2,
-      "series_label": "Mini Minimalist Pavilion & Pool Part 4",
-      "part": 4,
-      "total_parts": 4,
-      "milestone": "Part 4 construction",
-      "prior_state": "Stacked dark slate miniature blocks perimeter walls with cast concrete window and door lintels"
-    },
+    "active_multipart": null,
     "completed_series": [
-      "Mini Modern Villa (Parts 1-4 Complete)"
+      "Mini Modern Villa (Parts 1-4 Complete)",
+      "Mini Minimalist Pavilion & Pool (Parts 1-4 Complete)"
     ],
     "last_frame_path": "state/last_frame_smart_city.jpg",
     "history": [
@@ -174,6 +168,16 @@
         "total_parts": 4,
         "subtitle_2word": "SLATE WALLS",
         "completed_at": "2026-11-22T13:20:53.302Z"
+      },
+      {
+        "episode": 13,
+        "title": "Mini Minimalist Pavilion & Pool Part 4: Minimalist Pavilion & Pool - Roof Slab & Grand Transformation",
+        "structure_name": "Minimalist Pavilion & Pool",
+        "series_label": "Mini Minimalist Pavilion & Pool Part 4",
+        "part": 4,
+        "total_parts": 4,
+        "subtitle_2word": "PAVILION REVEAL",
+        "completed_at": "2026-11-22T14:06:50.327Z"
       }
     ]
   },
