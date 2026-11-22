@@ -7,23 +7,16 @@
     "cron_utc": "06:00 UTC",
     "cron_ist": "11:30 AM IST",
     "cron_schedule": "0 6 * * *",
-    "episode": 7,
+    "episode": 8,
     "camera_seed": 482910,
     "diorama_anchor_prompt": "Hands-on miniature alpine architecture worksite on mountain sand and river silt base with natural studio granite rocks. Thin timber shuttering formwork, metal pins, white grid mesh, smooth poured grey concrete.",
     "built_structures": [
       "Mini Alpine Timber Chalet Part 1: Smooth concrete foundation slab and entrance stairs on sloped mountain sand and loam base with studio granite boulders",
       "Mini Alpine Timber Chalet Part 2: Erected smooth concrete structural columns and ground patio deck slab",
-      "Mini Alpine Timber Chalet Part 3: Stacked miniature granite foundation stones perimeter walls with cast concrete window and door lintels"
+      "Mini Alpine Timber Chalet Part 3: Stacked miniature granite foundation stones perimeter walls with cast concrete window and door lintels",
+      "Mini Alpine Timber Chalet Part 4: Complete Alpine Timber Chalet with roof slab, stripped formwork, filled cascading hillside spring, and natural landscaping"
     ],
-    "active_multipart": {
-      "structure_name": "Alpine Timber Chalet",
-      "structure_index": 1,
-      "series_label": "Mini Alpine Timber Chalet Part 4",
-      "part": 4,
-      "total_parts": 4,
-      "milestone": "Part 4 construction",
-      "prior_state": "Stacked miniature granite foundation stones perimeter walls with cast concrete window and door lintels"
-    },
+    "active_multipart": null,
     "last_frame_path": "state/last_frame_mountain_village.jpg",
     "history": [
       {
@@ -55,7 +48,20 @@
         "total_parts": 4,
         "subtitle_2word": "GRANITE WALLS",
         "completed_at": "2026-11-22T11:51:47.142Z"
+      },
+      {
+        "episode": 8,
+        "title": "Mini Alpine Timber Chalet Part 4: Alpine Timber Chalet - Roof Slab & Grand Transformation",
+        "structure_name": "Alpine Timber Chalet",
+        "series_label": "Mini Alpine Timber Chalet Part 4",
+        "part": 4,
+        "total_parts": 4,
+        "subtitle_2word": "CHALET REVEAL",
+        "completed_at": "2026-11-22T12:52:42.153Z"
       }
+    ],
+    "completed_series": [
+      "Mini Alpine Timber Chalet (Parts 1-4 Complete)"
     ]
   },
   "smart_city": {

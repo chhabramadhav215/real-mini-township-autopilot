@@ -1899,7 +1899,107 @@
           }
         ]
       }
+    },
+    {
+      "id": "queue_mountain_village_ep8",
+      "townKey": "mountain_village",
+      "episode": 8,
+      "title": "Mini Alpine Timber Chalet Part 4: Alpine Timber Chalet - Roof Slab & Grand Transformation",
+      "structure_name": "Alpine Timber Chalet",
+      "series_label": "Mini Alpine Timber Chalet Part 4",
+      "part": 4,
+      "total_parts": 4,
+      "subtitle_2word": "CHALET REVEAL",
+      "problem": "The structure requires a cantilever roof slab, formwork stripping, and finished water landscaping.",
+      "solution": "Pour and cure upper concrete roof, strip all formwork, and fill the cascading hillside spring for the grand payoff.",
+      "tag_name": "queue-mountain_village-ep8",
+      "release_id": null,
+      "video_asset_name": "mountain_village_ep8.mp4",
+      "thumb_asset_name": "mountain_village_ep8_thumb.jpg",
+      "video_download_url": null,
+      "thumb_download_url": null,
+      "local_video_path": "C:\\real-mini-township\\queue_out\\mountain_village_ep8\\mountain_village_ep8.mp4",
+      "local_thumb_path": "C:\\real-mini-township\\queue_out\\mountain_village_ep8\\mountain_village_ep8_thumb.jpg",
+      "created_at": "2026-11-22T12:52:42.140Z",
+      "uploaded": false,
+      "uploaded_at": null,
+      "plan": {
+        "episode": 8,
+        "title": "Mini Alpine Timber Chalet Part 4: Alpine Timber Chalet - Roof Slab & Grand Transformation",
+        "structure_name": "Alpine Timber Chalet",
+        "structure_index": 1,
+        "series_label": "Mini Alpine Timber Chalet Part 4",
+        "part": 4,
+        "total_parts": 4,
+        "subtitle_2word": "CHALET REVEAL",
+        "problem": "The structure requires a cantilever roof slab, formwork stripping, and finished water landscaping.",
+        "solution": "Pour and cure upper concrete roof, strip all formwork, and fill the cascading hillside spring for the grand payoff.",
+        "is_multipart": true,
+        "multipart_info": {
+          "structure_name": "Alpine Timber Chalet",
+          "structure_index": 1,
+          "series_label": "Mini Alpine Timber Chalet Part 4",
+          "part": 4,
+          "total_parts": 4,
+          "milestone": "Upper / Roof / Reveal",
+          "prior_state": "Complete masonry walls, concrete columns, lintels, and foundation slab on sloped mountain sand and loam base with studio granite boulders."
+        },
+        "updated_anchor_prompt": "Hands-on miniature construction worksite on sand and soil base with studio rocks. Prior state: Complete masonry walls, concrete columns, lintels, and foundation slab on sloped mountain sand and loam base with studio granite boulders. Completed on site: Mini Alpine Timber Chalet Part 1: Smooth concrete foundation slab and entrance stairs on sloped mountain sand and loam base with studio granite boulders; Mini Alpine Timber Chalet Part 2: Erected smooth concrete structural columns and ground patio deck slab; Mini Alpine Timber Chalet Part 3: Stacked miniature granite foundation stones perimeter walls with cast concrete window and door lintels. Current milestone: Complete Alpine Timber Chalet with roof slab, stripped formwork, filled cascading hillside spring, and natural landscaping. Consistent studio backdrop with warm directional lighting.",
+        "structures_added": "Complete Alpine Timber Chalet with roof slab, stripped formwork, filled cascading hillside spring, and natural landscaping",
+        "stages": [
+          {
+            "stage_num": 1,
+            "title": "Roof Formwork",
+            "action": "Fitting wide split-level timber footing formwork roof shuttering across top of walls",
+            "tool": "split-level timber footing formwork and timber anchor pins",
+            "image_prompt": "Stage 1/5 of Mini Alpine Timber Chalet Part 4: Hands-on miniature construction photography (9:16 vertical). Continuous hands-on action: craftsman hands actively setting up and pressing thin wood shuttering formwork boards and inserting metal pins on the sand base. Craftsman hands actively performing: Fitting wide split-level timber footing formwork roof shuttering across top of walls using split-level timber footing formwork and timber anchor pins. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, crisp macro studio cinematography, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Continuous physical hands-on motion throughout the clip: craftsman hands actively pressing and aligning wood shuttering formwork into the sand base with uninterrupted hand movement, zero static shots. Craftsman hands perform Fitting wide split-level timber footing formwork roof shuttering across top of walls using split-level timber footing formwork and timber anchor pins, progressing cleanly toward laying double-layer woven white grid mesh across the entire roof shuttering. Active human hand and tool movement in every single frame, continuous live hands-on craftsmanship throughout the entire 5 seconds, zero frozen frames, thin wood shuttering, metal pins, flowing cement slurry, mini trowel screed, hands stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "pin_placement",
+            "narration": "Fitting wide roof shuttering boards."
+          },
+          {
+            "stage_num": 2,
+            "title": "Roof Mesh Placement",
+            "action": "Laying double-layer woven white grid mesh across the entire roof shuttering",
+            "tool": "woven white grid mesh sheets",
+            "image_prompt": "Stage 2/5 of Mini Alpine Timber Chalet Part 4: Hands-on miniature construction photography (9:16 vertical). Continuous hands-on action: craftsman hands actively aligning joints, inserting metal anchor pins, and laying white grid mesh. Craftsman hands actively performing: Laying double-layer woven white grid mesh across the entire roof shuttering using woven white grid mesh sheets. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, crisp macro studio cinematography, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Continuous physical hands-on motion throughout the clip: hands actively securing formwork joints with pins and placing grid mesh with steady non-stop movement. Craftsman hands perform Laying double-layer woven white grid mesh across the entire roof shuttering using woven white grid mesh sheets, progressing cleanly toward pouring a rich layer of dense grey mountain cement slurry across the roof formwork. Active human hand and tool movement in every single frame, continuous live hands-on craftsmanship throughout the entire 5 seconds, zero frozen frames, thin wood shuttering, metal pins, flowing cement slurry, mini trowel screed, hands stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "pin_placement",
+            "narration": "Reinforcing mesh spanning the entire roof."
+          },
+          {
+            "stage_num": 3,
+            "title": "Roof Slurry Pour",
+            "action": "Pouring a rich layer of dense grey mountain cement slurry across the roof formwork",
+            "tool": "cement pouring vessel and mini screed",
+            "image_prompt": "Stage 3/5 of Mini Alpine Timber Chalet Part 4: Hands-on miniature construction photography (9:16 vertical). Continuous live-action pouring: hands steadily pouring viscous flowing grey cement slurry into the formwork channels. Craftsman hands actively performing: Pouring a rich layer of dense grey mountain cement slurry across the roof formwork using cement pouring vessel and mini screed. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, crisp macro studio cinematography, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Continuous live-action pouring motion throughout the clip: craftsman hands steadily pouring wet grey cement slurry into the formwork channels, liquid mortar filling the forms with visible flowing motion throughout. Craftsman hands perform Pouring a rich layer of dense grey mountain cement slurry across the roof formwork using cement pouring vessel and mini screed, progressing cleanly toward burnishing wet cement slab to a mirror-smooth finish with a flexible mini trowel. Active human hand and tool movement in every single frame, continuous live hands-on craftsmanship throughout the entire 5 seconds, zero frozen frames, thin wood shuttering, metal pins, flowing cement slurry, mini trowel screed, hands stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "cement_pour",
+            "narration": "Pouring the smooth roof slab."
+          },
+          {
+            "stage_num": 4,
+            "title": "Burnish Finishing",
+            "action": "Burnishing wet cement slab to a mirror-smooth finish with a flexible mini trowel",
+            "tool": "mini stainless finishing trowel",
+            "image_prompt": "Stage 4/5 of Mini Alpine Timber Chalet Part 4: Hands-on miniature construction photography (9:16 vertical). Continuous hands-on screeding: hands actively dragging and vibrating a mini stainless steel trowel and screed blade back and forth across wet mortar. Craftsman hands actively performing: Burnishing wet cement slab to a mirror-smooth finish with a flexible mini trowel using mini stainless finishing trowel. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, crisp macro studio cinematography, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Continuous hands-on leveling motion throughout the clip: craftsman hands actively dragging a mini trowel and screed bar across wet cement, leveling dead-flat with uninterrupted physical movement. Craftsman hands perform Burnishing wet cement slab to a mirror-smooth finish with a flexible mini trowel using mini stainless finishing trowel, progressing cleanly toward stripping all formwork to reveal the finished architectural build and filling cascading hillside spring. Active human hand and tool movement in every single frame, continuous live hands-on craftsmanship throughout the entire 5 seconds, zero frozen frames, thin wood shuttering, metal pins, flowing cement slurry, mini trowel screed, hands stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "trowel_scrape",
+            "narration": "Burnishing the surface to a silky polish."
+          },
+          {
+            "stage_num": 5,
+            "title": "Grand Demolding Reveal",
+            "action": "Stripping all formwork to reveal the finished architectural build and filling cascading hillside spring",
+            "tool": "demolding spatula and water pipette",
+            "image_prompt": "Stage 5/5 of Mini Alpine Timber Chalet Part 4: Hands-on miniature construction photography (9:16 vertical). Continuous hands-on demolding reveal: craftsman hands actively pulling metal pins and peeling away wood shuttering boards to reveal razor-smooth cured concrete. Craftsman hands actively performing: Stripping all formwork to reveal the finished architectural build and filling cascading hillside spring using demolding spatula and water pipette. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, crisp macro studio cinematography, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Continuous hands-on reveal motion throughout the clip: craftsman hands actively peeling away wood formwork boards one by one to reveal razor-smooth cured concrete pillars, steps, and slabs, active hand movement revealing fine details throughout the clip. Craftsman hands perform Stripping all formwork to reveal the finished architectural build and filling cascading hillside spring using demolding spatula and water pipette, progressing cleanly toward celebrating the smooth demolded concrete reveal. Active human hand and tool movement in every single frame, continuous live hands-on craftsmanship throughout the entire 5 seconds, zero frozen frames, thin wood shuttering, metal pins, flowing cement slurry, mini trowel screed, hands stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "formwork_strip",
+            "narration": "Stripping formwork for the grand reveal. Complete!"
+          }
+        ]
+      }
     }
   ],
-  "last_updated": "2026-11-22T11:51:47.138Z"
+  "last_updated": "2026-11-22T12:52:42.146Z"
 }
