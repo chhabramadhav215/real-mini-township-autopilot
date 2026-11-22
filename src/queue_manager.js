@@ -88,7 +88,8 @@ function saveQueue(queueData) {
  */
 function getNextQueuedEpisode(townKey) {
   const queueData = loadQueue();
-  return queueData.queue.find(item => item.townKey === townKey && item.uploaded !== true);
+  return queueData.queue.find(item => item.townKey === townKey && item.uploaded !== true && Boolean(item.video_download_url))
+    || queueData.queue.find(item => item.townKey === townKey && item.uploaded !== true);
 }
 
 /**

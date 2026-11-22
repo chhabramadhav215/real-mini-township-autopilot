@@ -149,7 +149,7 @@ function selectNextTownAndEpisode(memory, queueData, forcedTown = null) {
   // Count unuploaded queued episodes per town
   const townStats = allTowns.map(townKey => {
     const currentBaseEp = Number(memory[townKey]?.episode || 0);
-    const queuedItems = (queueData.queue || []).filter(item => item.townKey === townKey && item.uploaded !== true);
+    const queuedItems = (queueData.queue || []).filter(item => item.townKey === townKey && item.uploaded !== true && Boolean(item.video_download_url));
     const allQueuedEps = (queueData.queue || []).filter(item => item.townKey === townKey).map(item => Number(item.episode));
     const historyEps = (memory[townKey]?.history || []).map(item => Number(item.episode));
     const highestEp = Math.max(currentBaseEp, ...allQueuedEps, ...historyEps, 0);
