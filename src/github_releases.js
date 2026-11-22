@@ -30,7 +30,21 @@ function getRepoInfo() {
 }
 
 function getGitHubToken() {
-  return process.env.GITHUB_TOKEN || process.env.GH_TOKEN || null;
+  if (process.env.GITHUB_TOKEN) return process.env.GITHUB_TOKEN;
+  if (process.env.GH_TOKEN) return process.env.GH_TOKEN;
+  try {
+    const res = spawnSync('git', ['credential', 'fill'], {
+      input: 'protocol=https\nhost=github.com\n\n',
+      encoding: 'utf8'
+    });
+    if (res.status === 0 && res.stdout) {
+      const match = res.stdout.match(/password=([^\r\n]+)/);
+      if (match && match[1]) {
+        return match[1].trim();
+      }
+    }
+  } catch (e) {}
+  return null;
 }
 
 /**
