@@ -1999,7 +1999,107 @@
           }
         ]
       }
+    },
+    {
+      "id": "queue_smart_city_ep12",
+      "townKey": "smart_city",
+      "episode": 12,
+      "title": "Mini Minimalist Pavilion & Pool Part 3: Minimalist Pavilion & Pool - Walls & Masonry Lintels",
+      "structure_name": "Minimalist Pavilion & Pool",
+      "series_label": "Mini Minimalist Pavilion & Pool Part 3",
+      "part": 3,
+      "total_parts": 4,
+      "subtitle_2word": "SLATE WALLS",
+      "problem": "The structural frame requires perimeter walls and reinforced concrete lintels over openings.",
+      "solution": "Stack dark slate miniature blocks with troweled mortar, place timber lintel boxes, and cast solid concrete headers.",
+      "tag_name": "queue-smart_city-ep12",
+      "release_id": 454462440,
+      "video_asset_name": "smart_city_ep12.mp4",
+      "thumb_asset_name": "smart_city_ep12_thumb.jpg",
+      "video_download_url": "https://github.com/chhabramadhav215/real-mini-township-autopilot/releases/download/queue-smart_city-ep12/smart_city_ep12.mp4",
+      "thumb_download_url": "https://github.com/chhabramadhav215/real-mini-township-autopilot/releases/download/queue-smart_city-ep12/smart_city_ep12_thumb.jpg",
+      "local_video_path": "C:\\real-mini-township\\queue_out\\smart_city_ep12\\smart_city_ep12.mp4",
+      "local_thumb_path": "C:\\real-mini-township\\queue_out\\smart_city_ep12\\smart_city_ep12_thumb.jpg",
+      "created_at": "2026-11-22T13:20:53.245Z",
+      "uploaded": false,
+      "uploaded_at": null,
+      "plan": {
+        "episode": 12,
+        "title": "Mini Minimalist Pavilion & Pool Part 3: Minimalist Pavilion & Pool - Walls & Masonry Lintels",
+        "structure_name": "Minimalist Pavilion & Pool",
+        "structure_index": 2,
+        "series_label": "Mini Minimalist Pavilion & Pool Part 3",
+        "part": 3,
+        "total_parts": 4,
+        "subtitle_2word": "SLATE WALLS",
+        "problem": "The structural frame requires perimeter walls and reinforced concrete lintels over openings.",
+        "solution": "Stack dark slate miniature blocks with troweled mortar, place timber lintel boxes, and cast solid concrete headers.",
+        "is_multipart": true,
+        "multipart_info": {
+          "structure_name": "Minimalist Pavilion & Pool",
+          "structure_index": 2,
+          "series_label": "Mini Minimalist Pavilion & Pool Part 3",
+          "part": 3,
+          "total_parts": 4,
+          "milestone": "Walls / Blocks",
+          "prior_state": "Cured concrete columns, terrace deck, and foundation slab on compacted sand base with polished studio river stones."
+        },
+        "updated_anchor_prompt": "Hands-on miniature construction worksite on sand and soil base with studio rocks. Prior state: Cured concrete columns, terrace deck, and foundation slab on compacted sand base with polished studio river stones. Completed on site: Mini Minimalist Pavilion & Pool Part 1: Smooth concrete foundation slab and entrance stairs on compacted sand base with polished studio river stones; Erected smooth concrete structural columns and ground patio deck slab; Mini Minimalist Pavilion & Pool Part 2: Erected smooth concrete structural columns and ground patio deck slab. Current milestone: Stacked dark slate miniature blocks perimeter walls with cast concrete window and door lintels. Consistent studio backdrop with warm directional lighting.",
+        "structures_added": "Stacked dark slate miniature blocks perimeter walls with cast concrete window and door lintels",
+        "stages": [
+          {
+            "stage_num": 1,
+            "title": "Mortar Bedding",
+            "action": "Spreading a thin bed of mortar onto the concrete deck using a mini pointed trowel",
+            "tool": "mini pointed stainless steel trowel",
+            "image_prompt": "Stage 1/5 of Mini Minimalist Pavilion & Pool Part 3: Hands-on miniature construction photography (9:16 vertical). Continuous hands-on action: craftsman hands actively setting up and pressing thin wood shuttering formwork boards and inserting metal pins on the sand base. Craftsman hands actively performing: Spreading a thin bed of mortar onto the concrete deck using a mini pointed trowel using mini pointed stainless steel trowel. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, crisp macro studio cinematography, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Continuous physical hands-on motion throughout the clip: craftsman hands actively pressing and aligning wood shuttering formwork into the sand base with uninterrupted hand movement, zero static shots. Craftsman hands perform Spreading a thin bed of mortar onto the concrete deck using a mini pointed trowel using mini pointed stainless steel trowel, progressing cleanly toward stacking individual dark slate miniature blocks in staggered courses and tapping level with trowel handle. Active human hand and tool movement in every single frame, continuous live hands-on craftsmanship throughout the entire 5 seconds, zero frozen frames, thin wood shuttering, metal pins, flowing cement slurry, mini trowel screed, hands stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "trowel_scrape",
+            "narration": "Spreading fresh mortar on the concrete deck."
+          },
+          {
+            "stage_num": 2,
+            "title": "Block Stacking",
+            "action": "Stacking individual dark slate miniature blocks in staggered courses and tapping level with trowel handle",
+            "tool": "dark slate miniature blocks and trowel handle",
+            "image_prompt": "Stage 2/5 of Mini Minimalist Pavilion & Pool Part 3: Hands-on miniature construction photography (9:16 vertical). Continuous hands-on action: craftsman hands actively aligning joints, inserting metal anchor pins, and laying white grid mesh. Craftsman hands actively performing: Stacking individual dark slate miniature blocks in staggered courses and tapping level with trowel handle using dark slate miniature blocks and trowel handle. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, crisp macro studio cinematography, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Continuous physical hands-on motion throughout the clip: hands actively securing formwork joints with pins and placing grid mesh with steady non-stop movement. Craftsman hands perform Stacking individual dark slate miniature blocks in staggered courses and tapping level with trowel handle using dark slate miniature blocks and trowel handle, progressing cleanly toward installing timber lintel formwork boxes across window and door openings. Active human hand and tool movement in every single frame, continuous live hands-on craftsmanship throughout the entire 5 seconds, zero frozen frames, thin wood shuttering, metal pins, flowing cement slurry, mini trowel screed, hands stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "brick_tap",
+            "narration": "Stacking miniature blocks course by course."
+          },
+          {
+            "stage_num": 3,
+            "title": "Lintel Formwork",
+            "action": "Installing timber lintel formwork boxes across window and door openings",
+            "tool": "timber lintel boxes and metal clips",
+            "image_prompt": "Stage 3/5 of Mini Minimalist Pavilion & Pool Part 3: Hands-on miniature construction photography (9:16 vertical). Continuous live-action pouring: hands steadily pouring viscous flowing grey cement slurry into the formwork channels. Craftsman hands actively performing: Installing timber lintel formwork boxes across window and door openings using timber lintel boxes and metal clips. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, crisp macro studio cinematography, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Continuous live-action pouring motion throughout the clip: craftsman hands steadily pouring wet grey cement slurry into the formwork channels, liquid mortar filling the forms with visible flowing motion throughout. Craftsman hands perform Installing timber lintel formwork boxes across window and door openings using timber lintel boxes and metal clips, progressing cleanly toward pouring light grey architectural cement slurry into lintel formwork and scraping joints flush. Active human hand and tool movement in every single frame, continuous live hands-on craftsmanship throughout the entire 5 seconds, zero frozen frames, thin wood shuttering, metal pins, flowing cement slurry, mini trowel screed, hands stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "pin_placement",
+            "narration": "Wood lintel formwork over door frames."
+          },
+          {
+            "stage_num": 4,
+            "title": "Lintel Cement Pour",
+            "action": "Pouring light grey architectural cement slurry into lintel formwork and scraping joints flush",
+            "tool": "cement ladle and joint scraper",
+            "image_prompt": "Stage 4/5 of Mini Minimalist Pavilion & Pool Part 3: Hands-on miniature construction photography (9:16 vertical). Continuous hands-on screeding: hands actively dragging and vibrating a mini stainless steel trowel and screed blade back and forth across wet mortar. Craftsman hands actively performing: Pouring light grey architectural cement slurry into lintel formwork and scraping joints flush using cement ladle and joint scraper. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, crisp macro studio cinematography, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Continuous hands-on leveling motion throughout the clip: craftsman hands actively dragging a mini trowel and screed bar across wet cement, leveling dead-flat with uninterrupted physical movement. Craftsman hands perform Pouring light grey architectural cement slurry into lintel formwork and scraping joints flush using cement ladle and joint scraper, progressing cleanly toward stripping timber lintel formwork to reveal neat masonry walls and solid concrete headers. Active human hand and tool movement in every single frame, continuous live hands-on craftsmanship throughout the entire 5 seconds, zero frozen frames, thin wood shuttering, metal pins, flowing cement slurry, mini trowel screed, hands stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "cement_pour",
+            "narration": "Pouring concrete lintels and scraping flush."
+          },
+          {
+            "stage_num": 5,
+            "title": "Lintel Demolding Reveal",
+            "action": "Stripping timber lintel formwork to reveal neat masonry walls and solid concrete headers",
+            "tool": "formwork release wedge",
+            "image_prompt": "Stage 5/5 of Mini Minimalist Pavilion & Pool Part 3: Hands-on miniature construction photography (9:16 vertical). Continuous hands-on demolding reveal: craftsman hands actively pulling metal pins and peeling away wood shuttering boards to reveal razor-smooth cured concrete. Craftsman hands actively performing: Stripping timber lintel formwork to reveal neat masonry walls and solid concrete headers using formwork release wedge. Building materials on sand base with studio rocks: thin wood shuttering formwork, metal pins, grid mesh, cement slurry, mini trowel, smooth cured concrete. Consistent studio backdrop, macro lens, shallow depth of field, warm directional lighting, crisp macro studio cinematography, authentic miniature craftsmanship.",
+            "motion_prompt": "Cinematic miniature construction video (720p, 5s duration, 9:16 vertical): Continuous hands-on reveal motion throughout the clip: craftsman hands actively peeling away wood formwork boards one by one to reveal razor-smooth cured concrete pillars, steps, and slabs, active hand movement revealing fine details throughout the clip. Craftsman hands perform Stripping timber lintel formwork to reveal neat masonry walls and solid concrete headers using formwork release wedge, progressing cleanly toward celebrating the smooth demolded concrete reveal. Active human hand and tool movement in every single frame, continuous live hands-on craftsmanship throughout the entire 5 seconds, zero frozen frames, thin wood shuttering, metal pins, flowing cement slurry, mini trowel screed, hands stripping formwork reveal. Studio sand base and rocks, smooth macro cinema tracking, 30fps.",
+            "asmr_type": "formwork_strip",
+            "narration": "Stripping lintels. The walls are locked solid."
+          }
+        ]
+      }
     }
   ],
-  "last_updated": "2026-11-22T12:52:42.146Z"
+  "last_updated": "2026-11-22T13:20:53.292Z"
 }
