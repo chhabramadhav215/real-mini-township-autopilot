@@ -2046,8 +2046,8 @@
       "local_video_path": "C:\\real-mini-township\\queue_out\\smart_city_ep12\\smart_city_ep12.mp4",
       "local_thumb_path": "C:\\real-mini-township\\queue_out\\smart_city_ep12\\smart_city_ep12_thumb.jpg",
       "created_at": "2026-11-22T13:20:53.245Z",
-      "uploaded": false,
-      "uploaded_at": null,
+      "uploaded": true,
+      "uploaded_at": "2026-11-23T07:30:00.595Z",
       "plan": {
         "episode": 12,
         "title": "Mini Minimalist Pavilion & Pool Part 3: Minimalist Pavilion & Pool - Walls & Masonry Lintels",
@@ -2123,6 +2123,31 @@
             "narration": "Stripping lintels. The walls are locked solid."
           }
         ]
+      },
+      "published_via": "github_actions_scheduled_queue",
+      "youtube_upload": {
+        "platform": "youtube",
+        "status": "success",
+        "videoId": "ypf9SdHxCMY",
+        "url": "https://youtube.com/shorts/ypf9SdHxCMY"
+      },
+      "instagram_upload": {
+        "platform": "instagram",
+        "status": "success",
+        "id": "18103032704544360",
+        "details": {
+          "id": "18103032704544360"
+        }
+      },
+      "facebook_upload": {
+        "platform": "facebook",
+        "status": "success",
+        "videoId": "1874352090578921",
+        "details": {
+          "success": true,
+          "message": "Video is Processing. To check the status of the video, please follow the instructions listed at https://developers.facebook.com/docs/video-api/guides/reels-publishing#get-the-upload-status.",
+          "post_id": "122103878841554115"
+        }
       }
     },
     {
@@ -2651,5 +2676,5 @@
       }
     }
   ],
-  "last_updated": "2026-11-22T19:06:24.357Z"
+  "last_updated": "2026-11-23T07:30:00.595Z"
 }
