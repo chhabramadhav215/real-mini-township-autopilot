@@ -2421,8 +2421,8 @@
       "local_video_path": "C:\\real-mini-township\\queue_out\\desert_town_ep8\\desert_town_ep8.mp4",
       "local_thumb_path": "C:\\real-mini-township\\queue_out\\desert_town_ep8\\desert_town_ep8_thumb.jpg",
       "created_at": "2026-11-22T14:30:41.825Z",
-      "uploaded": false,
-      "uploaded_at": null,
+      "uploaded": true,
+      "uploaded_at": "2026-11-23T17:56:55.783Z",
       "plan": {
         "episode": 8,
         "title": "Mini Desert Watchtower & Rampart Part 4: Desert Watchtower & Rampart - Roof Slab & Grand Transformation",
@@ -2498,6 +2498,31 @@
             "narration": "Stripping formwork for the grand reveal. Complete!"
           }
         ]
+      },
+      "published_via": "github_actions_scheduled_queue",
+      "youtube_upload": {
+        "platform": "youtube",
+        "status": "success",
+        "videoId": "oKuXne7-WaM",
+        "url": "https://youtube.com/shorts/oKuXne7-WaM"
+      },
+      "instagram_upload": {
+        "platform": "instagram",
+        "status": "success",
+        "id": "18198617110393104",
+        "details": {
+          "id": "18198617110393104"
+        }
+      },
+      "facebook_upload": {
+        "platform": "facebook",
+        "status": "success",
+        "videoId": "2902396506808922",
+        "details": {
+          "success": true,
+          "message": "Video is Processing. To check the status of the video, please follow the instructions listed at https://developers.facebook.com/docs/video-api/guides/reels-publishing#get-the-upload-status.",
+          "post_id": "122104408977554115"
+        }
       }
     },
     {
@@ -3001,5 +3026,5 @@
       }
     }
   ],
-  "last_updated": "2026-11-23T15:05:12.871Z"
+  "last_updated": "2026-11-23T17:56:55.783Z"
 }
