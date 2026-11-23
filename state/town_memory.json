@@ -102,7 +102,7 @@
     "cron_utc": "12:00 UTC",
     "cron_ist": "05:30 PM IST",
     "cron_schedule": "0 12 * * *",
-    "episode": 13,
+    "episode": 15,
     "camera_seed": 739215,
     "diorama_anchor_prompt": "Hands-on miniature construction worksite on sand and soil base with studio rocks. Prior state: Complete masonry walls, concrete columns, lintels, and foundation slab on compacted sand base with polished studio river stones. Completed on site: Erected smooth concrete structural columns and ground patio deck slab; Mini Minimalist Pavilion & Pool Part 2: Erected smooth concrete structural columns and ground patio deck slab; Mini Minimalist Pavilion & Pool Part 3: Stacked dark slate miniature blocks perimeter walls with cast concrete window and door lintels. Current milestone: Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping. Consistent studio backdrop with warm directional lighting.",
     "built_structures": [
@@ -117,19 +117,13 @@
       "Mini Minimalist Pavilion & Pool Part 4: Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping",
       "Mini Cantilever Studio & Sunken Deck Part 2: Erected smooth concrete structural columns and ground patio deck slab",
       "Stacked dark slate miniature blocks perimeter walls with cast concrete window and door lintels",
-      "Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping"
+      "Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping",
+      "Mini Minimalist Pavilion & Pool Part 4: Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping"
     ],
-    "active_multipart": {
-      "structure_name": "Minimalist Pavilion & Pool",
-      "structure_index": 2,
-      "series_label": "Mini Minimalist Pavilion & Pool Part 4",
-      "part": 4,
-      "total_parts": 4,
-      "milestone": "Upper / Roof / Reveal",
-      "prior_state": "Complete masonry walls, concrete columns, lintels, and foundation slab on compacted sand base with polished studio river stones."
-    },
+    "active_multipart": null,
     "completed_series": [
       "Mini Modern Villa (Parts 1-4 Complete)",
+      "Mini Minimalist Pavilion & Pool (Parts 1-4 Complete)",
       "Mini Minimalist Pavilion & Pool (Parts 1-4 Complete)"
     ],
     "last_frame_path": "state/last_frame_smart_city.jpg",
@@ -241,6 +235,16 @@
         "title": "Mini Minimalist Pavilion & Pool Part 4: Minimalist Pavilion & Pool - Roof Slab & Grand Transformation",
         "subtitle_2word": "PAVILION REVEAL",
         "completed_at": "2026-11-23T13:14:46.178Z"
+      },
+      {
+        "episode": 15,
+        "title": "Mini Minimalist Pavilion & Pool Part 4: Minimalist Pavilion & Pool - Roof Slab & Grand Transformation",
+        "structure_name": "Minimalist Pavilion & Pool",
+        "series_label": "Mini Minimalist Pavilion & Pool Part 4",
+        "part": 4,
+        "total_parts": 4,
+        "subtitle_2word": "PAVILION REVEAL",
+        "completed_at": "2026-11-23T14:40:20.125Z"
       }
     ]
   },
