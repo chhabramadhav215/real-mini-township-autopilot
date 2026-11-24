@@ -102,9 +102,9 @@
     "cron_utc": "12:00 UTC",
     "cron_ist": "05:30 PM IST",
     "cron_schedule": "0 12 * * *",
-    "episode": 15,
+    "episode": 14,
     "camera_seed": 739215,
-    "diorama_anchor_prompt": "Hands-on miniature construction worksite on sand and soil base with studio rocks. Prior state: Complete masonry walls, concrete columns, lintels, and foundation slab on compacted sand base with polished studio river stones. Completed on site: Erected smooth concrete structural columns and ground patio deck slab; Mini Minimalist Pavilion & Pool Part 2: Erected smooth concrete structural columns and ground patio deck slab; Mini Minimalist Pavilion & Pool Part 3: Stacked dark slate miniature blocks perimeter walls with cast concrete window and door lintels. Current milestone: Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping. Consistent studio backdrop with warm directional lighting.",
+    "diorama_anchor_prompt": "Hands-on miniature construction worksite on sand and soil base with studio rocks. Prior state: Cured smooth concrete foundation slab and entrance stairs on fine silica sand bed with dark granite studio outcrops. Completed on site: Mini Minimalist Pavilion & Pool Part 2: Erected smooth concrete structural columns and ground patio deck slab; Mini Minimalist Pavilion & Pool Part 3: Stacked dark slate miniature blocks perimeter walls with cast concrete window and door lintels; Mini Minimalist Pavilion & Pool Part 4: Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping. Current milestone: Erected smooth concrete structural columns and ground patio deck slab. Consistent studio backdrop with warm directional lighting.",
     "built_structures": [
       "Mini Modern Villa: Smooth concrete foundation slab and entrance stairs",
       "Mini Modern Villa: Structural concrete columns and ground terrace deck",
@@ -120,7 +120,15 @@
       "Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping",
       "Mini Minimalist Pavilion & Pool Part 4: Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping"
     ],
-    "active_multipart": null,
+    "active_multipart": {
+      "structure_name": "Cantilever Studio & Sunken Deck",
+      "structure_index": 3,
+      "series_label": "Mini Cantilever Studio & Sunken Deck Part 2",
+      "part": 2,
+      "total_parts": 4,
+      "milestone": "Deck / Columns",
+      "prior_state": "Cured smooth concrete foundation slab and entrance stairs on fine silica sand bed with dark granite studio outcrops."
+    },
     "completed_series": [
       "Mini Modern Villa (Parts 1-4 Complete)",
       "Mini Minimalist Pavilion & Pool (Parts 1-4 Complete)",
@@ -245,6 +253,12 @@
         "total_parts": 4,
         "subtitle_2word": "PAVILION REVEAL",
         "completed_at": "2026-11-23T14:40:20.125Z"
+      },
+      {
+        "episode": 14,
+        "title": "Mini Cantilever Studio & Sunken Deck Part 2: Cantilever Studio & Sunken Deck - Structural Columns & Deck",
+        "subtitle_2word": "SUSPENDED DECK",
+        "completed_at": "2026-11-24T07:10:53.910Z"
       }
     ]
   },
