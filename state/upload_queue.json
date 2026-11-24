@@ -2646,8 +2646,8 @@
       "local_video_path": "C:\\real-mini-township\\queue_out\\smart_city_ep14\\smart_city_ep14.mp4",
       "local_thumb_path": "C:\\real-mini-township\\queue_out\\smart_city_ep14\\smart_city_ep14_thumb.jpg",
       "created_at": "2026-11-22T15:14:45.610Z",
-      "uploaded": false,
-      "uploaded_at": null,
+      "uploaded": true,
+      "uploaded_at": "2026-11-24T07:10:56.668Z",
       "plan": {
         "episode": 14,
         "title": "Mini Cantilever Studio & Sunken Deck Part 2: Cantilever Studio & Sunken Deck - Structural Columns & Deck",
@@ -2723,6 +2723,31 @@
             "narration": "Stripping formwork. Sleek concrete pillars revealed."
           }
         ]
+      },
+      "published_via": "github_actions_scheduled_queue",
+      "youtube_upload": {
+        "platform": "youtube",
+        "status": "success",
+        "videoId": "iKBTwkiQjgk",
+        "url": "https://youtube.com/shorts/iKBTwkiQjgk"
+      },
+      "instagram_upload": {
+        "platform": "instagram",
+        "status": "success",
+        "id": "18140069701737495",
+        "details": {
+          "id": "18140069701737495"
+        }
+      },
+      "facebook_upload": {
+        "platform": "facebook",
+        "status": "success",
+        "videoId": "1146312314667191",
+        "details": {
+          "success": true,
+          "message": "Video is Processing. To check the status of the video, please follow the instructions listed at https://developers.facebook.com/docs/video-api/guides/reels-publishing#get-the-upload-status.",
+          "post_id": "122104915041554115"
+        }
       }
     },
     {
@@ -3026,5 +3051,5 @@
       }
     }
   ],
-  "last_updated": "2026-11-23T17:56:55.783Z"
+  "last_updated": "2026-11-24T07:10:56.668Z"
 }
