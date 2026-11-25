@@ -3221,8 +3221,8 @@
       "local_video_path": "C:\\real-mini-township\\queue_out\\desert_town_ep10\\desert_town_ep10.mp4",
       "local_thumb_path": "C:\\real-mini-township\\queue_out\\desert_town_ep10\\desert_town_ep10_thumb.jpg",
       "created_at": "2026-11-25T15:42:01.197Z",
-      "uploaded": false,
-      "uploaded_at": null,
+      "uploaded": true,
+      "uploaded_at": "2026-11-25T17:50:14.601Z",
       "plan": {
         "episode": 10,
         "title": "Mini Desert Watchtower & Rampart Part 3: Desert Watchtower & Rampart - Walls & Masonry Lintels",
@@ -3298,6 +3298,31 @@
             "narration": "Stripping lintels. The walls are locked solid."
           }
         ]
+      },
+      "published_via": "github_actions_scheduled_queue",
+      "youtube_upload": {
+        "platform": "youtube",
+        "status": "success",
+        "videoId": "YUvsY4V_Hz0",
+        "url": "https://youtube.com/shorts/YUvsY4V_Hz0"
+      },
+      "instagram_upload": {
+        "platform": "instagram",
+        "status": "success",
+        "id": "18023068748958636",
+        "details": {
+          "id": "18023068748958636"
+        }
+      },
+      "facebook_upload": {
+        "platform": "facebook",
+        "status": "success",
+        "videoId": "1766137167778588",
+        "details": {
+          "success": true,
+          "message": "Video is Processing. To check the status of the video, please follow the instructions listed at https://developers.facebook.com/docs/video-api/guides/reels-publishing#get-the-upload-status.",
+          "post_id": "122106583443554115"
+        }
       }
     },
     {
@@ -3401,5 +3426,5 @@
       }
     }
   ],
-  "last_updated": "2026-11-25T16:04:36.973Z"
+  "last_updated": "2026-11-25T17:50:14.602Z"
 }
