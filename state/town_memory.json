@@ -102,7 +102,7 @@
     "cron_utc": "12:00 UTC",
     "cron_ist": "05:30 PM IST",
     "cron_schedule": "0 12 * * *",
-    "episode": 17,
+    "episode": 18,
     "camera_seed": 739215,
     "diorama_anchor_prompt": "Hands-on miniature construction worksite on sand and soil base with studio rocks. Prior state: Complete masonry walls, concrete columns, lintels, and foundation slab on compacted sand base with polished studio river stones. Completed on site: Stacked dark slate miniature blocks perimeter walls with cast concrete window and door lintels; Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping; Mini Minimalist Pavilion & Pool Part 4: Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping. Current milestone: Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping. Consistent studio backdrop with warm directional lighting.",
     "built_structures": [
@@ -119,9 +119,18 @@
       "Stacked dark slate miniature blocks perimeter walls with cast concrete window and door lintels",
       "Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping",
       "Mini Minimalist Pavilion & Pool Part 4: Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping",
-      "Mini Minimalist Pavilion & Pool Part 4: Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping"
+      "Mini Minimalist Pavilion & Pool Part 4: Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping",
+      "Mini Dual-Wing Horizon Villa Part 2: Erected smooth concrete structural columns and ground patio deck slab"
     ],
-    "active_multipart": null,
+    "active_multipart": {
+      "structure_name": "Dual-Wing Horizon Villa",
+      "structure_index": 4,
+      "series_label": "Mini Dual-Wing Horizon Villa Part 3",
+      "part": 3,
+      "total_parts": 4,
+      "milestone": "Part 3 construction",
+      "prior_state": "Erected smooth concrete structural columns and ground patio deck slab"
+    },
     "completed_series": [
       "Mini Modern Villa (Parts 1-4 Complete)",
       "Mini Minimalist Pavilion & Pool (Parts 1-4 Complete)",
@@ -275,6 +284,16 @@
         "total_parts": 4,
         "subtitle_2word": "PAVILION REVEAL",
         "completed_at": "2026-11-25T15:19:09.765Z"
+      },
+      {
+        "episode": 18,
+        "title": "Mini Dual-Wing Horizon Villa Part 2: Dual-Wing Horizon Villa - Structural Columns & Deck",
+        "structure_name": "Dual-Wing Horizon Villa",
+        "series_label": "Mini Dual-Wing Horizon Villa Part 2",
+        "part": 2,
+        "total_parts": 4,
+        "subtitle_2word": "BRIDGE DECK",
+        "completed_at": "2026-11-25T16:04:36.979Z"
       }
     ]
   },
