@@ -307,7 +307,7 @@
     "cron_schedule": "0 17 * * *",
     "episode": 10,
     "camera_seed": 618492,
-    "diorama_anchor_prompt": "Hands-on miniature construction worksite on sand and soil base with studio rocks. Prior state: Cured concrete columns, terrace deck, and foundation slab on dense orange desert sand base with sandstone studio boulders. Completed on site: Mini Desert Watchtower & Rampart Part 3: Stacked miniature sundried clay blocks perimeter walls with cast concrete window and door lintels; Mini Desert Watchtower & Rampart Part 4: Complete Desert Watchtower & Rampart with roof slab, stripped formwork, filled shaded tower cistern basin, and natural landscaping; Stacked miniature sundried clay blocks perimeter walls with cast concrete window and door lintels. Current milestone: Stacked miniature sundried clay blocks perimeter walls with cast concrete window and door lintels. Consistent studio backdrop with warm directional lighting.",
+    "diorama_anchor_prompt": "Hands-on miniature construction worksite on sand and soil base with studio rocks. Prior state: Cured concrete columns, terrace deck, and foundation slab on dense orange desert sand base with sandstone studio boulders. Completed on site: Stacked miniature sundried clay blocks perimeter walls with cast concrete window and door lintels; Mini Desert Watchtower & Rampart Part 3: Stacked miniature sundried clay blocks perimeter walls with cast concrete window and door lintels; Complete Desert Watchtower & Rampart with roof slab, stripped formwork, filled shaded tower cistern basin, and natural landscaping. Current milestone: Stacked miniature sundried clay blocks perimeter walls with cast concrete window and door lintels. Consistent studio backdrop with warm directional lighting.",
     "built_structures": [
       "Mini Desert Oasis Villa Part 4: Complete Desert Oasis Villa with roof slab, stripped formwork, filled turquoise oasis pool, and natural landscaping",
       "Mini Desert Watchtower & Rampart Part 1: Smooth concrete foundation slab and entrance stairs on dense orange desert sand base with sandstone studio boulders",
@@ -322,11 +322,11 @@
     "active_multipart": {
       "structure_name": "Desert Watchtower & Rampart",
       "structure_index": 1,
-      "series_label": "Mini Desert Watchtower & Rampart Part 4",
-      "part": 4,
+      "series_label": "Mini Desert Watchtower & Rampart Part 3",
+      "part": 3,
       "total_parts": 4,
-      "milestone": "Part 4 construction",
-      "prior_state": "Stacked miniature sundried clay blocks perimeter walls with cast concrete window and door lintels"
+      "milestone": "Walls / Blocks",
+      "prior_state": "Cured concrete columns, terrace deck, and foundation slab on dense orange desert sand base with sandstone studio boulders."
     },
     "last_frame_path": "state/last_frame_desert_town.jpg",
     "history": [
@@ -417,6 +417,12 @@
         "total_parts": 4,
         "subtitle_2word": "CLAY WALLS",
         "completed_at": "2026-11-25T15:42:01.282Z"
+      },
+      {
+        "episode": 10,
+        "title": "Mini Desert Watchtower & Rampart Part 3: Desert Watchtower & Rampart - Walls & Masonry Lintels",
+        "subtitle_2word": "CLAY WALLS",
+        "completed_at": "2026-11-25T17:50:11.352Z"
       }
     ],
     "completed_series": [
