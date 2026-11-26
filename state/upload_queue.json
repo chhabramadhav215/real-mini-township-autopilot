@@ -3121,8 +3121,8 @@
       "local_video_path": "C:\\real-mini-township\\queue_out\\smart_city_ep17\\smart_city_ep17.mp4",
       "local_thumb_path": "C:\\real-mini-township\\queue_out\\smart_city_ep17\\smart_city_ep17_thumb.jpg",
       "created_at": "2026-11-25T15:19:09.736Z",
-      "uploaded": false,
-      "uploaded_at": null,
+      "uploaded": true,
+      "uploaded_at": "2026-11-26T07:13:34.501Z",
       "plan": {
         "episode": 17,
         "title": "Mini Minimalist Pavilion & Pool Part 4: Minimalist Pavilion & Pool - Roof Slab & Grand Transformation",
@@ -3198,6 +3198,31 @@
             "narration": "Stripping formwork for the grand reveal. Complete!"
           }
         ]
+      },
+      "published_via": "github_actions_scheduled_queue",
+      "youtube_upload": {
+        "platform": "youtube",
+        "status": "success",
+        "videoId": "mOQ5q8E61l8",
+        "url": "https://youtube.com/shorts/mOQ5q8E61l8"
+      },
+      "instagram_upload": {
+        "platform": "instagram",
+        "status": "success",
+        "id": "17894494416456638",
+        "details": {
+          "id": "17894494416456638"
+        }
+      },
+      "facebook_upload": {
+        "platform": "facebook",
+        "status": "success",
+        "videoId": "1521146546494706",
+        "details": {
+          "success": true,
+          "message": "Video is Processing. To check the status of the video, please follow the instructions listed at https://developers.facebook.com/docs/video-api/guides/reels-publishing#get-the-upload-status.",
+          "post_id": "122107132917554115"
+        }
       }
     },
     {
@@ -3426,5 +3451,5 @@
       }
     }
   ],
-  "last_updated": "2026-11-25T17:50:14.602Z"
+  "last_updated": "2026-11-26T07:13:34.501Z"
 }
