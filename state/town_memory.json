@@ -102,7 +102,7 @@
     "cron_utc": "12:00 UTC",
     "cron_ist": "05:30 PM IST",
     "cron_schedule": "0 12 * * *",
-    "episode": 18,
+    "episode": 17,
     "camera_seed": 739215,
     "diorama_anchor_prompt": "Hands-on miniature construction worksite on sand and soil base with studio rocks. Prior state: Complete masonry walls, concrete columns, lintels, and foundation slab on compacted sand base with polished studio river stones. Completed on site: Stacked dark slate miniature blocks perimeter walls with cast concrete window and door lintels; Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping; Mini Minimalist Pavilion & Pool Part 4: Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping. Current milestone: Complete Minimalist Pavilion & Pool with roof slab, stripped formwork, filled perimeter reflecting pool, and natural landscaping. Consistent studio backdrop with warm directional lighting.",
     "built_structures": [
@@ -123,13 +123,13 @@
       "Mini Dual-Wing Horizon Villa Part 2: Erected smooth concrete structural columns and ground patio deck slab"
     ],
     "active_multipart": {
-      "structure_name": "Dual-Wing Horizon Villa",
-      "structure_index": 4,
-      "series_label": "Mini Dual-Wing Horizon Villa Part 3",
-      "part": 3,
+      "structure_name": "Minimalist Pavilion & Pool",
+      "structure_index": 2,
+      "series_label": "Mini Minimalist Pavilion & Pool Part 4",
+      "part": 4,
       "total_parts": 4,
-      "milestone": "Part 3 construction",
-      "prior_state": "Erected smooth concrete structural columns and ground patio deck slab"
+      "milestone": "Upper / Roof / Reveal",
+      "prior_state": "Complete masonry walls, concrete columns, lintels, and foundation slab on compacted sand base with polished studio river stones."
     },
     "completed_series": [
       "Mini Modern Villa (Parts 1-4 Complete)",
@@ -294,6 +294,12 @@
         "total_parts": 4,
         "subtitle_2word": "BRIDGE DECK",
         "completed_at": "2026-11-25T16:04:36.979Z"
+      },
+      {
+        "episode": 17,
+        "title": "Mini Minimalist Pavilion & Pool Part 4: Minimalist Pavilion & Pool - Roof Slab & Grand Transformation",
+        "subtitle_2word": "PAVILION REVEAL",
+        "completed_at": "2026-11-26T07:13:32.177Z"
       }
     ]
   },
